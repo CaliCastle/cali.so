@@ -12,6 +12,8 @@
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
     "@types/react-dom": "18.0.9",
+    "@zolplay/react": "^0.5.1",
+    "@zolplay/utils": "^1.3.4",
     "cloudinary-build-url": "^0.2.4",
     "contentlayer": "^0.2.9",
     "dayjs": "^1.11.6",

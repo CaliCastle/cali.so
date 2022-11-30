@@ -3,6 +3,7 @@ import Link from 'next/link'
 import dayjs from 'dayjs'
 import { useLiveReload } from 'next-contentlayer/hooks'
 import { allPosts, Post } from 'contentlayer/generated'
+import { Mdx } from '~/components/Mdx'
 
 export async function getStaticPaths() {
   const paths = allPosts.map((post) => post.url)
@@ -44,11 +45,9 @@ const PostLayout = ({ post }: { post: Post }) => {
           <time dateTime={post.date} className="text-sm text-slate-600">
             {dayjs(post.date).format('MMMM D, YYYY')}
           </time>
+          <p>{post.readingTime.text}</p>
         </div>
-        <div
-          className="cl-post-body"
-          dangerouslySetInnerHTML={{ __html: post.body.html }}
-        />
+        <Mdx {...post.body} />
       </article>
     </>
   )

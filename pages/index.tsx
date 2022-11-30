@@ -21,7 +21,7 @@ function PostCard(post: Post) {
         unoptimized
       /> */}
       <time dateTime={post.date} className="block text-sm text-slate-600">
-        {dayjs(post.date).format('MMMM D, YYYY')}-{post.readingTime.text}
+        {dayjs(post.date).format('MMMM D, YYYY')} | {post.readingTime.text}
       </time>
       <h2 className="text-lg">
         <Link href={post.url} className="text-blue-700 hover:text-blue-900">
