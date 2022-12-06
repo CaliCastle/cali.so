@@ -16,6 +16,7 @@ specifiers:
   eslint-config-next: 13.0.6
   next: 13.0.6
   next-contentlayer: ^0.2.9
+  next-themes: ^0.2.1
   postcss: ^8.4.19
   prettier: ^2.8.0
   prettier-plugin-tailwindcss: ^0.2.0
@@ -39,6 +40,7 @@ dependencies:
   eslint-config-next: 13.0.6_s5ps7njkmjlaqajutnox5ntcla
   next: 13.0.6_biqbaboplfbrettd7655fr4n2y
   next-contentlayer: 0.2.9_6jx7hpii6hgsrmhxgqrmo3277u
+  next-themes: 0.2.1_6jx7hpii6hgsrmhxgqrmo3277u
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   reading-time: 1.5.0
@@ -3692,6 +3694,18 @@ packages:
       - '@effect-ts/otel-node'
       - markdown-wasm
       - supports-color
+    dev: false
+
+  /next-themes/0.2.1_6jx7hpii6hgsrmhxgqrmo3277u:
+    resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
+    peerDependencies:
+      next: '*'
+      react: '*'
+      react-dom: '*'
+    dependencies:
+      next: 13.0.6_biqbaboplfbrettd7655fr4n2y
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /next/13.0.6_biqbaboplfbrettd7655fr4n2y:
