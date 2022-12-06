@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const { fontFamily } = require('tailwindcss/defaultTheme')
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -8,8 +8,14 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        primary: {
+          900: '#000212',
+        },
+      },
+
       fontFamily: {
-        sans: ['Satoshi V', ...defaultTheme.fontFamily.sans],
+        sans: ['var(--font-sans)', ...fontFamily.sans],
       },
     },
   },
