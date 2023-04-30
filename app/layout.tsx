@@ -41,7 +41,6 @@ export default function RootLayout({
 
             <div className="relative text-slate-50">
               <Header />
-
               <main>{children}</main>
             </div>
           </ClerkProvider>

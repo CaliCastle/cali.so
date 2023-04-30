@@ -158,21 +158,11 @@ export function Header() {
                       transform: avatarTransform,
                     }}
                   >
-                    <motion.div
-                      key={isShowingAltAvatar ? 'alt' : 'default'}
-                      initial={{ opacity: 0, rotateY: 90 }}
-                      animate={{
-                        opacity: 1,
-                        rotateY: isShowingAltAvatar ? 180 : 0,
-                      }}
-                      exit={{ opacity: 0, rotateY: -90 }}
-                    >
-                      <Avatar.Image
-                        large
-                        alt={isShowingAltAvatar}
-                        className="block h-full w-full"
-                      />
-                    </motion.div>
+                    <Avatar.Image
+                      large
+                      alt={isShowingAltAvatar}
+                      className="block h-full w-full"
+                    />
                   </motion.div>
                 </motion.div>
               </div>
@@ -190,17 +180,7 @@ export function Header() {
                     onContextMenu={onAvatarContextMenu}
                   >
                     <Avatar>
-                      <motion.div
-                        key={isShowingAltAvatar ? 'alt' : 'default'}
-                        initial={{ opacity: 0, rotateY: 90 }}
-                        animate={{
-                          opacity: 1,
-                          rotateY: isShowingAltAvatar ? 180 : 0,
-                        }}
-                        exit={{ opacity: 0, rotateY: -90 }}
-                      >
-                        <Avatar.Image alt={isShowingAltAvatar} />
-                      </motion.div>
+                      <Avatar.Image alt={isShowingAltAvatar} />
                     </Avatar>
                   </motion.div>
                 )}
