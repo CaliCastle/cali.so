@@ -1,7 +1,10 @@
----
-title: Lorem Ipsum
-date: 2021-12-24
----
+import { makeMeta } from '~/lib/helper'
+
+export const meta = makeMeta({
+  title: 'Rewriting everything in Rust',
+  publishedAt: '2023-04-18',
+  tags: ['中文', '教程', 'Web 开发'],
+})
 
 Ullamco et nostrud magna commodo nostrud occaecat quis pariatur id ipsum. Ipsum
 consequat enim id excepteur consequat nostrud esse esse fugiat dolore.
@@ -20,3 +23,17 @@ labore exercitation irure laborum.
 - consectetur
 
 > Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+
+```rust
+use ferris_says::say;
+use std::io::{stdout, BufWriter};
+
+fn main() {
+    let stdout = stdout();
+    let message = String::from("Hello fellow hackers");
+    let width = message.chars().count();
+
+    let mut writer = BufWriter::new(stdout.lock());
+    say(message.as_bytes(), width, &mut writer).unwrap();
+}
+```
