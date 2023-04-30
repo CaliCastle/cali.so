@@ -5,7 +5,6 @@ import { clsxm } from '@zolplay/utils'
 import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useTheme } from 'next-themes'
 import React from 'react'
 
 const items = [
@@ -48,7 +47,10 @@ function NavItem({
   )
 }
 
-function Desktop(props: React.HTMLAttributes<HTMLDivElement>) {
+function Desktop({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
   const radius = useMotionValue(0)
@@ -61,18 +63,15 @@ function Desktop(props: React.HTMLAttributes<HTMLDivElement>) {
     },
     [mouseX, mouseY, radius]
   )
-  const { resolvedTheme } = useTheme()
   const background = useMotionTemplate`radial-gradient(${radius}px circle at ${mouseX}px ${mouseY}px, var(--spotlight-color) 0%, transparent 65%)`
 
   return (
     <nav
       onMouseMove={handleMouseMove}
-      style={{
-        '--spotlight-color':
-          resolvedTheme === 'dark'
-            ? 'rgb(217 249 157 / 0.07)'
-            : 'rgb(236 252 203 / 0.6)',
-      }}
+      className={clsxm(
+        '[--spotlight-color:rgb(236_252_203_/_0.6)] dark:[--spotlight-color:rgb(217_249_157_/_0.07)]',
+        className
+      )}
       {...props}
     >
       <ul className="group relative flex rounded-full bg-gradient-to-b from-zinc-50/20 to-white/80 px-3 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:from-zinc-900/30 dark:to-zinc-800/80 dark:text-zinc-200 dark:ring-zinc-100/10">
@@ -190,7 +189,37 @@ function Mobile(props: PopoverProps<'div'>) {
   )
 }
 
+function FooterNavLink({
+  href,
+  children,
+}: {
+  href: string
+  children: React.ReactNode
+}) {
+  return (
+    <Link
+      href={href}
+      className="transition hover:text-lime-500 dark:hover:text-lime-400"
+    >
+      {children}
+    </Link>
+  )
+}
+
+function Footer() {
+  return (
+    <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+      {items.map(({ href, text }) => (
+        <FooterNavLink key={href} href={href}>
+          {text}
+        </FooterNavLink>
+      ))}
+    </nav>
+  )
+}
+
 export const NavigationBar = {
   Desktop,
   Mobile,
+  Footer,
 } as const

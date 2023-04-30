@@ -4,6 +4,7 @@ import { ClerkProvider } from '@clerk/nextjs/app-beta'
 import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/ThemeProvider'
+import { Footer } from '~/components/layouts/Footer'
 import { Header } from '~/components/layouts/Header'
 import { sansFont } from '~/lib/font'
 
@@ -42,6 +43,7 @@ export default function RootLayout({
             <div className="relative text-slate-50">
               <Header />
               <main>{children}</main>
+              <Footer />
             </div>
           </ClerkProvider>
         </ThemeProvider>

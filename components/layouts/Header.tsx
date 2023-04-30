@@ -147,7 +147,7 @@ export function Header() {
                 className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
               />
               <Container className="sticky top-0 order-last -mb-3 pt-3">
-                <div className="static top-[var(--avatar-top,theme(spacing.3))] w-full">
+                <div className="static top-[var(--avatar-top,theme(spacing.3))] w-full select-none">
                   <motion.div
                     className="relative inline-flex"
                     layoutId="avatar"

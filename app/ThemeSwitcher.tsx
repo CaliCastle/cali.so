@@ -17,15 +17,10 @@ const themes = [
     value: 'dark',
     icon: TbMoon,
   },
-  {
-    label: '跟随系统',
-    value: 'system',
-    icon: TbCircleHalf2,
-  },
 ]
 export function ThemeSwitcher() {
   const [mounted, setMounted] = React.useState(false)
-  const { setTheme, theme } = useTheme()
+  const { setTheme, theme, resolvedTheme } = useTheme()
   const ThemeIcon = React.useMemo(
     () => themes.find((t) => t.value === theme)?.icon ?? TbCircleHalf2,
     [theme]
@@ -34,13 +29,7 @@ export function ThemeSwitcher() {
   React.useEffect(() => setMounted(true), [])
 
   function toggleTheme() {
-    if (theme === 'system') {
-      setTheme('dark')
-    } else if (theme === 'dark') {
-      setTheme('light')
-    } else {
-      setTheme('system')
-    }
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
   }
 
   if (!mounted) {
