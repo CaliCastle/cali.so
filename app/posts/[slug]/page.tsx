@@ -3,6 +3,7 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string }
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { default: Blog, meta } = await import(
     `../(content)/${params.slug}.mdx`
   )

@@ -1,10 +1,17 @@
 import '~/app/globals.css'
 
 import { ClerkProvider } from '@clerk/nextjs/app-beta'
+import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/ThemeProvider'
 import { Header } from '~/components/layouts/Header'
 import { sansFont } from '~/lib/font'
+
+export const metadata: Metadata = {
+  title: 'Cali | 开发者、设计师、细节控、创始人',
+  description:
+    '我是 Cali，佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。我热爱开发，设计，创新，享受生活，以及在未知领域中探索。',
+}
 
 export default function RootLayout({
   children,
