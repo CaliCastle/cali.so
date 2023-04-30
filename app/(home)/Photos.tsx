@@ -51,11 +51,11 @@ export function Photos() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="-my-4 flex w-full snap-x snap-proximity scroll-pl-4 gap-4 overflow-x-auto px-4 py-4 sm:gap-6 md:overflow-x-hidden md:px-0">
+      <div className="-my-4 flex w-full snap-x snap-proximity scroll-pl-4 justify-start gap-4 overflow-x-auto px-4 py-4 sm:gap-6 md:justify-center md:overflow-x-hidden md:px-0">
         {images.map((image, idx) => (
           <motion.div
             key={image.src}
-            className="relative h-40 flex-none shrink-0 snap-start overflow-hidden rounded-xl bg-zinc-100 ring-2 ring-lime-900/50 dark:bg-zinc-800 dark:ring-lime-300/10 md:h-72 md:rounded-3xl"
+            className="relative h-40 flex-none shrink-0 snap-start overflow-hidden rounded-xl bg-zinc-100 ring-2 ring-lime-800/20 dark:bg-zinc-800 dark:ring-lime-300/10 md:h-72 md:rounded-3xl"
             animate={{
               width,
               opacity: isCompact ? 1 : 0.85,

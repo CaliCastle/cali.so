@@ -47,7 +47,7 @@ export function SocialLink({
   return (
     <Link className="group -m-1 p-1" href={href} target="_blank" {...props}>
       {Icon && (
-        <Icon className="h-5 w-5 transition dark:fill-zinc-500 dark:group-hover:fill-zinc-200" />
+        <Icon className="h-5 w-5 fill-zinc-400 transition group-hover:fill-zinc-700 dark:fill-zinc-500 dark:group-hover:fill-zinc-200" />
       )}
     </Link>
   )
