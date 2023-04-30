@@ -1,6 +1,11 @@
 'use client'
 
-import { motion, useMotionTemplate, useMotionValue } from 'framer-motion'
+import {
+  AnimatePresence,
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+} from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
@@ -129,76 +134,91 @@ export function Header() {
 
   return (
     <>
-      <header className="pointer-events-none relative z-50 mb-[--header-mb] flex h-[--header-height] flex-col">
-        {isHomePage && (
-          <>
-            <div
-              ref={avatarRef}
-              className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
-            />
-            <Container className="sticky top-0 order-last -mb-3 pt-3">
-              <div className="static top-[var(--avatar-top,theme(spacing.3))] w-full">
-                <motion.div
-                  className="relative inline-flex"
-                  layoutId="avatar"
-                  onContextMenu={onAvatarContextMenu}
-                >
+      <motion.header
+        className="pointer-events-none relative z-50 mb-[--header-mb] flex h-[--header-height] flex-col"
+        layout
+        layoutRoot
+      >
+        <AnimatePresence>
+          {isHomePage && (
+            <>
+              <div
+                ref={avatarRef}
+                className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
+              />
+              <Container className="sticky top-0 order-last -mb-3 pt-3">
+                <div className="static top-[var(--avatar-top,theme(spacing.3))] w-full">
                   <motion.div
-                    className="absolute left-0 top-3 origin-left opacity-[var(--avatar-border-opacity,0)] transition-opacity"
-                    style={{
-                      transform: avatarBorderTransform,
-                    }}
+                    className="relative inline-flex"
+                    layoutId="avatar"
+                    layout
+                    onContextMenu={onAvatarContextMenu}
                   >
-                    <Avatar />
-                  </motion.div>
+                    <motion.div
+                      className="absolute left-0 top-3 origin-left opacity-[var(--avatar-border-opacity,0)] transition-opacity"
+                      style={{
+                        transform: avatarBorderTransform,
+                      }}
+                    >
+                      <Avatar />
+                    </motion.div>
 
-                  <motion.div
-                    className="block h-16 w-16 origin-left"
-                    style={{
-                      transform: avatarTransform,
-                    }}
-                  >
-                    <Avatar.Image
-                      large
-                      alt={isShowingAltAvatar}
-                      className="block h-full w-full"
-                    />
+                    <motion.div
+                      className="block h-16 w-16 origin-left"
+                      style={{
+                        transform: avatarTransform,
+                      }}
+                    >
+                      <Avatar.Image
+                        large
+                        alt={isShowingAltAvatar}
+                        className="block h-full w-full"
+                      />
+                    </motion.div>
                   </motion.div>
-                </motion.div>
-              </div>
-            </Container>
-          </>
-        )}
+                </div>
+              </Container>
+            </>
+          )}
+        </AnimatePresence>
         <div ref={headerRef} className="sticky top-0 z-10 h-16 pt-6">
           <Container className="static top-[var(--header-top,theme(spacing.6))] w-full">
             <div className="relative flex gap-4">
               <div className="flex flex-1">
-                {!isHomePage && (
-                  <motion.div
-                    layoutId="avatar"
-                    className="inline-flex"
-                    onContextMenu={onAvatarContextMenu}
-                  >
-                    <Avatar>
-                      <Avatar.Image alt={isShowingAltAvatar} />
-                    </Avatar>
-                  </motion.div>
-                )}
+                <AnimatePresence>
+                  {!isHomePage && (
+                    <motion.div
+                      layoutId="avatar"
+                      layout
+                      onContextMenu={onAvatarContextMenu}
+                    >
+                      <Avatar>
+                        <Avatar.Image alt={isShowingAltAvatar} />
+                      </Avatar>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div className="flex flex-1 justify-end md:justify-center">
                 <NavigationBar.Mobile className="pointer-events-auto md:hidden" />
                 <NavigationBar.Desktop className="pointer-events-auto hidden md:block" />
               </div>
               <div className="flex justify-end md:flex-1">
-                <div className="pointer-events-auto">
+                <motion.div
+                  className="pointer-events-auto"
+                  initial={{ opacity: 0, y: -30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
                   <ThemeSwitcher />
-                </div>
+                </motion.div>
               </div>
             </div>
           </Container>
         </div>
-      </header>
-      {isHomePage && <div className="h-[--content-offset]" />}
+      </motion.header>
+      <AnimatePresence>
+        {isHomePage && <motion.div layout className="h-[--content-offset]" />}
+      </AnimatePresence>
     </>
   )
 }
