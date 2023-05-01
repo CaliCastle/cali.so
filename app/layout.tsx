@@ -12,6 +12,29 @@ export const metadata: Metadata = {
   title: 'Cali | 开发者、设计师、细节控、创始人',
   description:
     '我是 Cali，佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。我热爱开发，设计，创新，享受生活，以及在未知领域中探索。',
+  keywords: 'Cali,Cali Castle,郭晓楠,佐玩,创始人,CEO,开发者,设计师,细节控,创新',
+  icons: {
+    icon: '/favicon-32x32.png',
+    shortcut: '/favicon.ico',
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  twitter: {
+    site: '@thecalicastle',
+    creator: '@thecalicastle',
+    card: 'summary_large_image',
+  },
 }
 
 export default function RootLayout({
@@ -40,7 +63,7 @@ export default function RootLayout({
               </div>
             </div>
 
-            <div className="relative text-slate-50">
+            <div className="relative text-zinc-800 dark:text-zinc-200">
               <Header />
               <main>{children}</main>
               <Footer />

@@ -9,6 +9,7 @@ const server = z.object({
   DATABASE_PASSWORD: z.string().min(1),
   NODE_ENV: z.enum(['development', 'test', 'production']),
   CLERK_SECRET_KEY: z.string().min(1),
+  CONVERTKIT_API_KEY: z.string().min(1),
 })
 
 const client = z.object({
@@ -29,6 +30,7 @@ const processEnv = {
   CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+  CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
 }
 
 // Don't touch the part below
