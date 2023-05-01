@@ -22,6 +22,9 @@ dependencies:
   '@radix-ui/react-tooltip':
     specifier: ^1.0.5
     version: 1.0.5(@types/react@18.2.0)(react-dom@18.2.0)(react@18.2.0)
+  '@vercel/analytics':
+    specifier: ^1.0.0
+    version: 1.0.0(react@18.2.0)
   '@vercel/edge-config':
     specifier: ^0.1.8
     version: 0.1.8
@@ -1445,6 +1448,14 @@ packages:
     dependencies:
       '@typescript-eslint/types': 5.59.1
       eslint-visitor-keys: 3.4.0
+
+  /@vercel/analytics@1.0.0(react@18.2.0):
+    resolution: {integrity: sha512-RQmj7pv82JwGDHrnKeRc6TtSw2U7rWNubc2IH0ernTzWTj02yr9zvIYiYJeztsBzrJtWv7m8Nz6vxxb+cdEtJw==}
+    peerDependencies:
+      react: ^16.8||^17||^18
+    dependencies:
+      react: 18.2.0
+    dev: false
 
   /@vercel/edge-config@0.1.8:
     resolution: {integrity: sha512-yjGpvKqummKdh4595VHU6QaFoKRYCsHLgw0QpdWa9rvOILKn8mzhbyLWJMXF5At95UPiy4w23S0Tir8PXf7KNg==}

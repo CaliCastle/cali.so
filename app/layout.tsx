@@ -1,6 +1,7 @@
 import '~/app/globals.css'
 
 import { ClerkProvider } from '@clerk/nextjs/app-beta'
+import { Analytics } from '@vercel/analytics/react'
 import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/ThemeProvider'
@@ -8,10 +9,12 @@ import { Footer } from '~/components/layouts/Footer'
 import { Header } from '~/components/layouts/Header'
 import { sansFont } from '~/lib/font'
 
+const title = 'Cali Castle | 开发者、设计师、细节控、创始人'
+const description =
+  '我叫 Cali，一名开发者，设计师，细节控，同时也是佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。'
 export const metadata: Metadata = {
-  title: 'Cali | 开发者、设计师、细节控、创始人',
-  description:
-    '我是 Cali，佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。我热爱开发，设计，创新，享受生活，以及在未知领域中探索。',
+  title,
+  description,
   keywords: 'Cali,Cali Castle,郭晓楠,佐玩,创始人,CEO,开发者,设计师,细节控,创新',
   icons: {
     icon: '/favicon-32x32.png',
@@ -29,6 +32,23 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
+  },
+  openGraph: {
+    title: {
+      default: title,
+      template: '%s | Cali Castle',
+    },
+    description,
+    siteName: 'Cali Castle',
+    locale: 'zh_CN',
+    type: 'website',
+    images: [
+      {
+        url: '/og_zh.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
   twitter: {
     site: '@thecalicastle',
@@ -70,6 +90,8 @@ export default function RootLayout({
             </div>
           </ClerkProvider>
         </ThemeProvider>
+
+        <Analytics />
       </body>
     </html>
   )

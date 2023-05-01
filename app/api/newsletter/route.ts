@@ -18,8 +18,6 @@ function subscribeToForm({ formId, email }: { formId: string; email: string }) {
     'Content-Type': 'application/json; charset=utf-8',
   })
 
-  console.log('apiKey', API_KEY)
-
   return fetch(url, {
     method: 'POST',
     headers,

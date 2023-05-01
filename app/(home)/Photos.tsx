@@ -59,7 +59,7 @@ export function Photos() {
             animate={{
               width,
               opacity: isCompact ? 1 : 0.85,
-              filter: isCompact ? 'saturate(0.8)' : 'saturate(0.7)',
+              filter: isCompact ? 'grayscale(0)' : 'grayscale(0.5)',
               rotate: idx % 2 === 0 ? 2 : -1,
             }}
             whileHover={
@@ -68,7 +68,7 @@ export function Photos() {
                 : {
                     width: expandedWidth,
                     opacity: 1,
-                    filter: 'saturate(1)',
+                    filter: 'grayscale(0)',
                   }
             }
             layout
