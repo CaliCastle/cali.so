@@ -10,6 +10,7 @@ const server = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']),
   CLERK_SECRET_KEY: z.string().min(1),
   CONVERTKIT_API_KEY: z.string().min(1),
+  VERCEL_ENV: z.enum(['development', 'preview', 'production']),
 })
 
 const client = z.object({
@@ -31,6 +32,7 @@ const processEnv = {
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
   process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
+  VERCEL_ENV: process.env.VERCEL_ENV,
 }
 
 // Don't touch the part below

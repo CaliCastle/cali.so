@@ -7,13 +7,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-const items = [
-  { href: '/', text: '首页' },
-  { href: '/posts', text: '文章' },
-  { href: '/projects', text: '项目' },
-  // { href: '/uses', text: '工具' },
-  { href: '/about', text: '关于' },
-]
+import { navigationItems } from '~/config/nav'
 
 function NavItem({
   href,
@@ -81,7 +75,7 @@ function Desktop({
           style={{ background }}
         />
 
-        {items.map(({ href, text }) => (
+        {navigationItems.map(({ href, text }) => (
           <NavItem key={href} href={href}>
             {text}
           </NavItem>
@@ -175,7 +169,7 @@ function Mobile(props: PopoverProps<'div'>) {
             </div>
             <nav className="mt-6">
               <ul className="-my-2 divide-y divide-zinc-500/20 text-base text-zinc-800 dark:divide-zinc-100/5 dark:text-zinc-300">
-                {items.map(({ href, text }) => (
+                {navigationItems.map(({ href, text }) => (
                   <MobileNavItem key={href} href={href}>
                     {text}
                   </MobileNavItem>
@@ -189,37 +183,7 @@ function Mobile(props: PopoverProps<'div'>) {
   )
 }
 
-function FooterNavLink({
-  href,
-  children,
-}: {
-  href: string
-  children: React.ReactNode
-}) {
-  return (
-    <Link
-      href={href}
-      className="transition hover:text-lime-500 dark:hover:text-lime-400"
-    >
-      {children}
-    </Link>
-  )
-}
-
-function Footer() {
-  return (
-    <nav className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
-      {items.map(({ href, text }) => (
-        <FooterNavLink key={href} href={href}>
-          {text}
-        </FooterNavLink>
-      ))}
-    </nav>
-  )
-}
-
 export const NavigationBar = {
   Desktop,
   Mobile,
-  Footer,
 } as const
