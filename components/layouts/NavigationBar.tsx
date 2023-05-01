@@ -23,7 +23,7 @@ function NavItem({
       <Link
         href={href}
         className={clsxm(
-          'relative block px-3 py-2 transition',
+          'relative block whitespace-nowrap px-3 py-2 transition',
           isActive
             ? 'text-lime-600 dark:text-lime-400'
             : 'hover:text-lime-600 dark:hover:text-lime-400'

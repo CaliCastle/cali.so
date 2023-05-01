@@ -66,8 +66,6 @@ export const metadata: Metadata = {
   },
 }
 
-export const revalidate = 60
-
 export default function RootLayout({
   children,
 }: {
@@ -105,3 +103,5 @@ export default function RootLayout({
     </html>
   )
 }
+
+export const runtime = 'experimental-edge'
