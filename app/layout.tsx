@@ -49,11 +49,21 @@ export const metadata: Metadata = {
         height: 630,
       },
     ],
+    url: 'https://cali.so',
   },
   twitter: {
     site: '@thecalicastle',
     creator: '@thecalicastle',
     card: 'summary_large_image',
+    title,
+    description,
+    images: [
+      {
+        url: '/og_zh.png',
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 }
 
