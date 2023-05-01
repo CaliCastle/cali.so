@@ -36,6 +36,26 @@ function Links() {
   )
 }
 
+function formatNumber(n: number, inChinese = false): string {
+  if (inChinese) {
+    if (Math.abs(n) >= 100000000) {
+      return (n / 100000000).toFixed(1) + '亿'
+    } else if (Math.abs(n) >= 10000) {
+      return (n / 10000).toFixed(1) + '万'
+    } else {
+      return new Intl.NumberFormat('en-US').format(n)
+    }
+  }
+
+  if (Math.abs(n) >= 1000000) {
+    return (n / 1000000).toFixed(1) + 'm'
+  } else if (Math.abs(n) >= 1000) {
+    return (n / 1000).toFixed(1) + 'k'
+  } else {
+    return new Intl.NumberFormat('en-US').format(n)
+  }
+}
+
 async function TotalPageViews() {
   let views: number
   if (env.VERCEL_ENV === 'production') {
@@ -46,10 +66,11 @@ async function TotalPageViews() {
 
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-600 dark:text-zinc-400 md:justify-start">
-      <span>
-        总浏览量 <span className="font-medium">{views}</span>
+      <TbUsers aria-hidden />
+      <span title={`${new Intl.NumberFormat('en-US').format(views)}次浏览`}>
+        <span className="font-medium">{formatNumber(views, true)}</span>
+        &nbsp;总浏览量
       </span>
-      <TbUsers />
     </span>
   )
 }
@@ -68,7 +89,7 @@ export function Footer() {
             </div>
           </Container.Inner>
           <Container.Inner className="mt-6">
-            <Suspense fallback={<span>...</span>}>
+            <Suspense>
               {/* @ts-expect-error Async Server Component */}
               <TotalPageViews />
             </Suspense>

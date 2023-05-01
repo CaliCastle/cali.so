@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import va from '@vercel/analytics'
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import React from 'react'
@@ -38,12 +39,13 @@ export function NewsletterSignup() {
   const onSubmit = React.useCallback(
     async (data: NewsletterForm) => {
       try {
+        va.track('Newsletter:Subscribe')
+
         const response = await fetch('/api/newsletter', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          cache: 'no-cache',
           body: JSON.stringify({ data }),
         })
         if (response.ok) {
