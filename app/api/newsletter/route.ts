@@ -34,6 +34,8 @@ function subscribeToForm({ formId, email }: { formId: string; email: string }) {
   })
 }
 
+export const runtime = 'edge'
+
 export async function POST(req: NextRequest) {
   try {
     const { data } = await req.json()
