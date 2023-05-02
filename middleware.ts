@@ -12,8 +12,8 @@ export const config = {
 export async function middleware(req: NextRequest) {
   const { geo } = req
   if (geo && env.VERCEL_ENV === 'production') {
-    const country = geo.country || 'US'
-    const city = geo.city || 'San Francisco'
+    const country = geo.country
+    const city = geo.city
 
     const countryInfo = countries.find((x) => x.cca2 === country)
     if (!countryInfo) {
@@ -21,8 +21,7 @@ export async function middleware(req: NextRequest) {
     }
 
     const flag = countryInfo.flag
-    const encodedInfo = JSON.stringify({ country, city, flag })
-    await kv.set(kvKeys.lastVisitor, encodedInfo)
+    await kv.set(kvKeys.currentVisitor, { country, city, flag })
   }
 
   return NextResponse.next()
