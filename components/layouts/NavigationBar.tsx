@@ -63,18 +63,23 @@ function Desktop({
     <nav
       onMouseMove={handleMouseMove}
       className={clsxm(
+        'group relative',
+        'rounded-full bg-gradient-to-b from-zinc-50/50 to-white/90',
+        'shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur',
+        'dark:from-zinc-900/50 dark:to-zinc-800/90 dark:ring-zinc-100/10',
         '[--spotlight-color:rgb(236_252_203_/_0.6)] dark:[--spotlight-color:rgb(217_249_157_/_0.07)]',
         className
       )}
       {...props}
     >
-      <ul className="group relative flex rounded-full bg-gradient-to-b from-zinc-50/50 to-white/90 px-3 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:from-zinc-900/50 dark:to-zinc-800/90 dark:text-zinc-200 dark:ring-zinc-100/10">
-        {/* Spotlight overlay */}
-        <motion.div
-          className="pointer-events-none absolute -inset-px rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-          style={{ background }}
-        />
+      {/* Spotlight overlay */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-full opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ background }}
+        aria-hidden="true"
+      />
 
+      <ul className="flex bg-transparent px-3 text-sm font-medium text-zinc-800 dark:text-zinc-200 ">
         {navigationItems.map(({ href, text }) => (
           <NavItem key={href} href={href}>
             {text}
