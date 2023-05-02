@@ -67,7 +67,7 @@ async function TotalPageViews() {
   return (
     <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 md:justify-start">
       <TbUsers aria-hidden />
-      <span title={`${new Intl.NumberFormat('en-US').format(views)}次浏览`}>
+      <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
         <span className="font-medium">{formatNumber(views, true)}</span>
         &nbsp;总浏览量
       </span>
