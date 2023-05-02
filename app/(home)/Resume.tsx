@@ -89,7 +89,7 @@ export function Resume() {
               </dd>
               <dt className="sr-only">日期</dt>
               <dd
-                className="ml-auto text-xs text-zinc-400 dark:text-zinc-500"
+                className="ml-auto text-xs text-zinc-500/80 dark:text-zinc-400/80"
                 aria-label={`${getRoleDate(role.start)} 到 ${getRoleDate(
                   role.end
                 )}`}

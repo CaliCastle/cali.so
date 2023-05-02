@@ -65,7 +65,7 @@ async function TotalPageViews() {
   }
 
   return (
-    <span className="flex items-center justify-center gap-1 text-xs text-zinc-600 dark:text-zinc-400 md:justify-start">
+    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 md:justify-start">
       <TbUsers aria-hidden />
       <span title={`${new Intl.NumberFormat('en-US').format(views)}次浏览`}>
         <span className="font-medium">{formatNumber(views, true)}</span>
@@ -82,7 +82,7 @@ export function Footer() {
         <div className="border-t border-zinc-100 pb-16 pt-10 dark:border-zinc-700/40">
           <Container.Inner>
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+              <p className="text-sm text-zinc-500/80 dark:text-zinc-400/80">
                 &copy; 1995 - {new Date().getFullYear()} Cali Castle.
               </p>
               <Links />
