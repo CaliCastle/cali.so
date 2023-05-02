@@ -38,3 +38,6 @@ next-env.d.ts
 
 # vs code
 .vscode
+
+# turbo
+.turbo

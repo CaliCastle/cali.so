@@ -1,26 +1,19 @@
 import Image, { type StaticImageData } from 'next/image'
 import React from 'react'
 import { TbBriefcase } from 'react-icons/tb'
-import { z } from 'zod'
 
 import eightNinthsLogo from '~/assets/company/8ninths.jpeg'
 import abletiveLogo from '~/assets/company/abletive.png'
 import vvsLogo from '~/assets/company/vvs.png'
 import zolplayLogo from '~/assets/company/zolplay.png'
 
-const resumeSchema = z.object({
-  company: z.string(),
-  title: z.string(),
-  start: z.union([
-    z.string(),
-    z.object({ label: z.string(), dateTime: z.number() }),
-  ]),
-  end: z.union([
-    z.string(),
-    z.object({ label: z.string(), dateTime: z.number() }),
-  ]),
-})
-type Resume = z.infer<typeof resumeSchema> & { logo: StaticImageData }
+type Resume = {
+  company: string
+  title: string
+  start: string | { label: string; dateTime: number }
+  end: string | { label: string; dateTime: number }
+  logo: StaticImageData
+}
 const resume: Resume[] = [
   {
     company: '深圳市佐玩信息技术有限公司',

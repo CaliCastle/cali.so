@@ -43,7 +43,7 @@ function formatNumber(n: number, inChinese = false): string {
     } else if (Math.abs(n) >= 10000) {
       return (n / 10000).toFixed(1) + '万'
     } else {
-      return new Intl.NumberFormat('en-US').format(n)
+      return Intl.NumberFormat('en-US').format(n)
     }
   }
 
@@ -52,7 +52,7 @@ function formatNumber(n: number, inChinese = false): string {
   } else if (Math.abs(n) >= 1000) {
     return (n / 1000).toFixed(1) + 'k'
   } else {
-    return new Intl.NumberFormat('en-US').format(n)
+    return Intl.NumberFormat('en-US').format(n)
   }
 }
 
@@ -61,7 +61,7 @@ async function TotalPageViews() {
   if (env.VERCEL_ENV === 'production') {
     views = await kv.incr('total_page_views')
   } else {
-    views = (await kv.get<number>('total_page_views')) ?? 0
+    views = 345678
   }
 
   return (
