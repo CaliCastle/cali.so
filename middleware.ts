@@ -6,7 +6,7 @@ import { env } from '~/env.mjs'
 import countries from '~/lib/countries.json'
 
 export const config = {
-  matcher: '/',
+  matcher: ['/((?!api|_next|.*\\..*).*)'],
 }
 
 export async function middleware(req: NextRequest) {
