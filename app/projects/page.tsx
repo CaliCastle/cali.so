@@ -8,4 +8,4 @@ export default function ProjectsPage() {
   )
 }
 
-// export const runtime = 'experimental-edge'
+export const runtime = 'experimental-edge'
