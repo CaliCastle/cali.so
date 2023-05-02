@@ -7,3 +7,5 @@ export default function ProjectsPage() {
     </Container>
   )
 }
+
+export const runtime = 'experimental-edge'

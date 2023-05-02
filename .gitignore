@@ -41,3 +41,5 @@ next-env.d.ts
 
 # turbo
 .turbo
+
+static/

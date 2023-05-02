@@ -7,3 +7,5 @@ export default function BlogPage() {
     </Container>
   )
 }
+
+export const runtime = 'experimental-edge'
