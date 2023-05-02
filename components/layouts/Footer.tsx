@@ -1,9 +1,11 @@
 import kv from '@vercel/kv'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
-import { TbUsers } from 'react-icons/tb'
 
+import { CursorClickIcon } from '~/components/icons/CursorClickIcon'
+import { UsersIcon } from '~/components/icons/UsersIcon'
 import { Container } from '~/components/ui/Container'
+import { kvKeys } from '~/config/kv'
 import { navigationItems } from '~/config/nav'
 import { env } from '~/env.mjs'
 
@@ -59,18 +61,48 @@ function formatNumber(n: number, inChinese = false): string {
 async function TotalPageViews() {
   let views: number
   if (env.VERCEL_ENV === 'production') {
-    views = await kv.incr('total_page_views')
+    views = await kv.incr(kvKeys.totalPageViews)
   } else {
     views = 345678
   }
 
   return (
-    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 md:justify-start">
-      <TbUsers aria-hidden />
+    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
+      <UsersIcon className="h-4 w-4" />
       <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
+        总浏览量&nbsp;
         <span className="font-medium">{formatNumber(views, true)}</span>
-        &nbsp;总浏览量
       </span>
+    </span>
+  )
+}
+
+type LastVisitor = {
+  country: string
+  city: string
+  flag: string
+}
+async function LastVisitorInfo() {
+  let lastVisitor: LastVisitor | null = null
+  if (env.VERCEL_ENV === 'production') {
+    lastVisitor = await kv.get<LastVisitor>(kvKeys.lastVisitor)
+  }
+
+  if (!lastVisitor) {
+    lastVisitor = {
+      country: 'US',
+      city: 'Seattle',
+      flag: '🇺🇸',
+    }
+  }
+
+  return (
+    <span className="flex items-center justify-center gap-1 text-xs text-zinc-500 dark:text-zinc-400 md:justify-start">
+      <CursorClickIcon className="h-4 w-4" />
+      <span>
+        最近访客来自&nbsp;{[lastVisitor.city, lastVisitor.country].join(', ')}
+      </span>
+      <span className="font-medium">{lastVisitor.flag}</span>
     </span>
   )
 }
@@ -89,10 +121,16 @@ export function Footer() {
             </div>
           </Container.Inner>
           <Container.Inner className="mt-6">
-            <Suspense>
-              {/* @ts-expect-error Async Server Component */}
-              <TotalPageViews />
-            </Suspense>
+            <div className="flex items-center justify-start gap-2">
+              <Suspense>
+                {/* @ts-expect-error Async Server Component */}
+                <TotalPageViews />
+              </Suspense>
+              <Suspense>
+                {/* @ts-expect-error Async Server Component */}
+                <LastVisitorInfo />
+              </Suspense>
+            </div>
           </Container.Inner>
         </div>
       </Container.Outer>
