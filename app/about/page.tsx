@@ -8,4 +8,4 @@ export default function AboutPage() {
   )
 }
 
-export const runtime = 'experimental-edge'
+export const runtime = 'edge'

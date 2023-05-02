@@ -113,4 +113,4 @@ export default function HomePage() {
   )
 }
 
-export const runtime = 'experimental-edge'
+export const runtime = 'edge'
