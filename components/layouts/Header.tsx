@@ -135,7 +135,7 @@ export function Header() {
   return (
     <>
       <motion.header
-        className="pointer-events-none relative z-50 mb-[--header-mb] flex h-[--header-height] flex-col"
+        className="pointer-events-none relative z-50 mb-[var(--header-mb,0px)] flex h-[var(--header-height,180px)] flex-col"
         layout
         layoutRoot
       >
@@ -203,22 +203,20 @@ export function Header() {
                 <NavigationBar.Mobile className="pointer-events-auto md:hidden" />
                 <NavigationBar.Desktop className="pointer-events-auto hidden md:block" />
               </div>
-              <div className="flex justify-end md:flex-1">
-                <motion.div
-                  className="pointer-events-auto"
-                  initial={{ opacity: 0, y: -30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
+              <motion.div
+                className="flex justify-end md:flex-1"
+                initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+              >
+                <div className="pointer-events-auto">
                   <ThemeSwitcher />
-                </motion.div>
-              </div>
+                </div>
+              </motion.div>
             </div>
           </Container>
         </div>
       </motion.header>
-      <AnimatePresence>
-        {isHomePage && <motion.div layout className="h-[--content-offset]" />}
-      </AnimatePresence>
+      {isHomePage && <div className="h-[--content-offset]" />}
     </>
   )
 }

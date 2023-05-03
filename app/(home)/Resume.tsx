@@ -1,11 +1,11 @@
 import Image, { type StaticImageData } from 'next/image'
 import React from 'react'
-import { TbBriefcase } from 'react-icons/tb'
 
 import eightNinthsLogo from '~/assets/company/8ninths.jpeg'
 import abletiveLogo from '~/assets/company/abletive.png'
 import vvsLogo from '~/assets/company/vvs.png'
 import zolplayLogo from '~/assets/company/zolplay.png'
+import { BriefcaseIcon } from '~/components/icons/BriefcaseIcon'
 
 type Resume = {
   company: string
@@ -64,7 +64,7 @@ export function Resume() {
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
       <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        <TbBriefcase className="h-6 w-6 flex-none" />
+        <BriefcaseIcon className="h-6 w-6 flex-none" />
         <span className="ml-3">工作经历</span>
       </h2>
       <ol className="mt-6 space-y-4">

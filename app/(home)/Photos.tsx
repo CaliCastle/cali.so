@@ -48,8 +48,12 @@ export function Photos() {
   return (
     <motion.div
       className="mt-16 sm:mt-20"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, scale: 0.925, y: 16 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{
+        delay: 0.5,
+        type: 'spring',
+      }}
     >
       <div className="-my-4 flex w-full snap-x snap-proximity scroll-pl-4 justify-start gap-4 overflow-x-auto px-4 py-4 sm:gap-6 md:justify-center md:overflow-x-hidden md:px-0">
         {images.map((image, idx) => (

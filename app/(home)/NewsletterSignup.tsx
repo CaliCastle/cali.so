@@ -6,10 +6,10 @@ import { clsxm } from '@zolplay/utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { TbMailbox } from 'react-icons/tb'
 import { useReward } from 'react-rewards'
 import { z } from 'zod'
 
+import { TiltedSendIcon } from '~/components/icons/TiltedSendIcon'
 import { Button } from '~/components/ui/Button'
 
 const formId = '5108903'
@@ -76,7 +76,7 @@ export function NewsletterSignup() {
     >
       <input type="hidden" className="hidden" {...register('formId')} />
       <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        <TbMailbox className="h-6 w-6 flex-none" />
+        <TiltedSendIcon className="h-6 w-6 flex-none" />
         <span className="ml-3">动态更新</span>
       </h2>
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -92,7 +92,7 @@ export function NewsletterSignup() {
           >
             <input
               type="email"
-              placeholder="电子邮箱"
+              placeholder="你的邮箱"
               aria-label="电子邮箱"
               required
               className="min-w-0 flex-auto appearance-none rounded-lg border border-zinc-900/10 bg-white px-3 py-[calc(theme(spacing.2)-1px)] placeholder:text-zinc-400 focus:border-lime-500 focus:outline-none focus:ring-4 focus:ring-lime-500/10 dark:border-zinc-700 dark:bg-zinc-700/[0.15] dark:text-zinc-200 dark:placeholder:text-zinc-500 dark:focus:border-lime-400/50 dark:focus:ring-lime-400/5 sm:text-sm"
