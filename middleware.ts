@@ -1,9 +1,9 @@
-import kv from '@vercel/kv'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import countries from '~/lib/countries.json'
+import { redis } from '~/lib/redis'
 
 export const config = {
   matcher: ['/((?!api|_next|.*\\..*).*)'],
@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
     }
 
     const flag = countryInfo.flag
-    await kv.set(kvKeys.currentVisitor, { country, city, flag })
+    await redis.set(kvKeys.currentVisitor, { country, city, flag })
   }
 
   return NextResponse.next()

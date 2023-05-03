@@ -17,7 +17,6 @@ import remarkGfm from 'remark-gfm'
 const nextConfig = {
   experimental: {
     appDir: true,
-    mdxRs: true,
     scrollRestoration: true,
   },
 

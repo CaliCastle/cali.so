@@ -1,4 +1,3 @@
-import kv from '@vercel/kv'
 import Link from 'next/link'
 import React, { Suspense } from 'react'
 
@@ -8,6 +7,7 @@ import { Container } from '~/components/ui/Container'
 import { kvKeys } from '~/config/kv'
 import { navigationItems } from '~/config/nav'
 import { env } from '~/env.mjs'
+import { redis } from '~/lib/redis'
 
 function NavLink({
   href,
@@ -61,7 +61,7 @@ function formatNumber(n: number, inChinese = false): string {
 async function TotalPageViews() {
   let views: number
   if (env.VERCEL_ENV === 'production') {
-    views = await kv.incr(kvKeys.totalPageViews)
+    views = await redis.incr(kvKeys.totalPageViews)
   } else {
     views = 345678
   }
@@ -85,12 +85,12 @@ type VisitorGeolocation = {
 async function LastVisitorInfo() {
   let lastVisitor: VisitorGeolocation | undefined = undefined
   if (env.VERCEL_ENV === 'production') {
-    const [lv, cv] = await kv.mget<VisitorGeolocation[]>(
+    const [lv, cv] = await redis.mget<VisitorGeolocation[]>(
       kvKeys.lastVisitor,
       kvKeys.currentVisitor
     )
     lastVisitor = lv
-    await kv.set(kvKeys.lastVisitor, cv)
+    await redis.set(kvKeys.lastVisitor, cv)
   }
 
   if (!lastVisitor) {
