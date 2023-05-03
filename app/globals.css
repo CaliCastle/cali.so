@@ -5,6 +5,7 @@
 html, body {
   text-rendering: optimizeLegibility;
   text-size-adjust: 100%;
+  background-color: var(--bg-color);
 }
 
 html.light {
