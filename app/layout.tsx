@@ -20,6 +20,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/apple-touch.png',
   },
+  themeColor: 'var(--bg-color)',
   manifest: '/site.webmanifest',
   robots: {
     index: true,
@@ -73,7 +74,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="zh"
+      lang="zh-CN"
       className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
       suppressHydrationWarning
     >

@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  text-rendering: optimizeLegibility;
+  text-size-adjust: 100%;
+}
+
+html.light {
+  --bg-color: theme('colors.zinc.50');
+}
+html.dark {
+  --bg-color: theme('colors.primary.900');
+}
+
 ::selection {
   background-color: theme('colors.lime.500');
   color: theme('colors.lime.950');

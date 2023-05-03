@@ -51,6 +51,10 @@ export function Header() {
         document.body.scrollHeight - window.innerHeight
       )
 
+      if (isInitial.current) {
+        setProperty('--header-position', 'sticky')
+      }
+
       setProperty('--content-offset', `${downDelay}px`)
 
       if (isInitial.current || scrollY < downDelay) {
@@ -66,9 +70,11 @@ export function Header() {
       }
 
       if (top === 0 && scrollY > 0 && scrollY >= downDelay) {
+        setProperty('--header-inner-position', 'fixed')
         removeProperty('--header-top')
         removeProperty('--avatar-top')
       } else {
+        removeProperty('--header-inner-position')
         setProperty('--header-top', '0px')
         setProperty('--avatar-top', '0px')
       }
@@ -146,8 +152,20 @@ export function Header() {
                 ref={avatarRef}
                 className="order-last mt-[calc(theme(spacing.16)-theme(spacing.3))]"
               />
-              <Container className="sticky top-0 order-last -mb-3 pt-3">
-                <div className="static top-[var(--avatar-top,theme(spacing.3))] w-full select-none">
+              <Container
+                className="top-0 order-last -mb-3 pt-3"
+                style={{
+                  position:
+                    'var(--header-position)' as React.CSSProperties['position'],
+                }}
+              >
+                <div
+                  className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
+                  style={{
+                    position:
+                      'var(--header-inner-position)' as React.CSSProperties['position'],
+                  }}
+                >
                   <motion.div
                     className="relative inline-flex"
                     layoutId="avatar"
@@ -181,8 +199,21 @@ export function Header() {
             </>
           )}
         </AnimatePresence>
-        <div ref={headerRef} className="sticky top-0 z-10 h-16 pt-6">
-          <Container className="static top-[var(--header-top,theme(spacing.6))] w-full">
+        <div
+          ref={headerRef}
+          className="top-0 z-10 h-16 pt-6"
+          style={{
+            position:
+              'var(--header-position)' as React.CSSProperties['position'],
+          }}
+        >
+          <Container
+            className="top-[var(--header-top,theme(spacing.6))] w-full"
+            style={{
+              position:
+                'var(--header-inner-position)' as React.CSSProperties['position'],
+            }}
+          >
             <div className="relative flex gap-4">
               <div className="flex flex-1">
                 <AnimatePresence>
