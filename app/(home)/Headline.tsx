@@ -110,12 +110,36 @@ export function Headline() {
           delay: 0.25,
         }}
       >
-        <SocialLink href="https://cali.so/twitter" aria-label="我的推特" />
-        <SocialLink href="https://cali.so/github" aria-label="我的 GitHub" />
-        <SocialLink href="https://cali.so/youtube" aria-label="我的 YouTube" />
-        <SocialLink href="https://cali.so/tg" aria-label="我的 Telegram" />
-        <SocialLink href="https://cali.so/linkedin" aria-label="我的领英" />
-        <SocialLink href="mailto:hi@cali.so" aria-label="我的邮箱" />
+        <SocialLink
+          href="https://cali.so/twitter"
+          aria-label="我的推特"
+          platform="twitter"
+        />
+        <SocialLink
+          href="https://cali.so/github"
+          aria-label="我的 GitHub"
+          platform="github"
+        />
+        <SocialLink
+          href="https://cali.so/youtube"
+          aria-label="我的 YouTube"
+          platform="youtube"
+        />
+        <SocialLink
+          href="https://cali.so/tg"
+          aria-label="我的 Telegram"
+          platform="telegram"
+        />
+        <SocialLink
+          href="https://cali.so/linkedin"
+          aria-label="我的领英"
+          platform="linkedin"
+        />
+        <SocialLink
+          href="mailto:hi@cali.so"
+          aria-label="我的邮箱"
+          platform="mail"
+        />
       </motion.div>
     </div>
   )

@@ -10,13 +10,24 @@ import {
 } from 'react-icons/bs'
 import { IoMailOpen } from 'react-icons/io5'
 
-const iconMapper: { [key: string]: IconType } = {
-  '(?:github.com)': BsGithub,
-  '((?:t.co)|(?:twitter.com))': BsTwitter,
-  '((?:youtu.be)|(?:youtube.com))': BsYoutube,
-  '((?:t.me)|(?:telegram.com))': BsTelegram,
-  '(?:linkedin.com)': BsLinkedin,
-  '(?:mailto:)': IoMailOpen,
+type Platform =
+  | 'github'
+  | 'twitter'
+  | 'youtube'
+  | 'telegram'
+  | 'linkedin'
+  | 'mail'
+type PlatformIcon = {
+  icon: IconType
+  platform: Platform
+}
+const iconMapper: { [key: string]: PlatformIcon } = {
+  '(?:github.com)': { icon: BsGithub, platform: 'github' },
+  '((?:t.co)|(?:twitter.com))': { icon: BsTwitter, platform: 'twitter' },
+  '((?:youtu.be)|(?:youtube.com))': { icon: BsYoutube, platform: 'youtube' },
+  '((?:t.me)|(?:telegram.com))': { icon: BsTelegram, platform: 'telegram' },
+  '(?:linkedin.com)': { icon: BsLinkedin, platform: 'linkedin' },
+  '(?:mailto:)': { icon: IoMailOpen, platform: 'mail' },
 }
 
 function getIconForUrl(url: string): IconType | undefined {
@@ -25,7 +36,25 @@ function getIconForUrl(url: string): IconType | undefined {
       `^(?:https?:\/\/)?(?:[^@/\\n]+@)?(?:www.)?` + regexStr
     )
     if (regex.test(url)) {
-      return iconMapper[regexStr]
+      const { icon } = iconMapper[regexStr]!
+      return icon
+    }
+  }
+
+  return undefined
+}
+
+function getIconForPlatform(
+  platform: Platform | undefined
+): IconType | undefined {
+  if (!platform) {
+    return undefined
+  }
+
+  for (const regexStr in iconMapper) {
+    const { icon, platform: p } = iconMapper[regexStr]!
+    if (p === platform) {
+      return icon
     }
   }
 
@@ -34,11 +63,13 @@ function getIconForUrl(url: string): IconType | undefined {
 
 export function SocialLink({
   icon,
+  platform,
   href,
   ...props
-}: { icon?: IconType } & LinkProps &
+}: { icon?: IconType; platform?: Platform } & LinkProps &
   React.AnchorHTMLAttributes<HTMLAnchorElement>) {
-  const Icon = icon || getIconForUrl(href.toString())
+  const Icon =
+    icon ?? getIconForPlatform(platform) ?? getIconForUrl(href.toString())
 
   if (!Icon) {
     console.warn(`No icon found for ${href.toString()}`)
