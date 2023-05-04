@@ -1,6 +1,5 @@
 import '~/app/globals.css'
 
-import { Analytics } from '@vercel/analytics/react'
 import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/ThemeProvider'
@@ -12,14 +11,10 @@ const title = 'Cali Castle | 开发者、设计师、细节控、创始人'
 const description =
   '我叫 Cali，一名开发者，设计师，细节控，同时也是佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。'
 export const metadata: Metadata = {
+  metadataBase: new URL('https://cali.so'),
   title,
   description,
   keywords: 'Cali,Cali Castle,郭晓楠,佐玩,创始人,CEO,开发者,设计师,细节控,创新',
-  icons: {
-    icon: '/favicon-32x32.png',
-    shortcut: '/favicon.ico',
-    apple: '/apple-touch.png',
-  },
   themeColor: 'var(--bg-color)',
   manifest: '/site.webmanifest',
   robots: {
@@ -100,7 +95,7 @@ export default function RootLayout({
           </div>
         </ThemeProvider>
 
-        <Analytics />
+        {/*<Analytics />*/}
       </body>
     </html>
   )
