@@ -1,9 +1,9 @@
 import '~/app/globals.css'
 
+import { Analytics } from '@vercel/analytics/react'
 import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/ThemeProvider'
-import { Footer } from '~/components/layouts/Footer'
 import { Header } from '~/components/layouts/Header'
 import { sansFont } from '~/lib/font'
 
@@ -91,11 +91,11 @@ export default function RootLayout({
           <div className="relative text-zinc-800 dark:text-zinc-200">
             <Header />
             <main>{children}</main>
-            <Footer />
+            {/*<Footer />*/}
           </div>
         </ThemeProvider>
 
-        {/*<Analytics />*/}
+        <Analytics />
       </body>
     </html>
   )
