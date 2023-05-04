@@ -1,11 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import withMdx from '@next/mdx'
 import { get } from '@vercel/edge-config'
-import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypePrettyCode from 'rehype-pretty-code'
-import rehypeSlug from 'rehype-slug'
-import remarkGfm from 'remark-gfm'
 
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
@@ -15,13 +8,12 @@ import remarkGfm from 'remark-gfm'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    appDir: true,
-    scrollRestoration: true,
-  },
+  // experimental: {
+  //   serverActions: true,
+  // },
 
   images: {
-    domains: ['assets.cali.so'],
+    domains: ['cdn.sanity.io'],
   },
 
   async redirects() {
@@ -33,39 +25,4 @@ const nextConfig = {
   },
 }
 
-export default withMdx({
-  extension: /\.mdx?$/,
-  options: {
-    remarkPlugins: [remarkGfm],
-    rehypePlugins: [
-      rehypeSlug,
-      [
-        rehypePrettyCode,
-        {
-          theme: 'one-dark-pro',
-          onVisitLine(node) {
-            // Prevent lines from collapsing in `display: grid` mode, and allow empty
-            // lines to be copy/pasted
-            if (node.children.length === 0) {
-              node.children = [{ type: 'text', value: ' ' }]
-            }
-          },
-          onVisitHighlightedLine(node) {
-            node.properties.className.push('line--highlighted')
-          },
-          onVisitHighlightedWord(node) {
-            node.properties.className = ['word--highlighted']
-          },
-        },
-      ],
-      [
-        rehypeAutolinkHeadings,
-        {
-          properties: {
-            className: ['anchor'],
-          },
-        },
-      ],
-    ],
-  },
-})(nextConfig)
+export default nextConfig

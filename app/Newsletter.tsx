@@ -20,7 +20,7 @@ export const newsletterFormSchema = z.object({
 })
 export type NewsletterForm = z.infer<typeof newsletterFormSchema>
 
-export function NewsletterSignup() {
+export function Newsletter() {
   const {
     register,
     handleSubmit,
