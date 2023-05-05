@@ -8,10 +8,6 @@ import { get } from '@vercel/edge-config'
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // experimental: {
-  //   serverActions: true,
-  // },
-
   images: {
     domains: ['cdn.sanity.io'],
   },

@@ -159,11 +159,18 @@ export function Header() {
                     'var(--header-position)' as React.CSSProperties['position'],
                 }}
               >
-                <div
+                <motion.div
                   className="top-[var(--avatar-top,theme(spacing.3))] w-full select-none"
                   style={{
                     position:
                       'var(--header-inner-position)' as React.CSSProperties['position'],
+                  }}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    type: 'spring',
+                    damping: 30,
+                    stiffness: 200,
                   }}
                 >
                   <motion.div
@@ -194,7 +201,7 @@ export function Header() {
                       />
                     </motion.div>
                   </motion.div>
-                </div>
+                </motion.div>
               </Container>
             </>
           )}
@@ -215,7 +222,16 @@ export function Header() {
             }}
           >
             <div className="relative flex gap-4">
-              <div className="flex flex-1">
+              <motion.div
+                className="flex flex-1"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  type: 'spring',
+                  damping: 30,
+                  stiffness: 200,
+                }}
+              >
                 <AnimatePresence>
                   {!isHomePage && (
                     <motion.div
@@ -229,7 +245,7 @@ export function Header() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
               <div className="flex flex-1 justify-end md:justify-center">
                 <NavigationBar.Mobile className="pointer-events-auto md:hidden" />
                 <NavigationBar.Desktop className="pointer-events-auto hidden md:block" />
