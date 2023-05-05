@@ -128,11 +128,9 @@ export function Footer() {
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
               <Suspense>
-                {/* @ts-expect-error Async Server Component */}
                 <TotalPageViews />
               </Suspense>
               <Suspense>
-                {/* @ts-expect-error Async Server Component */}
                 <LastVisitorInfo />
               </Suspense>
             </div>

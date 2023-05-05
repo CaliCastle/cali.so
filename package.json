@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.17.0",
+    "@clerk/nextjs": "^4.17.1",
     "@headlessui/react": "^1.7.14",
     "@hookform/resolvers": "^3.1.0",
     "@mdx-js/loader": "^2.3.0",
@@ -61,6 +61,6 @@
     "prettier-plugin-tailwindcss": "^0.2.8",
     "tailwindcss": "^3.3.2",
     "turbo": "^1.9.3",
-    "typescript": "^5.0.4"
+    "typescript": "5.1.0-beta"
   }
 }
