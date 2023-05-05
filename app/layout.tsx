@@ -16,7 +16,10 @@ export const metadata: Metadata = {
   title,
   description,
   keywords: 'Cali,Cali Castle,郭晓楠,佐玩,创始人,CEO,开发者,设计师,细节控,创新',
-  themeColor: 'var(--bg-color)',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#000212' },
+    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+  ],
   manifest: '/site.webmanifest',
   robots: {
     index: true,
