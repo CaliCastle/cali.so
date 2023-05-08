@@ -6,7 +6,7 @@ import countries from '~/lib/countries.json'
 import { redis } from '~/lib/redis'
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)'],
+  matcher: ['/((?!api|_next|studio|.*\\..*).*)'],
 }
 
 export async function middleware(req: NextRequest) {

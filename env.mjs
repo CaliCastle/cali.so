@@ -17,6 +17,8 @@ const server = z.object({
 
 const client = z.object({
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
+  NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
+  NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
 })
 
 /**
@@ -37,6 +39,8 @@ const processEnv = {
   VERCEL_ENV: process.env.VERCEL_ENV,
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+  NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
 }
 
 // Don't touch the part below

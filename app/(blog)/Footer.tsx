@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import React, { Suspense } from 'react'
+import React from 'react'
 
 import { CursorClickIcon } from '~/components/icons/CursorClickIcon'
 import { UsersIcon } from '~/components/icons/UsersIcon'
@@ -127,12 +127,14 @@ export function Footer() {
           </Container.Inner>
           <Container.Inner className="mt-6">
             <div className="flex flex-col items-center justify-start gap-2 sm:flex-row">
-              <Suspense>
+              <React.Suspense>
+                {/* @ts-expect-error Async Server Component */}
                 <TotalPageViews />
-              </Suspense>
-              <Suspense>
+              </React.Suspense>
+              <React.Suspense>
+                {/* @ts-expect-error Async Server Component */}
                 <LastVisitorInfo />
-              </Suspense>
+              </React.Suspense>
             </div>
           </Container.Inner>
         </div>

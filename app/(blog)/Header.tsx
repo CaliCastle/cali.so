@@ -9,9 +9,9 @@ import {
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-import { ThemeSwitcher } from '~/app/ThemeSwitcher'
+import { NavigationBar } from '~/app/(blog)/NavigationBar'
+import { ThemeSwitcher } from '~/app/(blog)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
-import { NavigationBar } from '~/components/layouts/NavigationBar'
 import { Container } from '~/components/ui/Container'
 import { clamp } from '~/lib/math'
 

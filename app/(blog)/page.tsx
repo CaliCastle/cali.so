@@ -1,10 +1,10 @@
-import { Headline } from '~/app/Headline'
-import { Newsletter } from '~/app/Newsletter'
-import { Photos } from '~/app/Photos'
-import { Resume } from '~/app/Resume'
+import { Headline } from '~/app/(blog)/Headline'
+import { Newsletter } from '~/app/(blog)/Newsletter'
+import { Photos } from '~/app/(blog)/Photos'
+import { Resume } from '~/app/(blog)/Resume'
 import { Container } from '~/components/ui/Container'
 
-export default function HomePage() {
+export default function BlogHomePage() {
   return (
     <>
       <Container className="mt-10">
