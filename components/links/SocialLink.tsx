@@ -36,6 +36,7 @@ function getIconForUrl(url: string): IconType | undefined {
       `^(?:https?:\/\/)?(?:[^@/\\n]+@)?(?:www.)?` + regexStr
     )
     if (regex.test(url)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const { icon } = iconMapper[regexStr]!
       return icon
     }
@@ -51,8 +52,7 @@ function getIconForPlatform(
     return undefined
   }
 
-  for (const regexStr in iconMapper) {
-    const { icon, platform: p } = iconMapper[regexStr]!
+  for (const { icon, platform: p } of Object.values(iconMapper)) {
     if (p === platform) {
       return icon
     }

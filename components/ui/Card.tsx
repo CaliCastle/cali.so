@@ -99,7 +99,7 @@ Card.Eyebrow = function CardEyebrow({
   decorate?: boolean
   className?: string
   children: React.ReactNode
-} & React.HTMLAttributes<any>) {
+} & React.HTMLAttributes<unknown>) {
   return (
     <Component
       className={clsxm(
