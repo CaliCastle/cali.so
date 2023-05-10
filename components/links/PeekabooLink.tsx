@@ -3,7 +3,6 @@
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence } from 'framer-motion'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
 import React from 'react'
 
@@ -81,15 +80,10 @@ export function PeekabooLink({
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <Image
-                  src={`/api/link-preview/${href
-                    .replace('https://', '')
-                    .replace('http://', '')}`}
+                <img
+                  src={`/api/link-preview?url=${href}`}
                   alt={`${href} 的预览图`}
-                  priority
                   className="pointer-events-none absolute left-0 top-0 h-full w-full rounded-xl object-cover"
-                  width={300}
-                  height={150}
                 />
               </motion.div>
             </HoverCard.Content>

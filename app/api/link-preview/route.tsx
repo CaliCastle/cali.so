@@ -8,15 +8,10 @@ const height = 630
 export const runtime = 'edge'
 export const revalidate = 60 * 60 // 1 hour
 
-export function GET(
-  req: NextRequest,
-  {
-    params: { url },
-  }: {
-    params: { url: string }
-  }
-) {
-  console.log('url', url)
+export function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url)
+  const url = searchParams.get('url')
+
   if (!url) {
     return NextResponse.error()
   }
