@@ -100,7 +100,7 @@ export function PeekabooLink({
                 }}
               >
                 <Image
-                  src={`/api/link.preview?url=${href}`}
+                  src={`/api/link-preview?url=${href}`}
                   placeholder="blur"
                   blurDataURL={`data:image/svg+xml;base64,${toBase64(
                     shimmer(300, 150)
