@@ -13,6 +13,7 @@ const server = z.object({
   VERCEL_ENV: z.enum(['development', 'preview', 'production']),
   UPSTASH_REDIS_REST_URL: z.string().min(1),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
+  LINK_PREVIEW_API_BASE_URL: z.string().min(1),
 })
 
 const client = z.object({
@@ -41,6 +42,7 @@ const processEnv = {
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
   NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+  LINK_PREVIEW_API_BASE_URL: process.env.LINK_PREVIEW_API_BASE_URL,
 }
 
 // Don't touch the part below
