@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { TbPlanet } from 'react-icons/tb'
 import Balancer from 'react-wrap-balancer'
 
-import { ExternalLinkIcon } from '~/components/icons/ExternalLinkIcon'
 import { SparkleIcon } from '~/components/icons/SparkleIcon'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
 import { SocialLink } from '~/components/links/SocialLink'
@@ -85,10 +84,7 @@ export function Headline() {
       >
         <Balancer>
           我是 Cali，
-          <PeekabooLink href="https://zolplay.cn">
-            佐玩
-            <ExternalLinkIcon className="mx-0.5 -mt-1 inline-block" />
-          </PeekabooLink>
+          <PeekabooLink href="https://zolplay.cn">佐玩</PeekabooLink>
           创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。
           我热爱开发，设计，创新，享受生活，以及在未知领域中探索。
         </Balancer>

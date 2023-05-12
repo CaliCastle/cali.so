@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import Link, { type LinkProps } from 'next/link'
 import React from 'react'
 
+import { RichLink } from '~/components/links/RichLink'
 import { HoverCard } from '~/components/ui/HoverCard'
 
 type PeekabooLinkProps = LinkProps &
@@ -36,8 +37,8 @@ export function PeekabooLink({
   return (
     <HoverCard.Root openDelay={0} closeDelay={50} onOpenChange={onOpenChange}>
       <HoverCard.Trigger asChild>
-        <Link
-          href={`${href}?utm_source=cali.so`}
+        <RichLink
+          href={href}
           className={clsxm(
             'font-semibold text-zinc-800 hover:underline dark:text-zinc-100',
             className
@@ -46,14 +47,14 @@ export function PeekabooLink({
           {...props}
         >
           {children}
-        </Link>
+        </RichLink>
       </HoverCard.Trigger>
       <AnimatePresence mode="wait">
         {isOpen && (
           <HoverCard.Portal forceMount>
             <HoverCard.Content asChild>
               <motion.div
-                className="pointer-events-none relative w-[300px] overflow-hidden !p-0"
+                className="pointer-events-none relative w-[400px] overflow-hidden !p-0"
                 initial={{
                   opacity: 0,
                   scale: 0.965,
@@ -66,7 +67,7 @@ export function PeekabooLink({
                   scale: 1,
                   y: 0,
                   transformOrigin: 'center 115px',
-                  height: 150,
+                  height: 250,
                 }}
                 exit={{
                   opacity: 0,

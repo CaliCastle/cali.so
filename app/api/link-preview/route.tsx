@@ -3,7 +3,7 @@ import { ImageResponse, type NextRequest, NextResponse } from 'next/server'
 import { env } from '~/env.mjs'
 
 const width = 1200
-const height = 630
+const height = 750
 
 export const runtime = 'edge'
 export const revalidate = 60 * 60 // 1 hour
