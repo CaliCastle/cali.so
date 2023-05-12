@@ -39,11 +39,6 @@ export async function GET(req: NextRequest) {
       const favicon = $('link[rel="icon"]').attr('href')
       const finalFavicon = appleTouchIcon ?? favicon
       if (finalFavicon) {
-        // absolute url
-        if (finalFavicon.startsWith('http') || finalFavicon.startsWith('//')) {
-          iconUrl = finalFavicon
-        }
-
         iconUrl = new URL(finalFavicon, url).href
       }
     }
