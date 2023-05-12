@@ -54,27 +54,24 @@ export function PeekabooLink({
           <HoverCard.Portal forceMount>
             <HoverCard.Content asChild>
               <motion.div
-                className="pointer-events-none relative w-[400px] overflow-hidden !p-0"
+                className="pointer-events-none relative w-[400px] origin-top overflow-hidden !p-0"
                 initial={{
                   opacity: 0,
                   scale: 0.965,
                   y: 9,
-                  transformOrigin: 'center 115px',
                   height: 0,
                 }}
                 animate={{
                   opacity: 1,
                   scale: 1,
                   y: 0,
-                  transformOrigin: 'center 115px',
                   height: 250,
                 }}
                 exit={{
                   opacity: 0,
                   scale: 0.98,
                   y: 8,
-                  transformOrigin: 'center 115px',
-                  height: 90,
+                  height: 0,
                 }}
                 transition={{
                   duration: 0.2,
