@@ -1,5 +1,6 @@
 'use client'
 
+import { AnimatePresence, motion } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import React from 'react'
 
@@ -20,6 +21,7 @@ const themes = [
 ]
 export function ThemeSwitcher() {
   const [mounted, setMounted] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
   const { setTheme, theme, resolvedTheme } = useTheme()
   const ThemeIcon = React.useMemo(
     () => themes.find((t) => t.value === theme)?.icon ?? LightningIcon,
@@ -37,8 +39,8 @@ export function ThemeSwitcher() {
   }
 
   return (
-    <Tooltip.Provider>
-      <Tooltip.Root disableHoverableContent>
+    <Tooltip.Provider disableHoverableContent>
+      <Tooltip.Root open={open} onOpenChange={setOpen}>
         <Tooltip.Trigger asChild>
           <button
             type="button"
@@ -49,9 +51,21 @@ export function ThemeSwitcher() {
             <ThemeIcon className="h-6 w-6 stroke-zinc-500 p-0.5 transition group-hover:stroke-zinc-700 dark:group-hover:stroke-zinc-200" />
           </button>
         </Tooltip.Trigger>
-        <Tooltip.Content>
-          {themes.find((t) => t.value === theme)?.label}
-        </Tooltip.Content>
+        <AnimatePresence>
+          {open && (
+            <Tooltip.Portal forceMount>
+              <Tooltip.Content asChild>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                >
+                  {themes.find((t) => t.value === theme)?.label}
+                </motion.div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </AnimatePresence>
       </Tooltip.Root>
     </Tooltip.Provider>
   )

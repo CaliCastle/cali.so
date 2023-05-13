@@ -4,11 +4,7 @@ import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import { clsxm } from '@zolplay/utils'
 import * as React from 'react'
 
-const TooltipProvider = TooltipPrimitive.Provider
-
-const TooltipRoot = TooltipPrimitive.Root
-
-const TooltipTrigger = TooltipPrimitive.Trigger
+const { Provider, Root, Trigger, Portal } = TooltipPrimitive
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
@@ -27,8 +23,9 @@ const TooltipContent = React.forwardRef<
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
 export const Tooltip = {
-  Root: TooltipRoot,
-  Trigger: TooltipTrigger,
+  Root,
+  Trigger,
   Content: TooltipContent,
-  Provider: TooltipProvider,
+  Provider,
+  Portal,
 } as const
