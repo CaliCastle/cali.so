@@ -1,4 +1,4 @@
-import { type IconProps } from '~/types/components'
+import { type IconProps } from '~/assets'
 
 export function YouTubeIcon(props: IconProps = {}) {
   return (
