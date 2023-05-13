@@ -4,7 +4,6 @@ import Link, { type LinkProps } from 'next/link'
 import React from 'react'
 
 import { ExternalLinkIcon } from '~/assets'
-import { makeBlurDataURL } from '~/lib/image'
 
 type RichLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {
@@ -39,8 +38,6 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
             alt=""
             aria-hidden="true"
             className="inline h-4 w-4"
-            placeholder="blur"
-            blurDataURL={makeBlurDataURL(16, 16)}
             width={16}
             height={16}
             unoptimized
