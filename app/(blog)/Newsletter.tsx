@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form'
 import { useReward } from 'react-rewards'
 import { z } from 'zod'
 
-import { TiltedSendIcon } from '~/assets/icons/TiltedSendIcon'
+import { TiltedSendIcon } from '~/assets'
 import { Button } from '~/components/ui/Button'
 
 const formId = '5108903'

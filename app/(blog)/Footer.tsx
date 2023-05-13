@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { CursorClickIcon } from '~/assets/icons/CursorClickIcon'
-import { UsersIcon } from '~/assets/icons/UsersIcon'
+import { CursorClickIcon, UsersIcon } from '~/assets'
 import { Container } from '~/components/ui/Container'
 import { kvKeys } from '~/config/kv'
 import { navigationItems } from '~/config/nav'
