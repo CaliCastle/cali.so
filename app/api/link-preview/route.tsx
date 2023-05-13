@@ -24,6 +24,7 @@ export function GET(req: NextRequest) {
 
   return new ImageResponse(
     (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={imageUrl.toString()}
         alt={`Preview of ${url}`}

@@ -1,13 +1,28 @@
 import * as cheerio from 'cheerio'
-import { type NextRequest, NextResponse } from 'next/server'
+import { ImageResponse, type NextRequest, NextResponse } from 'next/server'
 
 import { redis } from '~/lib/redis'
 
 export const runtime = 'edge'
-export const revalidate = 60 * 60 * 24 // 1 day
+export const revalidate = 60 * 60 * 24 * 3 // 3 days
 
 function getKey(url: string) {
   return `favicon:${url}`
+}
+
+const width = 32
+const height = width
+function renderFavicon(url: string) {
+  return new ImageResponse(
+    (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={url} alt={`${url} 的图标`} width={width} height={height} />
+    ),
+    {
+      width,
+      height,
+    }
+  )
 }
 
 export async function GET(req: NextRequest) {
@@ -21,7 +36,7 @@ export async function GET(req: NextRequest) {
   try {
     const cachedFavicon = await redis.get<string>(getKey(url))
     if (cachedFavicon) {
-      return NextResponse.json({ iconUrl: cachedFavicon })
+      return renderFavicon(cachedFavicon)
     }
 
     const res = await fetch(url, {
@@ -45,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     await redis.set(getKey(url), iconUrl, { ex: revalidate })
 
-    return NextResponse.json({ iconUrl })
+    return renderFavicon(iconUrl)
   } catch (e) {
     console.error(e)
   }

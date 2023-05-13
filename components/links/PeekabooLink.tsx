@@ -3,11 +3,13 @@
 import { clsxm } from '@zolplay/utils'
 import { AnimatePresence } from 'framer-motion'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
 import React from 'react'
 
 import { RichLink } from '~/components/links/RichLink'
 import { HoverCard } from '~/components/ui/HoverCard'
+import { makeBlurDataURL } from '~/lib/image'
 
 type PeekabooLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {
@@ -77,11 +79,15 @@ export function PeekabooLink({
                   duration: 0.2,
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={`/api/link-preview?url=${href}`}
                   alt={`${href} 的预览图`}
                   className="pointer-events-none absolute left-0 top-0 h-full w-full rounded-xl object-cover"
+                  placeholder="blur"
+                  blurDataURL={makeBlurDataURL(16, 16)}
+                  width={400}
+                  height={250}
+                  unoptimized
                 />
               </motion.div>
             </HoverCard.Content>
