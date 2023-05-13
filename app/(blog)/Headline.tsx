@@ -1,10 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { TbPlanet } from 'react-icons/tb'
 import Balancer from 'react-wrap-balancer'
 
-import { SparkleIcon } from '~/components/icons/SparkleIcon'
+import { SparkleIcon, UserSecurityIcon } from '~/assets'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
 import { SocialLink } from '~/components/links/SocialLink'
 
@@ -44,7 +43,7 @@ function OCD() {
 function Founder() {
   return (
     <span className="group">
-      <TbPlanet className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
+      <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
       <span>创始人</span>
     </span>
   )
@@ -108,24 +107,24 @@ export function Headline() {
           platform="twitter"
         />
         <SocialLink
-          href="https://cali.so/github"
-          aria-label="我的 GitHub"
-          platform="github"
-        />
-        <SocialLink
           href="https://cali.so/youtube"
           aria-label="我的 YouTube"
           platform="youtube"
         />
         <SocialLink
+          href="https://cali.so/bilibili"
+          aria-label="我的 Bilibili"
+          platform="bilibili"
+        />
+        <SocialLink
+          href="https://cali.so/github"
+          aria-label="我的 GitHub"
+          platform="github"
+        />
+        <SocialLink
           href="https://cali.so/tg"
           aria-label="我的 Telegram"
           platform="telegram"
-        />
-        <SocialLink
-          href="https://cali.so/linkedin"
-          aria-label="我的领英"
-          platform="linkedin"
         />
         <SocialLink
           href="mailto:hi@cali.so"

@@ -1,8 +1,9 @@
 import { clsxm } from '@zolplay/utils'
 import Link, { type LinkProps } from 'next/link'
-import { type IconBaseProps } from 'react-icons'
 
-function ChevronRightIcon(props: IconBaseProps) {
+import { type IconProps } from '~/assets'
+
+function ChevronRightIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" {...props}>
       <path

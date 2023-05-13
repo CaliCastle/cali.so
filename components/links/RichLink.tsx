@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
 import React from 'react'
 
-import { ExternalLinkIcon } from '~/components/icons/ExternalLinkIcon'
+import { ExternalLinkIcon } from '~/assets'
 
 type RichLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {

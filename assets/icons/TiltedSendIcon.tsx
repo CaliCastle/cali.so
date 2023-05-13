@@ -1,6 +1,6 @@
-import { type IconBaseProps } from 'react-icons'
+import { type IconProps } from '~/types/components'
 
-export function TiltedSendIcon(props: IconBaseProps = {}) {
+export function TiltedSendIcon(props: IconProps = {}) {
   return (
     <svg
       width="1em"

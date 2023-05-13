@@ -2,10 +2,8 @@
 
 import { useTheme } from 'next-themes'
 import React from 'react'
-import { TbCircleHalf2 } from 'react-icons/tb'
 
-import { MoonIcon } from '~/components/icons/MoonIcon'
-import { SunIcon } from '~/components/icons/SunIcon'
+import { LightningIcon, MoonIcon, SunIcon } from '~/assets'
 import { Tooltip } from '~/components/ui/Tooltip'
 
 const themes = [
@@ -24,7 +22,7 @@ export function ThemeSwitcher() {
   const [mounted, setMounted] = React.useState(false)
   const { setTheme, theme, resolvedTheme } = useTheme()
   const ThemeIcon = React.useMemo(
-    () => themes.find((t) => t.value === theme)?.icon ?? TbCircleHalf2,
+    () => themes.find((t) => t.value === theme)?.icon ?? LightningIcon,
     [theme]
   )
 

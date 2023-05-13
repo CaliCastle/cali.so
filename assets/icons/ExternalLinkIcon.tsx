@@ -1,6 +1,6 @@
-import { type IconBaseProps } from 'react-icons'
+import { type IconProps } from '~/types/components'
 
-export function ExternalLinkIcon(props: IconBaseProps = {}) {
+export function ExternalLinkIcon(props: IconProps = {}) {
   return (
     <svg
       width="1em"

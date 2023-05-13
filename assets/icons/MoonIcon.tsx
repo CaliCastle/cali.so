@@ -1,6 +1,6 @@
-import { type IconBaseProps } from 'react-icons'
+import { type IconProps } from '~/types/components'
 
-export function MoonIcon(props: IconBaseProps = {}) {
+export function MoonIcon(props: IconProps = {}) {
   return (
     <svg
       width="1em"

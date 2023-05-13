@@ -1,7 +1,6 @@
-import React from 'react'
-import { type IconBaseProps } from 'react-icons'
+import { type IconProps } from '~/types/components'
 
-export function UsersIcon(props: IconBaseProps = {}) {
+export function UsersIcon(props: IconProps = {}) {
   return (
     <svg
       viewBox="0 0 24 24"

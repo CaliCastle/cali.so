@@ -1,6 +1,6 @@
-import { type IconBaseProps } from 'react-icons'
+import { type IconProps } from '~/types/components'
 
-export function BriefcaseIcon(props: IconBaseProps = {}) {
+export function BriefcaseIcon(props: IconProps = {}) {
   return (
     <svg
       width="1em"
