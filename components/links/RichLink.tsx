@@ -55,7 +55,7 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
             height={14}
           />
         ) : (
-          <span className="inline-block h-3.5 w-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-700" />
+          <span className="mr-0.5 inline-block h-3.5 w-3.5 rounded-xl bg-zinc-100 dark:bg-zinc-700" />
         )}
         {children}
         <ExternalLinkIcon className="inline-block" />
