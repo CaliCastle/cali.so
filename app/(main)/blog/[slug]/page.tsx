@@ -129,7 +129,7 @@ export default async function BlogPage({
 
                 <span className="inline-flex items-center space-x-1.5">
                   <HourglassIcon />
-                  <span>{post.readingTime.toFixed(1)}分钟阅读</span>
+                  <span>{post.readingTime.toFixed(0)}分钟阅读</span>
                 </span>
               </div>
             </header>
