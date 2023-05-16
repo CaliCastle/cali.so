@@ -6,6 +6,7 @@ import { Container } from '~/components/ui/Container'
 import { kvKeys } from '~/config/kv'
 import { navigationItems } from '~/config/nav'
 import { env } from '~/env.mjs'
+import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
 function NavLink({
@@ -37,26 +38,6 @@ function Links() {
   )
 }
 
-function formatNumber(n: number, inChinese = false): string {
-  if (inChinese) {
-    if (Math.abs(n) >= 100000000) {
-      return (n / 100000000).toFixed(1) + '亿'
-    } else if (Math.abs(n) >= 10000) {
-      return (n / 10000).toFixed(1) + '万'
-    } else {
-      return Intl.NumberFormat('en-US').format(n)
-    }
-  }
-
-  if (Math.abs(n) >= 1000000) {
-    return (n / 1000000).toFixed(1) + 'm'
-  } else if (Math.abs(n) >= 1000) {
-    return (n / 1000).toFixed(1) + 'k'
-  } else {
-    return Intl.NumberFormat('en-US').format(n)
-  }
-}
-
 async function TotalPageViews() {
   let views: number
   if (env.VERCEL_ENV === 'production') {
@@ -70,7 +51,7 @@ async function TotalPageViews() {
       <UsersIcon className="h-4 w-4" />
       <span title={`${Intl.NumberFormat('en-US').format(views)}次浏览`}>
         总浏览量&nbsp;
-        <span className="font-medium">{formatNumber(views, true)}</span>
+        <span className="font-medium">{prettifyNumber(views, true)}</span>
       </span>
     </span>
   )

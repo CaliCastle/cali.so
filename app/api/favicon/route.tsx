@@ -33,6 +33,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.error()
   }
 
+  let iconUrl = 'https://cali.so/favicon_blank.png'
+
   try {
     const cachedFavicon = await redis.get<string>(getKey(url))
     if (cachedFavicon) {
@@ -46,13 +48,13 @@ export async function GET(req: NextRequest) {
       cache: 'force-cache',
     })
 
-    let iconUrl = ''
     if (res.ok) {
       const html = await res.text()
       const $ = cheerio.load(html)
       const appleTouchIcon = $('link[rel="apple-touch-icon"]').attr('href')
       const favicon = $('link[rel="icon"]').attr('href')
-      const finalFavicon = appleTouchIcon ?? favicon
+      const shortcutFavicon = $('link[rel="shortcut icon"]').attr('href')
+      const finalFavicon = appleTouchIcon ?? favicon ?? shortcutFavicon
       if (finalFavicon) {
         iconUrl = new URL(finalFavicon, url).href
       }
@@ -65,5 +67,7 @@ export async function GET(req: NextRequest) {
     console.error(e)
   }
 
-  return NextResponse.error()
+  await redis.set(getKey(url), iconUrl, { ex: revalidate })
+
+  return renderFavicon(iconUrl)
 }

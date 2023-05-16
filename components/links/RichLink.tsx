@@ -41,6 +41,7 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
             width={16}
             height={16}
             unoptimized
+            priority={false}
           />
         </span>
 

@@ -3,24 +3,18 @@ import { z } from 'zod'
 
 import { readingTimeType } from '~/sanity/schemas/types/readingTime'
 
-export const PaletteSwatch = z.object({
-  background: z.string(),
-  foreground: z.string(),
-})
 export const Post = z.object({
   _id: z.string(),
   title: z.string(),
   slug: z.string(),
-  image: z.object({
+  mainImage: z.object({
     _ref: z.string(),
     asset: z.object({
       url: z.string(),
-      path: z.string(),
-      palette: PaletteSwatch,
       lqip: z.string(),
     }),
   }),
-  palette: PaletteSwatch.optional(),
+  publishedAt: z.string(),
   description: z.string(),
   categories: z.array(z.string()),
   body: z.any(),
