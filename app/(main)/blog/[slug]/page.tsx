@@ -144,3 +144,4 @@ export default async function BlogPage({
 }
 
 export const runtime = 'edge'
+export const revalidate = 60
