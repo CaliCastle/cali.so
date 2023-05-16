@@ -75,9 +75,9 @@ export function Newsletter() {
       onSubmit={handleSubmit(onSubmit)}
     >
       <input type="hidden" className="hidden" {...register('formId')} />
-      <h2 className="flex text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        <TiltedSendIcon className="h-6 w-6 flex-none" />
-        <span className="ml-3">动态更新</span>
+      <h2 className="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        <TiltedSendIcon className="h-5 w-5 flex-none" />
+        <span className="ml-2">动态更新</span>
       </h2>
       <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
         获取我最新发布的内容通知，随时可以取消订阅。

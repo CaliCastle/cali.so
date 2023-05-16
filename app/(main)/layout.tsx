@@ -1,8 +1,8 @@
 import { Analytics } from '@vercel/analytics/react'
 
-import { Footer } from '~/app/(blog)/Footer'
-import { Header } from '~/app/(blog)/Header'
-import { ThemeProvider } from '~/app/(blog)/ThemeProvider'
+import { Footer } from '~/app/(main)/Footer'
+import { Header } from '~/app/(main)/Header'
+import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 
 export default function BlogLayout({
   children,
