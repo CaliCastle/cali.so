@@ -20,6 +20,7 @@ const client = z.object({
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
   NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
   NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
+  NEXT_PUBLIC_LIVEBLOCKS_API_KEY: z.string().min(1),
 })
 
 /**
@@ -43,6 +44,7 @@ const processEnv = {
   NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
   NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
   LINK_PREVIEW_API_BASE_URL: process.env.LINK_PREVIEW_API_BASE_URL,
+  NEXT_PUBLIC_LIVEBLOCKS_API_KEY: process.env.NEXT_PUBLIC_LIVEBLOCKS_API_KEY,
 }
 
 // Don't touch the part below

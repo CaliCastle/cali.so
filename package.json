@@ -13,6 +13,8 @@
     "@clerk/nextjs": "^4.18.0",
     "@headlessui/react": "^1.7.14",
     "@hookform/resolvers": "^3.1.0",
+    "@liveblocks/client": "^1.0.9",
+    "@liveblocks/zustand": "^1.0.9",
     "@mdx-js/loader": "^2.3.0",
     "@portabletext/react": "^3.0.0",
     "@radix-ui/react-hover-card": "^1.0.5",
@@ -45,7 +47,8 @@
     "rehype-slug": "^5.1.0",
     "remark-gfm": "^3.0.1",
     "sanity": "^3.11.1",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "zustand": "^4.3.8"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",
