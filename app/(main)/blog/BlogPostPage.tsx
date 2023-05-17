@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import React from 'react'
 import Balancer from 'react-wrap-balancer'
 
 import {
@@ -13,9 +14,32 @@ import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
 import { Container } from '~/components/ui/Container'
 import { prettifyNumber } from '~/lib/math'
+import { useLivePostStore } from '~/lib/store'
 import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
+  const {
+    liveblocks: { enterRoom, leaveRoom },
+  } = useLivePostStore()
+
+  React.useEffect(() => {
+    enterRoom(post._id)
+    return () => leaveRoom(post._id)
+  }, [enterRoom, leaveRoom, post._id])
+
+  const setCursor = useLivePostStore((state) => state.setCursor)
+  React.useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = e.clientX
+      const y = e.clientY
+      setCursor({ x, y })
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [setCursor])
+
   return (
     <Container className="mt-16 lg:mt-32">
       <div className="xl:relative">

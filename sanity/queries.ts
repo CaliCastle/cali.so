@@ -5,7 +5,7 @@ import { type Post } from '~/sanity/schemas/post'
 
 export const getLatestBlogPostsQuery = (limit = 5) =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt > "${
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${
     new Date().toISOString().split('T')[0]
   }" && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
     _id,

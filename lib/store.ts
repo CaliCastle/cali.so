@@ -1,25 +1,27 @@
 import { createClient } from '@liveblocks/client'
 import type { WithLiveblocks } from '@liveblocks/zustand'
 import { liveblocks } from '@liveblocks/zustand'
-import create from 'zustand'
+import { create } from 'zustand'
 
 import { env } from '~/env.mjs'
 
+type Cursor = { x: number; y: number }
+
 type State = {
-  // Your Zustand state type will be defined here
+  cursor: Cursor
+  setCursor: (cursor: Cursor) => void
 }
 
 const client = createClient({
   publicApiKey: env.NEXT_PUBLIC_LIVEBLOCKS_API_KEY,
 })
 
-const useStore = create<WithLiveblocks<State>>()(
+export const useLivePostStore = create<WithLiveblocks<State>>()(
   liveblocks(
     (set) => ({
-      // Your state and actions will go here
+      cursor: { x: 0, y: 0 },
+      setCursor: (cursor) => set({ cursor }),
     }),
-    { client }
+    { client, presenceMapping: { cursor: true } }
   )
 )
-
-export default useStore
