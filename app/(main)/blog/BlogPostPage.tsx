@@ -14,11 +14,24 @@ import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
 import { Container } from '~/components/ui/Container'
 import { prettifyNumber } from '~/lib/math'
-import { usePostPresenceStore } from '~/lib/store'
+import { usePostPresenceStore, usePostStore } from '~/lib/store'
 import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
+  const { enterRoom, leaveRoom } = usePostStore((state) => state.liveblocks)
   const setRoomId = usePostPresenceStore((state) => state.setRoomId)
+
+  React.useEffect(() => {
+    if (post._id) {
+      enterRoom(`post.${post._id}`)
+    }
+
+    return () => {
+      if (post._id) {
+        leaveRoom(`post.${post._id}`)
+      }
+    }
+  }, [enterRoom, leaveRoom, post._id])
 
   React.useEffect(() => {
     setRoomId(`post.presence.${post._id}`)

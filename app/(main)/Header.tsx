@@ -12,6 +12,7 @@ import React from 'react'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
+import { LiveAvatars } from '~/components/LiveAvatars'
 import { Multiplayer } from '~/components/Multiplayer'
 import { Container } from '~/components/ui/Container'
 import { clamp } from '~/lib/math'
@@ -263,9 +264,20 @@ export function Header() {
               <AnimatePresence>
                 {!isHomePage && (
                   <motion.div
+                    className="absolute left-14 top-0 z-50"
+                    initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
+                  >
+                    <LiveAvatars />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <AnimatePresence>
+                {!isHomePage && (
+                  <motion.div
                     className="absolute right-14 top-0 z-50"
-                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, x: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, x: 0, scale: 1 }}
                   >
                     <Multiplayer />
                   </motion.div>
