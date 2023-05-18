@@ -10,12 +10,12 @@ const MAX_OTHERS = 7
 const MAX_AVATARS = 8
 
 const animationProps = {
-  initial: { width: 0, transformOrigin: 'left' },
-  animate: { width: 'auto', height: 'auto' },
-  exit: { width: 0 },
+  initial: { width: 0, transformOrigin: 'left', opacity: 0 },
+  animate: { width: 'auto', height: 'auto', opacity: 1 },
+  exit: { width: 0, opacity: 0 },
   transition: {
     type: 'spring',
-    damping: 20,
+    damping: 18,
     mass: 1,
     stiffness: 200,
     restSpeed: 0.01,
