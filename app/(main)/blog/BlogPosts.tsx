@@ -8,13 +8,14 @@ import {
   HourglassIcon,
   ScriptIcon,
 } from '~/assets'
+import { kvKeys } from '~/config/kv'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 import { getLatestBlogPosts } from '~/sanity/queries'
 
 export async function BlogPosts() {
   const posts = await getLatestBlogPosts()
-  const postIdKeys = posts.map(({ _id }) => `post:views:${_id}`)
+  const postIdKeys = posts.map(({ _id }) => kvKeys.postViews(_id))
   const views = await redis.mget<number[]>(postIdKeys.join(' '))
 
   return (

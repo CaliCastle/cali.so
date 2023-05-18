@@ -14,30 +14,28 @@ import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
 import { Container } from '~/components/ui/Container'
 import { prettifyNumber } from '~/lib/math'
+import { usePostPresenceStore, usePostStore } from '~/lib/store'
 import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
-  // const {
-  //   liveblocks: { enterRoom, leaveRoom },
-  // } = useLivePostStore()
-  //
-  // React.useEffect(() => {
-  //   enterRoom(post._id)
-  //   return () => leaveRoom(post._id)
-  // }, [enterRoom, leaveRoom, post._id])
-  //
-  // const setCursor = useLivePostStore((state) => state.setCursor)
-  // React.useEffect(() => {
-  //   const handleMouseMove = (e: MouseEvent) => {
-  //     const x = e.clientX
-  //     const y = e.clientY
-  //     setCursor({ x, y })
-  //   }
-  //
-  //   window.addEventListener('mousemove', handleMouseMove)
-  //
-  //   return () => window.removeEventListener('mousemove', handleMouseMove)
-  // }, [setCursor])
+  const { enterRoom, leaveRoom } = usePostStore((state) => state.liveblocks)
+  const setRoomId = usePostPresenceStore((state) => state.setRoomId)
+
+  React.useEffect(() => {
+    if (post._id) {
+      enterRoom(`post.${post._id}`)
+    }
+
+    return () => {
+      if (post._id) {
+        leaveRoom(`post.${post._id}`)
+      }
+    }
+  }, [enterRoom, leaveRoom, post._id])
+
+  React.useEffect(() => {
+    setRoomId(`post.presence.${post._id}`)
+  }, [setRoomId, post._id])
 
   return (
     <Container className="mt-16 lg:mt-32">
@@ -59,7 +57,7 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                 <Image
                   src={post.mainImage.asset.url}
                   alt={post.title}
-                  className="rounded-3xl ring-1 ring-zinc-900/5 transition dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
+                  className="select-none rounded-3xl ring-1 ring-zinc-900/5 transition dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
                   placeholder="blur"
                   blurDataURL={post.mainImage.asset.lqip}
                   unoptimized

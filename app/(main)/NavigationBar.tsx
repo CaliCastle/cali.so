@@ -64,9 +64,9 @@ function Desktop({
       onMouseMove={handleMouseMove}
       className={clsxm(
         'group relative',
-        'rounded-full bg-gradient-to-b from-zinc-50/50 to-white/90',
-        'shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur',
-        'dark:from-zinc-900/50 dark:to-zinc-800/90 dark:ring-zinc-100/10',
+        'rounded-full bg-gradient-to-b from-zinc-50/70 to-white/90',
+        'shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-md',
+        'dark:from-zinc-900/70 dark:to-zinc-800/90 dark:ring-zinc-100/10',
         '[--spotlight-color:rgb(236_252_203_/_0.6)] dark:[--spotlight-color:rgb(217_249_157_/_0.07)]',
         className
       )}
@@ -109,7 +109,7 @@ function MobileNavItem({
 function Mobile(props: PopoverProps<'div'>) {
   return (
     <Popover {...props}>
-      <Popover.Button className="group flex items-center rounded-full bg-gradient-to-b from-zinc-50/20 to-white/80 px-4 py-2 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur focus:outline-none focus-visible:ring-2 dark:from-zinc-900/30 dark:to-zinc-800/80 dark:text-zinc-200 dark:ring-white/10 dark:hover:ring-white/20 dark:focus-visible:ring-yellow-500/80">
+      <Popover.Button className="group flex items-center rounded-full bg-gradient-to-b from-zinc-50/20 to-white/80 px-4 py-2 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-md focus:outline-none focus-visible:ring-2 dark:from-zinc-900/30 dark:to-zinc-800/80 dark:text-zinc-200 dark:ring-white/10 dark:hover:ring-white/20 dark:focus-visible:ring-yellow-500/80">
         前往
         {/* Chevron */}
         <svg
@@ -136,7 +136,7 @@ function Mobile(props: PopoverProps<'div'>) {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Popover.Overlay className="fixed inset-0 z-50 bg-zinc-800/40 backdrop-blur-sm dark:bg-black/80" />
+          <Popover.Overlay className="fixed inset-0 z-50 bg-zinc-800/40 backdrop-blur dark:bg-black/80" />
         </Transition.Child>
         <Transition.Child
           as={React.Fragment}
