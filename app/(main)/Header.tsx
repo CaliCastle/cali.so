@@ -249,7 +249,7 @@ export function Header() {
                 </AnimatePresence>
               </motion.div>
               <div className="flex flex-1 justify-end md:justify-center">
-                <NavigationBar.Mobile className="pointer-events-auto md:hidden" />
+                <NavigationBar.Mobile className="pointer-events-auto relative z-50 md:hidden" />
                 <NavigationBar.Desktop className="pointer-events-auto relative z-50 hidden md:block" />
               </div>
               <motion.div
