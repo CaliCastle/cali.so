@@ -12,6 +12,7 @@ import React from 'react'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
+import { Multiplayer } from '~/components/Multiplayer'
 import { Container } from '~/components/ui/Container'
 import { clamp } from '~/lib/math'
 
@@ -259,6 +260,17 @@ export function Header() {
                   <ThemeSwitcher />
                 </div>
               </motion.div>
+              <AnimatePresence>
+                {!isHomePage && (
+                  <motion.div
+                    className="absolute left-14 top-0 z-50"
+                    initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                  >
+                    <Multiplayer />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </Container>
         </div>

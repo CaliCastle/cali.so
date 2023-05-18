@@ -19,7 +19,6 @@ export const Post = z.object({
   categories: z.array(z.string()),
   body: z.any(),
   readingTime: z.number(),
-  aiSummary: z.string().optional(),
 })
 export type Post = z.infer<typeof Post>
 
@@ -84,11 +83,6 @@ export default defineType({
       options: {
         source: 'body',
       },
-    }),
-    defineField({
-      name: 'aiSummary',
-      title: 'AI Summary',
-      type: 'text',
     }),
   ],
 
