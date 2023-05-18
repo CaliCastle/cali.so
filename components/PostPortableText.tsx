@@ -14,6 +14,7 @@ const components: PortableTextComponents = {
         placeholder="blur"
         blurDataURL={value.lqip}
         unoptimized
+        className="select-none"
       />
     ),
   },

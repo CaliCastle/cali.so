@@ -8,7 +8,7 @@ import { atomWithStorage } from 'jotai/utils'
 import React, { Fragment } from 'react'
 import Balancer from 'react-wrap-balancer'
 
-import { CursorIcon, MinusCircleIcon } from '~/assets'
+import { CloudIcon, CursorClickIcon, CursorIcon, UFOIcon } from '~/assets'
 import { Tooltip } from '~/components/ui/Tooltip'
 import { usePostPresenceStore } from '~/lib/store'
 
@@ -42,26 +42,27 @@ export function Multiplayer() {
   return (
     <>
       <Tooltip.Provider disableHoverableContent>
-        <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
+        <Tooltip.Root
+          open={tooltipOpen}
+          onOpenChange={setTooltipOpen}
+          delayDuration={0.1}
+        >
           <Tooltip.Trigger asChild>
             <button
               type="button"
               className={clsxm(
-                'inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm outline-offset-2 transition active:transition-none',
+                'hidden items-center justify-center rounded-lg outline-offset-2 transition active:transition-none md:inline-flex',
                 'group rounded-full bg-gradient-to-b from-zinc-50/70 to-white/95 px-3 py-2 text-zinc-500 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-md transition dark:from-zinc-900/70 dark:to-zinc-800/90 dark:text-zinc-400 dark:ring-white/10 dark:hover:ring-white/20',
-                'pointer-events-auto h-10',
+                'pointer-events-auto h-10 w-10',
                 connection === 'open' &&
-                  'from-zinc-50/80 to-yellow-100/80 shadow-yellow-200/10 dark:to-yellow-950/80 dark:shadow-yellow-500/5'
+                  'from-zinc-50/80 to-yellow-100/80 shadow-yellow-200/40 dark:to-yellow-950/90 dark:shadow-yellow-500/20 dark:ring-yellow-500/20'
               )}
               onClick={() => setEnabledMultiplayer((prev) => !prev)}
             >
-              {connection === 'open' ? <MinusCircleIcon /> : <CursorIcon />}
-              <span className="text-xs font-medium">
-                {connection === 'open' && '关闭多人光标'}
-                {connection === 'closed' && '开启多人光标'}
-                {connection === 'connecting' && '连接中...'}
-                {connection === 'failed' && '连接失败'}
-              </span>
+              {connection === 'closed' && <CursorIcon />}
+              {connection === 'open' && <CursorClickIcon />}
+              {connection === 'connecting' && <CloudIcon />}
+              {connection === 'failed' && <UFOIcon />}
             </button>
           </Tooltip.Trigger>
           <AnimatePresence>
@@ -73,7 +74,12 @@ export function Multiplayer() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                   >
-                    <Balancer>可以看到其他人的实时光标位置</Balancer>
+                    <Balancer>
+                      {connection === 'open' && '已显示多人光标'}
+                      {connection === 'closed' && '点击显示多人光标'}
+                      {connection === 'connecting' && '连接中...'}
+                      {connection === 'failed' && '连接失败'}
+                    </Balancer>
                   </motion.div>
                 </Tooltip.Content>
               </Tooltip.Portal>
@@ -244,7 +250,6 @@ function Cursor({ color, x, y, isDown }: CursorProps) {
         animate={{
           x,
           y,
-          // backgroundColor: color,
         }}
         transition={{
           type: 'spring',
@@ -253,6 +258,7 @@ function Cursor({ color, x, y, isDown }: CursorProps) {
           duration: 0.1,
         }}
       >
+        <span className="absolute left-0 top-0 block h-40 w-40 origin-center -translate-x-[calc(50%-6px)] -translate-y-[calc(50%-6px)] transform-gpu bg-[radial-gradient(50%_50%_at_50%_50%,rgba(25,25,25,0.05)_0%,rgba(25,25,25,0)_100%)] dark:bg-[radial-gradient(50%_50%_at_50%_50%,rgba(222,222,222,0.04)_0%,rgba(222,222,222,0)_100%)]" />
         <AnimatePresence>
           {isDown && (
             <motion.span

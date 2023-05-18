@@ -263,7 +263,7 @@ export function Header() {
               <AnimatePresence>
                 {!isHomePage && (
                   <motion.div
-                    className="absolute left-14 top-0 z-50"
+                    className="absolute right-14 top-0 z-50"
                     initial={{ opacity: 0, y: -20, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                   >

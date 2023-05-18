@@ -44,7 +44,7 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                 <Image
                   src={post.mainImage.asset.url}
                   alt={post.title}
-                  className="rounded-3xl ring-1 ring-zinc-900/5 transition dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
+                  className="select-none rounded-3xl ring-1 ring-zinc-900/5 transition dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20"
                   placeholder="blur"
                   blurDataURL={post.mainImage.asset.lqip}
                   unoptimized
