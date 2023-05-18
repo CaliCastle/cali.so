@@ -250,7 +250,7 @@ export function Header() {
               </motion.div>
               <div className="flex flex-1 justify-end md:justify-center">
                 <NavigationBar.Mobile className="pointer-events-auto md:hidden" />
-                <NavigationBar.Desktop className="pointer-events-auto hidden md:block" />
+                <NavigationBar.Desktop className="pointer-events-auto relative z-50 hidden md:block" />
               </div>
               <motion.div
                 className="flex justify-end md:flex-1"
@@ -264,7 +264,7 @@ export function Header() {
               <AnimatePresence>
                 {!isHomePage && (
                   <motion.div
-                    className="absolute left-14 top-0 z-50"
+                    className="absolute left-14 top-0 z-30"
                     initial={{ opacity: 0, x: -20, scale: 0.95 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                   >
@@ -275,7 +275,7 @@ export function Header() {
               <AnimatePresence>
                 {!isHomePage && (
                   <motion.div
-                    className="absolute right-14 top-0 z-50"
+                    className="absolute right-14 top-0 z-40"
                     initial={{ opacity: 0, x: 20, scale: 0.95 }}
                     animate={{ opacity: 1, x: 0, scale: 1 }}
                   >

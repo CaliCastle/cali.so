@@ -15,7 +15,7 @@ const animationProps = {
   exit: { width: 0 },
   transition: {
     type: 'spring',
-    damping: 15,
+    damping: 20,
     mass: 1,
     stiffness: 200,
     restSpeed: 0.01,
@@ -36,7 +36,7 @@ export function LiveAvatars() {
         delayDuration={0.1}
       >
         <Tooltip.Trigger asChild>
-          <div className="pointer-events-auto flex h-10 select-none place-content-center place-items-center -space-x-1.5">
+          <div className="pointer-events-auto flex h-10 select-none place-content-center place-items-center -space-x-2">
             <AnimatePresence>
               {hasMore && (
                 <motion.div key="more" className="" {...animationProps}>
