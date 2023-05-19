@@ -35,6 +35,10 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
 
   React.useEffect(() => {
     setRoomId(`post.presence.${post._id}`)
+
+    return () => {
+      setRoomId(undefined)
+    }
   }, [setRoomId, post._id])
 
   return (
