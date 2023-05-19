@@ -71,9 +71,6 @@ export async function GET(req: NextRequest) {
         'Content-Type': 'text/html',
       },
       cache: 'force-cache',
-      next: {
-        revalidate,
-      },
     })
 
     if (res.ok) {
