@@ -34,7 +34,7 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
       >
         <span className="mr-px inline-flex translate-y-0.5">
           <Image
-            src={`/api/favicon?url=${href}`}
+            src={`/api/favicon?url=${new URL(href).origin}`}
             alt=""
             aria-hidden="true"
             className="inline h-4 w-4"

@@ -10,6 +10,26 @@ function getKey(url: string) {
   return `favicon:${url}`
 }
 
+const faviconMapper: { [key: string]: string } = {
+  '(?:github.com)': 'https://cali.so/favicons/github.png',
+  '((?:t.co)|(?:twitter.com))': 'https://cali.so/favicons/twitter.png',
+  '(?:coolshell.cn)': 'https://cali.so/favicons/coolshell.png',
+}
+
+function getPredefinedIconForUrl(url: string): string | undefined {
+  for (const regexStr in faviconMapper) {
+    const regex = new RegExp(
+      `^(?:https?:\/\/)?(?:[^@/\\n]+@)?(?:www.)?` + regexStr
+    )
+    if (regex.test(url)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return faviconMapper[regexStr]!
+    }
+  }
+
+  return undefined
+}
+
 const width = 32
 const height = width
 function renderFavicon(url: string) {
@@ -36,6 +56,11 @@ export async function GET(req: NextRequest) {
   let iconUrl = 'https://cali.so/favicon_blank.png'
 
   try {
+    const predefinedIcon = getPredefinedIconForUrl(url)
+    if (predefinedIcon) {
+      return renderFavicon(predefinedIcon)
+    }
+
     const cachedFavicon = await redis.get<string>(getKey(url))
     if (cachedFavicon) {
       return renderFavicon(cachedFavicon)
@@ -46,6 +71,9 @@ export async function GET(req: NextRequest) {
         'Content-Type': 'text/html',
       },
       cache: 'force-cache',
+      next: {
+        revalidate,
+      },
     })
 
     if (res.ok) {
