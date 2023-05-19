@@ -11,14 +11,14 @@ const client = createClient({
 
 type Cursor = { x: number; y: number; isDown?: boolean }
 
-type PostPresence = {
+type Presence = {
   roomId?: string
   cursor: Cursor | null
   setRoomId: (roomId: string | undefined) => void
   setCursor: (cursor: Cursor | null) => void
 }
 
-export const usePostPresenceStore = create<WithLiveblocks<PostPresence>>()(
+export const usePresenceStore = create<WithLiveblocks<Presence>>()(
   liveblocks(
     (set) => ({
       roomId: undefined,
@@ -33,28 +33,24 @@ export const usePostPresenceStore = create<WithLiveblocks<PostPresence>>()(
 type PostState = {
   likes: number
   hearts: number
-  cries: number
   claps: number
-  setLikes: (likes: number) => void
-  setHearts: (hearts: number) => void
-  setCries: (cries: number) => void
-  setClaps: (claps: number) => void
+  addLike: () => void
+  addHeart: () => void
+  addClap: () => void
 }
 export const usePostStore = create<WithLiveblocks<PostState>>()(
   liveblocks(
     (set) => ({
       likes: 0,
       hearts: 0,
-      cries: 0,
       claps: 0,
-      setLikes: (likes) => set({ likes }),
-      setHearts: (hearts) => set({ hearts }),
-      setCries: (cries) => set({ cries }),
-      setClaps: (claps) => set({ claps }),
+      addLike: () => set((state) => ({ likes: state.likes + 1 })),
+      addHeart: () => set((state) => ({ hearts: state.hearts + 1 })),
+      addClap: () => set((state) => ({ claps: state.claps + 1 })),
     }),
     {
       client,
-      storageMapping: { likes: true, hearts: true, cries: true, claps: true },
+      storageMapping: { likes: true, hearts: true, claps: true },
     }
   )
 )

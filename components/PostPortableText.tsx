@@ -1,20 +1,16 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
-import Image from 'next/image'
 
+import { BleedThroughImage } from '~/components/BleedThroughImage'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
 
 const components: PortableTextComponents = {
   types: {
     image: ({ value }) => (
-      <Image
+      <BleedThroughImage
         src={value.url}
         alt=""
-        width={value.dimensions.width}
-        height={value.dimensions.height}
-        placeholder="blur"
-        blurDataURL={value.lqip}
-        unoptimized
-        className="select-none"
+        dimensions={value.dimensions}
+        lqip={value.lqip}
       />
     ),
   },

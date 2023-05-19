@@ -10,7 +10,7 @@ import Balancer from 'react-wrap-balancer'
 
 import { CloudIcon, CursorClickIcon, CursorIcon, UFOIcon } from '~/assets'
 import { Tooltip } from '~/components/ui/Tooltip'
-import { usePostPresenceStore } from '~/lib/store'
+import { usePresenceStore } from '~/lib/store'
 
 const enabledMultiplayerAtom = atomWithStorage(
   '__cali_so.enabled_multiplayer',
@@ -24,7 +24,7 @@ export function Multiplayer() {
   const {
     liveblocks: { enterRoom, leaveRoom, connection },
     roomId,
-  } = usePostPresenceStore()
+  } = usePresenceStore()
   React.useEffect(() => {
     if (roomId && enabledMultiplayer) {
       enterRoom(roomId)
@@ -47,24 +47,26 @@ export function Multiplayer() {
           onOpenChange={setTooltipOpen}
           delayDuration={0.1}
         >
-          <Tooltip.Trigger asChild>
-            <button
-              type="button"
-              className={clsxm(
-                'hidden items-center justify-center rounded-lg outline-offset-2 transition active:transition-none md:inline-flex',
-                'group rounded-full bg-gradient-to-b from-zinc-50/70 to-white/95 px-3 py-2 text-zinc-500 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-md transition dark:from-zinc-900/70 dark:to-zinc-800/90 dark:text-zinc-400 dark:ring-white/10 dark:hover:ring-white/20',
-                'pointer-events-auto h-10 w-10',
-                connection === 'open' &&
-                  'from-zinc-50/80 to-yellow-100/80 shadow-yellow-200/40 dark:to-yellow-950/90 dark:shadow-yellow-500/20 dark:ring-yellow-500/20'
-              )}
-              onClick={() => setEnabledMultiplayer((prev) => !prev)}
-            >
-              {connection === 'closed' && <CursorIcon />}
-              {connection === 'open' && <CursorClickIcon />}
-              {connection === 'connecting' && <CloudIcon />}
-              {connection === 'failed' && <UFOIcon />}
-            </button>
-          </Tooltip.Trigger>
+          {roomId && (
+            <Tooltip.Trigger asChild>
+              <button
+                type="button"
+                className={clsxm(
+                  'hidden items-center justify-center rounded-lg outline-offset-2 transition active:transition-none md:inline-flex',
+                  'group rounded-full bg-gradient-to-b from-zinc-50/70 to-white/95 px-3 py-2 text-zinc-500 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur-md transition dark:from-zinc-900/70 dark:to-zinc-800/90 dark:text-zinc-400 dark:ring-white/10 dark:hover:ring-white/20',
+                  'pointer-events-auto h-10 w-10',
+                  connection === 'open' &&
+                    'from-zinc-50/80 to-yellow-100/80 shadow-yellow-200/40 dark:to-yellow-950/90 dark:shadow-yellow-500/20 dark:ring-yellow-500/20'
+                )}
+                onClick={() => setEnabledMultiplayer((prev) => !prev)}
+              >
+                {connection === 'closed' && <CursorIcon />}
+                {connection === 'open' && <CursorClickIcon />}
+                {connection === 'connecting' && <CloudIcon />}
+                {connection === 'failed' && <UFOIcon />}
+              </button>
+            </Tooltip.Trigger>
+          )}
           <AnimatePresence>
             {tooltipOpen && (
               <Tooltip.Portal forceMount>
@@ -94,7 +96,7 @@ export function Multiplayer() {
 }
 
 function useLiveCursors() {
-  const setCursor = usePostPresenceStore((state) => state.setCursor)
+  const setCursor = usePresenceStore((state) => state.setCursor)
 
   React.useEffect(() => {
     const scroll = {
@@ -174,7 +176,7 @@ function useLiveCursors() {
     }
   }, [setCursor])
 
-  const others = usePostPresenceStore((state) => state.liveblocks.others)
+  const others = usePresenceStore((state) => state.liveblocks.others)
 
   const cursors = []
 

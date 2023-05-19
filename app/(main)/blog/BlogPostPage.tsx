@@ -14,12 +14,12 @@ import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
 import { Container } from '~/components/ui/Container'
 import { prettifyNumber } from '~/lib/math'
-import { usePostPresenceStore, usePostStore } from '~/lib/store'
+import { usePostStore, usePresenceStore } from '~/lib/store'
 import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
   const { enterRoom, leaveRoom } = usePostStore((state) => state.liveblocks)
-  const setRoomId = usePostPresenceStore((state) => state.setRoomId)
+  const setRoomId = usePresenceStore((state) => state.setRoomId)
 
   React.useEffect(() => {
     if (post._id) {
@@ -52,8 +52,17 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
           {/*  </button>*/}
           {/*)}*/}
           <article>
-            <header className="flex flex-col">
-              <div className="relative mb-7 aspect-[240/135] w-full md:mb-12 md:scale-110">
+            <header className="relative flex flex-col items-center pb-5 after:absolute after:-bottom-1 after:block after:h-px after:w-full after:rounded after:bg-gradient-to-r after:from-zinc-400/20 after:via-zinc-200/10 after:to-transparent dark:after:from-zinc-600/20 dark:after:via-zinc-700/10">
+              <div className="relative mb-7 aspect-[240/135] w-[120%] md:mb-12">
+                <div className="absolute z-0 aspect-[240/135] w-full blur-xl saturate-150 after:absolute after:inset-0 after:block after:bg-white/50 dark:after:bg-black/50">
+                  <Image
+                    src={post.mainImage.asset.url}
+                    alt=""
+                    className="select-none"
+                    unoptimized
+                    fill
+                  />
+                </div>
                 <Image
                   src={post.mainImage.asset.url}
                   alt={post.title}
@@ -64,11 +73,7 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                   fill
                 />
               </div>
-              <div className="flex w-full items-center justify-between space-x-4 text-sm font-medium text-zinc-600/80 dark:text-zinc-400/80">
-                <span className="inline-flex items-center space-x-1.5">
-                  <ScriptIcon />
-                  <span>{post.categories.join(', ')}</span>
-                </span>
+              <div className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-600/80 dark:text-zinc-400/80">
                 <time
                   dateTime={post.publishedAt}
                   className="flex items-center space-x-1.5"
@@ -80,11 +85,15 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                     )}
                   </span>
                 </time>
+                <span className="inline-flex items-center space-x-1.5">
+                  <ScriptIcon />
+                  <span>{post.categories.join(', ')}</span>
+                </span>
               </div>
-              <h1 className="mt-6 text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
+              <h1 className="mt-6 w-full text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
                 <Balancer>{post.title}</Balancer>
               </h1>
-              <p className="my-5 text-sm font-medium text-zinc-500">
+              <p className="my-5 w-full text-sm font-medium text-zinc-500">
                 <Balancer>{post.description}</Balancer>
               </p>
               <div className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-700/50 dark:text-zinc-300/50">
