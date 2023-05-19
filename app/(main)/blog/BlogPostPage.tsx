@@ -53,7 +53,7 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
           {/*)}*/}
           <article>
             <header className="relative flex flex-col items-center pb-5 after:absolute after:-bottom-1 after:block after:h-px after:w-full after:rounded after:bg-gradient-to-r after:from-zinc-400/20 after:via-zinc-200/10 after:to-transparent dark:after:from-zinc-600/20 dark:after:via-zinc-700/10">
-              <div className="relative mb-7 aspect-[240/135] w-[120%] md:mb-12">
+              <div className="relative mb-7 aspect-[240/135] w-full md:mb-12 md:w-[120%]">
                 <div className="absolute z-0 aspect-[240/135] w-full blur-xl saturate-150 after:absolute after:inset-0 after:block after:bg-white/50 dark:after:bg-black/50">
                   <Image
                     src={post.mainImage.asset.url}
