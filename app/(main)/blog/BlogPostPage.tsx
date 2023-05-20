@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
 import Balancer from 'react-wrap-balancer'
@@ -14,33 +15,9 @@ import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
 import { Container } from '~/components/ui/Container'
 import { prettifyNumber } from '~/lib/math'
-import { usePostStore, usePresenceStore } from '~/lib/store'
 import { type Post } from '~/sanity/schemas/post'
 
 export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
-  const { enterRoom, leaveRoom } = usePostStore((state) => state.liveblocks)
-  const setRoomId = usePresenceStore((state) => state.setRoomId)
-
-  React.useEffect(() => {
-    if (post._id) {
-      enterRoom(`post.${post._id}`)
-    }
-
-    return () => {
-      if (post._id) {
-        leaveRoom(`post.${post._id}`)
-      }
-    }
-  }, [enterRoom, leaveRoom, post._id])
-
-  React.useEffect(() => {
-    setRoomId(`post.presence.${post._id}`)
-
-    return () => {
-      setRoomId(undefined)
-    }
-  }, [setRoomId, post._id])
-
   return (
     <Container className="mt-16 lg:mt-32">
       <div className="xl:relative">
@@ -57,7 +34,17 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
           {/*)}*/}
           <article>
             <header className="relative flex flex-col items-center pb-5 after:absolute after:-bottom-1 after:block after:h-px after:w-full after:rounded after:bg-gradient-to-r after:from-zinc-400/20 after:via-zinc-200/10 after:to-transparent dark:after:from-zinc-600/20 dark:after:via-zinc-700/10">
-              <div className="relative mb-7 aspect-[240/135] w-full md:mb-12 md:w-[120%]">
+              <motion.div
+                className="relative mb-7 aspect-[240/135] w-full md:mb-12 md:w-[120%]"
+                initial={{ opacity: 0, scale: 0.96, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{
+                  duration: 0.35,
+                  type: 'spring',
+                  stiffness: 120,
+                  damping: 20,
+                }}
+              >
                 <div className="absolute z-0 aspect-[240/135] w-full blur-xl saturate-150 after:absolute after:inset-0 after:block after:bg-white/50 dark:after:bg-black/50">
                   <Image
                     src={post.mainImage.asset.url}
@@ -76,8 +63,19 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                   unoptimized
                   fill
                 />
-              </div>
-              <div className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-600/80 dark:text-zinc-400/80">
+              </motion.div>
+              <motion.div
+                className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-600/80 dark:text-zinc-400/80"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.15,
+                  type: 'spring',
+                  stiffness: 150,
+                  damping: 20,
+                  delay: 0.1,
+                }}
+              >
                 <time
                   dateTime={post.publishedAt}
                   className="flex items-center space-x-1.5"
@@ -93,14 +91,47 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                   <ScriptIcon />
                   <span>{post.categories.join(', ')}</span>
                 </span>
-              </div>
-              <h1 className="mt-6 w-full text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
+              </motion.div>
+              <motion.h1
+                className="mt-6 w-full text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.2,
+                  type: 'spring',
+                  stiffness: 150,
+                  damping: 30,
+                  delay: 0.2,
+                }}
+              >
                 <Balancer>{post.title}</Balancer>
-              </h1>
-              <p className="my-5 w-full text-sm font-medium text-zinc-500">
+              </motion.h1>
+              <motion.p
+                className="my-5 w-full text-sm font-medium text-zinc-500"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.2,
+                  type: 'spring',
+                  stiffness: 150,
+                  damping: 20,
+                  delay: 0.23,
+                }}
+              >
                 <Balancer>{post.description}</Balancer>
-              </p>
-              <div className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-700/50 dark:text-zinc-300/50">
+              </motion.p>
+              <motion.div
+                className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-700/50 dark:text-zinc-300/50"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.15,
+                  type: 'spring',
+                  stiffness: 150,
+                  damping: 20,
+                  delay: 0.255,
+                }}
+              >
                 <span className="inline-flex items-center space-x-1.5">
                   <CursorClickIcon />
                   <span>{prettifyNumber(views ?? 0, true)}次点击</span>
@@ -110,7 +141,7 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
                   <HourglassIcon />
                   <span>{post.readingTime.toFixed(0)}分钟阅读</span>
                 </span>
-              </div>
+              </motion.div>
             </header>
             <Prose className="mt-8">
               <PostPortableText value={post.body} />

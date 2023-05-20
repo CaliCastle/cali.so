@@ -1,5 +1,6 @@
 'use client'
 
+import { clsxm } from '@zolplay/utils'
 import {
   AnimatePresence,
   motion,
@@ -12,8 +13,6 @@ import React from 'react'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
-import { LiveAvatars } from '~/components/LiveAvatars'
-import { Multiplayer } from '~/components/Multiplayer'
 import { Container } from '~/components/ui/Container'
 import { clamp } from '~/lib/math'
 
@@ -143,7 +142,12 @@ export function Header() {
   return (
     <>
       <motion.header
-        className="pointer-events-none relative z-50 mb-[var(--header-mb,0px)] flex h-[var(--header-height,180px)] flex-col"
+        className={clsxm(
+          'pointer-events-none relative z-50 mb-[var(--header-mb,0px)] flex flex-col',
+          isHomePage
+            ? 'h-[var(--header-height,180px)]'
+            : 'h-[var(--header-height,64px)]'
+        )}
         layout
         layoutRoot
       >
@@ -261,28 +265,6 @@ export function Header() {
                   <ThemeSwitcher />
                 </div>
               </motion.div>
-              <AnimatePresence>
-                {!isHomePage && (
-                  <motion.div
-                    className="absolute left-14 top-0 z-30"
-                    initial={{ opacity: 0, x: -20, scale: 0.95 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                  >
-                    <LiveAvatars />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <AnimatePresence>
-                {!isHomePage && (
-                  <motion.div
-                    className="absolute right-14 top-0 z-40"
-                    initial={{ opacity: 0, x: 20, scale: 0.95 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                  >
-                    <Multiplayer />
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </Container>
         </div>
