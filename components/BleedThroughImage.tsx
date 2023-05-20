@@ -12,6 +12,7 @@ export function BleedThroughImage({
   dimensions,
   lqip,
   className,
+  alt,
   ...props
 }: BleedThroughImageProps) {
   return (
@@ -22,6 +23,7 @@ export function BleedThroughImage({
           height={dimensions.height}
           unoptimized
           {...props}
+          alt=""
         />
       </div>
       <Image
@@ -32,6 +34,7 @@ export function BleedThroughImage({
         blurDataURL={lqip}
         className={clsxm('relative z-20', className)}
         {...props}
+        alt={alt ?? ''}
       />
     </div>
   )
