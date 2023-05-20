@@ -64,7 +64,28 @@ export default async function BlogPage({
     views = 35900
   }
 
-  return <BlogPostPage post={post} views={views} />
+  let reactions: number[] = []
+  try {
+    const res = await fetch(
+      `http://localhost:3000/api/reactions?id=${post._id}`,
+      {
+        next: {
+          tags: ['reactions:' + post._id, post._id],
+        },
+      }
+    )
+    reactions = await res.json()
+  } catch (error) {
+    console.error(error)
+  }
+
+  return (
+    <BlogPostPage
+      post={post}
+      views={views}
+      reactions={reactions.length > 0 ? reactions : undefined}
+    />
+  )
 }
 
 export const runtime = 'edge'

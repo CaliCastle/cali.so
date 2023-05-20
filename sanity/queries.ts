@@ -36,6 +36,7 @@ export const getBlogPostQuery = (slug: string) =>
     description,
     publishedAt,
     readingTime,
+    mood,
     body[] {
       ...,
       _type == "image" => {

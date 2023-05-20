@@ -19,6 +19,7 @@ export const Post = z.object({
   categories: z.array(z.string()),
   body: z.any(),
   readingTime: z.number(),
+  mood: z.enum(['happy', 'sad', 'neutral']),
 })
 export type Post = z.infer<typeof Post>
 
@@ -84,10 +85,24 @@ export default defineType({
         source: 'body',
       },
     }),
+    defineField({
+      name: 'mood',
+      title: 'Mood',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Neutral', value: 'neutral' },
+          { title: 'Happy', value: 'happy' },
+          { title: 'Sad', value: 'sad' },
+        ],
+        layout: 'radio',
+      },
+    }),
   ],
 
   initialValue: () => ({
     publishedAt: new Date().toISOString(),
+    mood: 'neutral',
   }),
 
   preview: {
