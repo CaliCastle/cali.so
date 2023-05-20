@@ -28,7 +28,7 @@ export async function BlogPosts({ limit = 5 }) {
           <Link
             key={idx}
             href={`/blog/${slug}`}
-            className="group relative flex aspect-[240/135] w-full flex-col justify-end gap-16 rounded-3xl bg-white p-6 transition-shadow after:absolute after:inset-0 after:rounded-3xl after:bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.7)_55%,#000_82.5%,#000)] after:opacity-100 after:ring-2 after:ring-zinc-200 after:transition-opacity hover:shadow-xl hover:after:opacity-70 dark:after:ring-zinc-800/70"
+            className="group relative flex aspect-[240/135] w-full flex-col justify-end gap-16 rounded-3xl bg-white p-4 transition-shadow after:absolute after:inset-0 after:rounded-3xl after:bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.7)_55%,#000_82.5%,#000)] after:opacity-100 after:ring-2 after:ring-zinc-200 after:transition-opacity hover:shadow-xl hover:after:opacity-70 dark:after:ring-zinc-800/70 md:p-6"
           >
             <Image
               src={mainImage.asset.url}
@@ -39,24 +39,24 @@ export async function BlogPosts({ limit = 5 }) {
               fill
             />
             <span className="z-10 flex w-full flex-col gap-2">
-              <h2 className="text-xl font-bold tracking-tight text-zinc-50">
+              <h2 className="text-base font-bold tracking-tight text-zinc-50 md:text-xl">
                 <Balancer>{title}</Balancer>
               </h2>
               <span className="flex items-center justify-between">
                 <span className="inline-flex items-center space-x-3">
-                  <span className="inline-flex items-center space-x-1 text-sm font-medium text-zinc-400">
+                  <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-zinc-400 md:text-sm">
                     <CalendarIcon />
                     <span>
                       {Intl.DateTimeFormat('zh').format(new Date(publishedAt))}
                     </span>
                   </span>
 
-                  <span className="inline-flex items-center space-x-1 text-sm font-medium text-zinc-400">
+                  <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-zinc-400 md:text-sm">
                     <ScriptIcon />
                     <span>{categories.join(', ')}</span>
                   </span>
                 </span>
-                <span className="inline-flex items-center space-x-3 text-xs font-medium text-zinc-300/60">
+                <span className="inline-flex items-center space-x-3 text-[12px] font-medium text-zinc-300/60 md:text-xs">
                   <span className="inline-flex items-center space-x-1">
                     <CursorClickIcon />
                     <span>{prettifyNumber(views[idx] ?? 0, true)}</span>

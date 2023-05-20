@@ -10,9 +10,11 @@ import {
   CursorClickIcon,
   HourglassIcon,
   ScriptIcon,
+  UTurnLeftIcon,
 } from '~/assets'
 import { PostPortableText } from '~/components/PostPortableText'
 import { Prose } from '~/components/Prose'
+import { Button } from '~/components/ui/Button'
 import { Container } from '~/components/ui/Container'
 import { prettifyNumber } from '~/lib/math'
 import { type Post } from '~/sanity/schemas/post'
@@ -22,16 +24,14 @@ export function BlogPostPage({ post, views }: { post: Post; views?: number }) {
     <Container className="mt-16 lg:mt-32">
       <div className="xl:relative">
         <div className="mx-auto max-w-2xl">
-          {/*{previousPathname && (*/}
-          {/*  <button*/}
-          {/*    type="button"*/}
-          {/*    onClick={() => router.back()}*/}
-          {/*    aria-label="Go back to articles"*/}
-          {/*    className="group mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 transition dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20 lg:absolute lg:-left-5 lg:-mt-2 lg:mb-0 xl:-top-1.5 xl:left-0 xl:mt-0"*/}
-          {/*  >*/}
-          {/*    <ArrowLeftIcon className="h-4 w-4 stroke-zinc-500 transition group-hover:stroke-zinc-700 dark:stroke-zinc-500 dark:group-hover:stroke-zinc-400" />*/}
-          {/*  </button>*/}
-          {/*)}*/}
+          <Button
+            href="/blog"
+            variant="secondary"
+            aria-label="Go back to articles"
+            className="group mb-8 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md shadow-zinc-800/5 ring-1 ring-zinc-900/5 transition dark:border dark:border-zinc-700/50 dark:bg-zinc-800 dark:ring-0 dark:ring-white/10 dark:hover:border-zinc-700 dark:hover:ring-white/20 lg:absolute lg:-left-5 lg:-mt-2 lg:mb-0 xl:-top-1.5 xl:left-0 xl:mt-0"
+          >
+            <UTurnLeftIcon className="h-8 w-8 stroke-zinc-500 transition group-hover:stroke-zinc-700 dark:stroke-zinc-500 dark:group-hover:stroke-zinc-400" />
+          </Button>
           <article>
             <header className="relative flex flex-col items-center pb-5 after:absolute after:-bottom-1 after:block after:h-px after:w-full after:rounded after:bg-gradient-to-r after:from-zinc-400/20 after:via-zinc-200/10 after:to-transparent dark:after:from-zinc-600/20 dark:after:via-zinc-700/10">
               <motion.div
