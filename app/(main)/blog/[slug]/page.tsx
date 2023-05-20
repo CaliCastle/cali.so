@@ -66,14 +66,11 @@ export default async function BlogPage({
 
   let reactions: number[] = []
   try {
-    const res = await fetch(
-      `http://localhost:3000/api/reactions?id=${post._id}`,
-      {
-        next: {
-          tags: ['reactions:' + post._id, post._id],
-        },
-      }
-    )
+    const res = await fetch(`https://cali.so/api/reactions?id=${post._id}`, {
+      next: {
+        tags: ['reactions:' + post._id, post._id],
+      },
+    })
     reactions = await res.json()
   } catch (error) {
     console.error(error)
