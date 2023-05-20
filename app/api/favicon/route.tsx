@@ -13,6 +13,7 @@ function getKey(url: string) {
 const faviconMapper: { [key: string]: string } = {
   '(?:github.com)': 'https://cali.so/favicons/github.png',
   '((?:t.co)|(?:twitter.com))': 'https://cali.so/favicons/twitter.png',
+  'coolshell.cn': 'https://cali.so/favicons/coolshell.png',
 }
 
 function getPredefinedIconForUrl(url: string): string | undefined {
