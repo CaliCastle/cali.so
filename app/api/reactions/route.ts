@@ -1,3 +1,4 @@
+import { Ratelimit } from '@upstash/ratelimit'
 import { revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -19,6 +20,18 @@ export async function GET(req: NextRequest) {
     await redis.set(getKey(id), [0, 0, 0, 0])
   }
 
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(30, '10 s'),
+    analytics: true,
+  })
+  const { success } = await ratelimit.limit(getKey(id))
+  if (!success) {
+    return new Response('Too Many Requests', {
+      status: 429,
+    })
+  }
+
   return NextResponse.json(value ?? [0, 0, 0, 0])
 }
 
@@ -31,6 +44,18 @@ export async function PATCH(req: NextRequest) {
   }
 
   const key = getKey(id)
+
+  const ratelimit = new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(50, '10 s'),
+    analytics: true,
+  })
+  const { success } = await ratelimit.limit(key)
+  if (!success) {
+    return new Response('Too Many Requests', {
+      status: 429,
+    })
+  }
 
   let current = await redis.get<number[]>(key)
   if (!current) {
