@@ -33,7 +33,10 @@ export function Activity() {
   const { data } = useQuery<{ app: string }>(
     'activity',
     () => fetch('/api/activity').then((res) => res.json()),
-    { refetchInterval: 2000 }
+    {
+      refetchInterval: 2000,
+      enabled: new URL(window.location.href).hostname === 'cali.so',
+    }
   )
   const [open, setOpen] = React.useState(false)
 
