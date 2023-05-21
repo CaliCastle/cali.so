@@ -112,7 +112,7 @@ function ReactIcon({
     return val - bounds.y - bounds.height / 2
   })
 
-  const heightSync = useTransform(distance, [-120, 0, 120], [24, 48, 24])
+  const heightSync = useTransform(distance, [-120, 0, 120], [24, 56, 24])
   const height = useSpring(heightSync, {
     mass: 0.1,
     stiffness: 180,
@@ -126,7 +126,7 @@ function ReactIcon({
       style={{ height }}
       className="relative aspect-square h-8"
       whileTap={{
-        scale: 1.25,
+        scale: 1.3,
       }}
       onClick={onClick}
     >
@@ -139,7 +139,7 @@ function ReactIcon({
         fill
         unoptimized
       />
-      <span className="absolute -bottom-6 left-0 w-full text-[12px] font-semibold text-zinc-700/30 dark:text-zinc-200/25">
+      <span className="absolute -bottom-6 left-0 flex w-full items-center justify-center whitespace-nowrap text-[12px] font-semibold text-zinc-700/30 dark:text-zinc-200/25">
         {prettifyNumber(count, true)}
       </span>
     </motion.button>

@@ -68,7 +68,7 @@ export default async function BlogPage({
   try {
     const res = await fetch(`https://cali.so/api/reactions?id=${post._id}`, {
       next: {
-        tags: ['reactions:' + post._id, post._id],
+        tags: [`reactions:${post._id}`],
       },
     })
     reactions = await res.json()

@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { redis } from '~/lib/redis'
@@ -29,15 +30,19 @@ export async function PATCH(req: NextRequest) {
     return new Response('Missing id or index', { status: 400 })
   }
 
-  let current = await redis.get<number[]>(getKey(id))
+  const key = getKey(id)
+
+  let current = await redis.get<number[]>(key)
   if (!current) {
-    await redis.set(getKey(id), [0, 0, 0, 0])
+    await redis.set(key, [0, 0, 0, 0])
     current = [0, 0, 0, 0]
   }
   // increment the array value at the index
   current[parseInt(index)] += 1
 
-  await redis.set(getKey(id), current)
+  await redis.set(key, current)
+
+  revalidateTag(key)
 
   return NextResponse.json({
     data: current,
