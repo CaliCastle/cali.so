@@ -34,7 +34,7 @@ export function Activity() {
     'activity',
     () => fetch('/api/activity').then((res) => res.json()),
     {
-      refetchInterval: 2000,
+      refetchInterval: 5000,
       enabled: new URL(window.location.href).hostname === 'cali.so',
     }
   )
