@@ -10,6 +10,7 @@ import {
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
+import { Activity } from '~/app/(main)/Activity'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import { Avatar } from '~/components/Avatar'
@@ -265,6 +266,22 @@ export function Header() {
                   <ThemeSwitcher />
                 </div>
               </motion.div>
+
+              <AnimatePresence>
+                {!isHomePage && (
+                  <motion.div
+                    className="absolute left-14 top-1 flex h-8 items-center"
+                    initial={{ opacity: 0, scale: 0.3 }}
+                    animate={{
+                      opacity: 1,
+                      scale: 1,
+                      transition: { delay: 1 },
+                    }}
+                  >
+                    <Activity />
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </Container>
         </div>

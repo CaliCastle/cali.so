@@ -56,7 +56,6 @@ export function Headline() {
         className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
-        exit="initial"
         transition={{
           type: 'spring',
           damping: 25,
@@ -72,7 +71,6 @@ export function Headline() {
         className="mt-6 text-base text-zinc-600 dark:text-zinc-400"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        exit="initial"
         transition={{
           type: 'spring',
           damping: 30,
@@ -92,7 +90,6 @@ export function Headline() {
         className="mt-6 flex gap-6"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        exit="initial"
         transition={{
           type: 'spring',
           damping: 50,

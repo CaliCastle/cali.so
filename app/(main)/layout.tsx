@@ -3,6 +3,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { Footer } from '~/app/(main)/Footer'
 import { Header } from '~/app/(main)/Header'
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
+import { QueryProvider } from '~/app/QueryProvider'
 
 export default function BlogLayout({
   children,
@@ -25,11 +26,13 @@ export default function BlogLayout({
           </div>
         </div>
 
-        <div className="relative text-zinc-800 dark:text-zinc-200">
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
+        <QueryProvider>
+          <div className="relative text-zinc-800 dark:text-zinc-200">
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </div>
+        </QueryProvider>
       </ThemeProvider>
 
       <Analytics />
