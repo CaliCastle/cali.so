@@ -1,7 +1,9 @@
+import { Ratelimit } from '@upstash/ratelimit'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { env } from '~/env.mjs'
+import { redis } from '~/lib/redis'
 
 const API_KEY = env.CONVERTKIT_API_KEY
 const BASE_URL = 'https://api.convertkit.com/v3'
@@ -36,7 +38,18 @@ function subscribeToForm({ formId, email }: { formId: string; email: string }) {
 
 export const runtime = 'edge'
 
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(1, '10 s'),
+  analytics: true,
+})
+
 export async function POST(req: NextRequest) {
+  const { success } = await ratelimit.limit('subscribe_' + (req.ip ?? ''))
+  if (!success) {
+    return NextResponse.error()
+  }
+
   try {
     const { data } = await req.json()
     const parsed = newsletterFormSchema.parse(data)

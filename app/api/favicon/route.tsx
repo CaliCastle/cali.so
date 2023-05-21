@@ -1,7 +1,7 @@
 import * as cheerio from 'cheerio'
 import { ImageResponse, type NextRequest, NextResponse } from 'next/server'
 
-import { redis } from '~/lib/redis'
+import { ratelimit, redis } from '~/lib/redis'
 
 export const runtime = 'edge'
 export const revalidate = 60 * 60 * 24 * 3 // 3 days
@@ -52,6 +52,11 @@ export async function GET(req: NextRequest) {
   const url = searchParams.get('url')
 
   if (!url) {
+    return NextResponse.error()
+  }
+
+  const { success } = await ratelimit.limit('favicon' + `_${req.ip ?? ''}`)
+  if (!success) {
     return NextResponse.error()
   }
 

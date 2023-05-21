@@ -10,6 +10,12 @@ function getKey(id: string) {
   return `reactions:${id}`
 }
 
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(30, '10 s'),
+  analytics: true,
+})
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
@@ -20,12 +26,7 @@ export async function GET(req: NextRequest) {
     await redis.set(getKey(id), [0, 0, 0, 0])
   }
 
-  const ratelimit = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(30, '10 s'),
-    analytics: true,
-  })
-  const { success } = await ratelimit.limit(getKey(id))
+  const { success } = await ratelimit.limit(getKey(id) + `_${req.ip ?? ''}`)
   if (!success) {
     return new Response('Too Many Requests', {
       status: 429,
@@ -45,12 +46,7 @@ export async function PATCH(req: NextRequest) {
 
   const key = getKey(id)
 
-  const ratelimit = new Ratelimit({
-    redis,
-    limiter: Ratelimit.slidingWindow(50, '10 s'),
-    analytics: true,
-  })
-  const { success } = await ratelimit.limit(key)
+  const { success } = await ratelimit.limit(key + `_${req.ip ?? ''}`)
   if (!success) {
     return new Response('Too Many Requests', {
       status: 429,
