@@ -67,6 +67,7 @@ export function Activity() {
               priority
               fetchPriority="high"
               unoptimized
+              className="pointer-events-none select-none"
             />
           </div>
         </Tooltip.Trigger>
