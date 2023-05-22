@@ -16,7 +16,7 @@ import { getLatestBlogPosts } from '~/sanity/queries'
 export async function BlogPosts({ limit = 5 }) {
   const posts = await getLatestBlogPosts(limit)
   const postIdKeys = posts.map(({ _id }) => kvKeys.postViews(_id))
-  const views = await redis.mget<number[]>(postIdKeys.join(' '))
+  const views = await redis.mget<number[]>(...postIdKeys)
 
   return (
     <>
