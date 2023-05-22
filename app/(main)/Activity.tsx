@@ -35,7 +35,10 @@ export function Activity() {
     () => fetch('/api/activity').then((res) => res.json()),
     {
       refetchInterval: 5000,
-      enabled: new URL(window.location.href).hostname === 'cali.so',
+      enabled:
+        typeof window === 'undefined'
+          ? false
+          : new URL(window.location.href).hostname === 'cali.so',
     }
   )
   const [open, setOpen] = React.useState(false)
