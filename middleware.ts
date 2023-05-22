@@ -8,7 +8,7 @@ import { getIP } from '~/lib/ip'
 import { redis } from '~/lib/redis'
 
 export const config = {
-  matcher: ['/((?!api|_next|studio|.*\\..*).*)'],
+  matcher: ['/((?!_next|studio|.*\\..*).*)'],
 }
 
 export async function middleware(req: NextRequest) {
@@ -16,8 +16,16 @@ export async function middleware(req: NextRequest) {
 
   const blockedIPs = await get<string[]>('blocked_ips')
   const ip = getIP(req)
+  const isApi = nextUrl.pathname.startsWith('/api/')
 
   if (blockedIPs?.includes(ip)) {
+    if (isApi) {
+      return NextResponse.json(
+        { error: 'You have been blocked.' },
+        { status: 403 }
+      )
+    }
+
     nextUrl.pathname = '/blocked'
     return NextResponse.rewrite(nextUrl)
   }
@@ -27,7 +35,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(nextUrl)
   }
 
-  if (geo && env.VERCEL_ENV === 'production') {
+  if (geo && !isApi && env.VERCEL_ENV === 'production') {
     const country = geo.country
     const city = geo.city
 

@@ -55,7 +55,6 @@ export async function PATCH(req: NextRequest) {
 
   let current = await redis.get<number[]>(key)
   if (!current) {
-    await redis.set(key, [0, 0, 0, 0])
     current = [0, 0, 0, 0]
   }
   // increment the array value at the index
