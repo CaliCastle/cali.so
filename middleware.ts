@@ -22,6 +22,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.rewrite(nextUrl)
   }
 
+  if (nextUrl.pathname === '/blocked') {
+    nextUrl.pathname = '/'
+    return NextResponse.redirect(nextUrl)
+  }
+
   if (geo && env.VERCEL_ENV === 'production') {
     const country = geo.country
     const city = geo.city
