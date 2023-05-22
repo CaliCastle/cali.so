@@ -2,6 +2,7 @@ import '~/app/globals.css'
 
 import { type Metadata } from 'next'
 
+import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { sansFont } from '~/lib/font'
 
 const title = 'Cali Castle | 开发者、设计师、细节控、创始人'
@@ -76,7 +77,16 @@ export default function RootLayout({
       className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex h-full flex-col">{children}</body>
+      <body className="flex h-full flex-col">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
