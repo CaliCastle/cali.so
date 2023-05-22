@@ -1,13 +1,14 @@
 import { groq } from 'next-sanity'
 
+import { getDate } from '~/lib/date'
 import { clientFetch } from '~/sanity/lib/client'
 import { type Post } from '~/sanity/schemas/post'
 
 export const getLatestBlogPostsQuery = (limit = 5) =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${
-    new Date().toISOString().split('T')[0]
-  }" && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().format(
+    'YYYY-MM-DD'
+  )}" && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,
@@ -23,8 +24,9 @@ export const getLatestBlogPostsQuery = (limit = 5) =>
       }
     }
   }`
-export const getLatestBlogPosts = (limit = 5) =>
-  clientFetch<Post[]>(getLatestBlogPostsQuery(limit))
+export const getLatestBlogPosts = (limit = 5) => {
+  return clientFetch<Post[]>(getLatestBlogPostsQuery(limit))
+}
 
 export const getBlogPostQuery = (slug: string) =>
   groq`

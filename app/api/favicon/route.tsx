@@ -16,6 +16,7 @@ const faviconMapper: { [key: string]: string } = {
   '(?:github.com)': 'https://cali.so/favicons/github.png',
   '((?:t.co)|(?:twitter.com))': 'https://cali.so/favicons/twitter.png',
   'coolshell.cn': 'https://cali.so/favicons/coolshell.png',
+  'vercel.com': 'https://cali.so/favicons/vercel.png',
 }
 
 function getPredefinedIconForUrl(url: string): string | undefined {
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
       return renderFavicon(cachedFavicon)
     }
 
-    const res = await fetch(url, {
+    const res = await fetch(new URL(`https://${url}`).href, {
       headers: {
         'Content-Type': 'text/html',
       },
@@ -88,7 +89,7 @@ export async function GET(req: NextRequest) {
       const shortcutFavicon = $('link[rel="shortcut icon"]').attr('href')
       const finalFavicon = appleTouchIcon ?? favicon ?? shortcutFavicon
       if (finalFavicon) {
-        iconUrl = new URL(finalFavicon, url).href
+        iconUrl = new URL(finalFavicon, new URL(`https://${url}`).href).href
       }
     }
 
