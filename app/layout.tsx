@@ -41,13 +41,6 @@ export const metadata: Metadata = {
     siteName: 'Cali Castle',
     locale: 'zh_CN',
     type: 'website',
-    images: [
-      {
-        url: '/og_zh.png',
-        width: 1200,
-        height: 630,
-      },
-    ],
     url: 'https://cali.so',
   },
   twitter: {
@@ -56,13 +49,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: [
-      {
-        url: '/og_zh.png',
-        width: 1200,
-        height: 630,
-      },
-    ],
   },
 }
 
