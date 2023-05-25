@@ -29,6 +29,7 @@
     "@zolplay/utils": "^1.3.4",
     "cheerio": "1.0.0-rc.12",
     "dayjs": "^1.11.7",
+    "feed": "^4.2.2",
     "framer-motion": "^10.12.12",
     "jotai": "^2.1.0",
     "next": "^13.4.3",

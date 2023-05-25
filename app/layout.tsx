@@ -4,17 +4,15 @@ import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { sansFont } from '~/lib/font'
+import { seo } from '~/lib/seo'
 
-const title = 'Cali Castle | 开发者、设计师、细节控、创始人'
-const description =
-  '我叫 Cali，一名开发者，设计师，细节控，同时也是佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。'
 export const metadata: Metadata = {
-  metadataBase: new URL('https://cali.so'),
+  metadataBase: seo.url,
   title: {
     template: '%s | Cali Castle',
-    default: title,
+    default: seo.title,
   },
-  description,
+  description: seo.description,
   keywords: 'Cali,Cali Castle,郭晓楠,佐玩,创始人,CEO,开发者,设计师,细节控,创新',
   themeColor: [
     { media: '(prefers-color-scheme: dark)', color: '#000212' },
@@ -34,10 +32,10 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: {
-      default: title,
+      default: seo.title,
       template: '%s | Cali Castle',
     },
-    description,
+    description: seo.description,
     siteName: 'Cali Castle',
     locale: 'zh_CN',
     type: 'website',
@@ -47,8 +45,8 @@ export const metadata: Metadata = {
     site: '@thecalicastle',
     creator: '@thecalicastle',
     card: 'summary_large_image',
-    title,
-    description,
+    title: seo.title,
+    description: seo.description,
   },
 }
 
