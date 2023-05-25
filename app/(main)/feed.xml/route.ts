@@ -12,8 +12,8 @@ export async function GET() {
     id: seo.url.href,
     link: seo.url.href,
     language: 'zh-CN',
-    image: `${seo.url.href}/opengraph-image.png`,
-    favicon: `${seo.url.href}/icon.png`,
+    image: `${seo.url.href}opengraph-image.png`,
+    favicon: `${seo.url.href}icon.png`,
     copyright: '版权所有 2023, Cali Castle',
     generator: 'PHP 9.0',
     author: {
@@ -32,7 +32,7 @@ export async function GET() {
     feed.addItem({
       title: post.title,
       id: post._id,
-      link: `${seo.url.href}/blog/${post.slug}`,
+      link: `${seo.url.href}blog/${post.slug}`,
       description: post.description,
       date: new Date(post.publishedAt),
       image: post.mainImage.asset.url,
