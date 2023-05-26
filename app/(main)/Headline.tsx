@@ -123,6 +123,7 @@ export function Headline() {
           aria-label="我的 Telegram"
           platform="telegram"
         />
+        <SocialLink href="/feed.xml" platform="rss" aria-label="RSS 订阅" />
         <SocialLink
           href="mailto:hi@cali.so"
           aria-label="我的邮箱"

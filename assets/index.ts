@@ -2,6 +2,7 @@ import type React from 'react'
 
 export type IconProps = React.SVGAttributes<SVGElement>
 
+export { AtomIcon } from './icons/AtomIcon'
 export { BilibiliIcon } from './icons/BilibiliIcon'
 export { BriefcaseIcon } from './icons/BriefcaseIcon'
 export { CalendarIcon } from './icons/CalendarIcon'

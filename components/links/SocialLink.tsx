@@ -5,6 +5,7 @@ import Link, { type LinkProps } from 'next/link'
 import React from 'react'
 
 import {
+  AtomIcon,
   BilibiliIcon,
   GitHubIcon,
   type IconProps,
@@ -23,6 +24,7 @@ type Platform =
   | 'telegram'
   | 'bilibili'
   | 'mail'
+  | 'rss'
 type PlatformInfo = {
   icon: IconType
   platform: Platform
@@ -51,6 +53,7 @@ const iconMapper: { [key: string]: PlatformInfo } = {
     label: '哔哩哔哩',
   },
   '(?:mailto:)': { icon: MailIcon, platform: 'mail', label: '邮箱地址' },
+  '(?:feed.xml)': { icon: AtomIcon, platform: 'rss', label: 'RSS 订阅' },
 }
 
 function getIconForUrl(url: string): PlatformInfo | undefined {
