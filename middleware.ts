@@ -35,7 +35,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(nextUrl)
   }
 
-  if (nextUrl.pathname === '/feed') {
+  if (nextUrl.pathname === '/feed' || nextUrl.pathname === '/rss') {
     nextUrl.pathname = '/feed.xml'
     return NextResponse.rewrite(nextUrl)
   }
