@@ -16,8 +16,8 @@ export function BleedThroughImage({
   ...props
 }: BleedThroughImageProps) {
   return (
-    <div className="relative">
-      <div className="not-prose absolute z-10 h-full w-full opacity-80 blur-2xl saturate-150 after:absolute after:inset-0 after:block after:bg-white/50 dark:opacity-70 dark:after:bg-black/50">
+    <div className="group relative">
+      <div className="not-prose absolute z-10 h-full w-full scale-[0.96] transform-gpu opacity-80 blur-2xl saturate-150 transition-transform after:absolute after:inset-0 after:block after:bg-white/50 group-hover:scale-105 dark:opacity-70 dark:after:bg-black/50">
         <Image
           width={dimensions.width}
           height={dimensions.height}

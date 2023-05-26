@@ -1,4 +1,5 @@
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
+import { Tweet } from 'react-tweet'
 
 import { BleedThroughImage } from '~/components/BleedThroughImage'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
@@ -12,6 +13,11 @@ const components: PortableTextComponents = {
         dimensions={value.dimensions}
         lqip={value.lqip}
       />
+    ),
+    tweet: ({ value }) => (
+      <div className="flex justify-center">
+        <Tweet id={value.id} />
+      </div>
     ),
   },
 

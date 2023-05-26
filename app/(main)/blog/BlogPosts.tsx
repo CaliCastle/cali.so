@@ -9,6 +9,7 @@ import {
   ScriptIcon,
 } from '~/assets'
 import { kvKeys } from '~/config/kv'
+import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 import { getLatestBlogPosts } from '~/sanity/queries'
@@ -16,7 +17,13 @@ import { getLatestBlogPosts } from '~/sanity/queries'
 export async function BlogPosts({ limit = 5 }) {
   const posts = await getLatestBlogPosts(limit)
   const postIdKeys = posts.map(({ _id }) => kvKeys.postViews(_id))
-  const views = await redis.mget<number[]>(...postIdKeys)
+
+  let views: number[] = []
+  if (env.VERCEL_ENV === 'development') {
+    views = posts.map(() => Math.floor(Math.random() * 1000))
+  } else {
+    views = await redis.mget<number[]>(postIdKeys.join(' '))
+  }
 
   return (
     <>

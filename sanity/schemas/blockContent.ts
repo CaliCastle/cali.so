@@ -1,5 +1,7 @@
 import { defineArrayMember, defineType } from 'sanity'
 
+import { Tweet } from '~/sanity/components/Tweet'
+
 /**
  * This is the schema type for block content used in the post document type
  * Importing this type into the studio configuration's `schema` property
@@ -31,7 +33,10 @@ export default defineType({
         { title: 'H4', value: 'h4' },
         { title: 'Quote', value: 'blockquote' },
       ],
-      lists: [{ title: 'Bullet', value: 'bullet' }],
+      lists: [
+        { title: 'Bullet', value: 'bullet' },
+        { title: 'Numbered', value: 'number' },
+      ],
       // Marks let you mark up inline text in the Portable Text Editor
       marks: {
         // Decorators usually describe a single property – e.g. a typographic
@@ -39,6 +44,9 @@ export default defineType({
         decorators: [
           { title: 'Strong', value: 'strong' },
           { title: 'Emphasis', value: 'em' },
+          { title: 'Underline', value: 'underline' },
+          { title: 'Strike', value: 'strike-through' },
+          { title: 'Code', value: 'code' },
         ],
         // Annotations can be any object structure – e.g. a link or a footnote.
         annotations: [
@@ -70,6 +78,21 @@ export default defineType({
           title: 'Alternative Text',
         },
       ],
+    }),
+    defineArrayMember({
+      type: 'object',
+      name: 'tweet',
+      title: 'Tweet',
+      fields: [
+        {
+          name: 'id',
+          type: 'string',
+          title: 'Tweet ID',
+        },
+      ],
+      components: {
+        block: Tweet,
+      },
     }),
   ],
 })
