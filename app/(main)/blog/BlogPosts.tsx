@@ -22,7 +22,7 @@ export async function BlogPosts({ limit = 5 }) {
   if (env.VERCEL_ENV === 'development') {
     views = posts.map(() => Math.floor(Math.random() * 1000))
   } else {
-    views = await redis.mget<number[]>(postIdKeys.join(' '))
+    views = await redis.mget<number[]>(...postIdKeys)
   }
 
   return (
