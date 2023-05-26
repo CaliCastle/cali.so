@@ -36,7 +36,7 @@ export async function GET() {
 
   return new Response(feed.xml(), {
     headers: {
-      'content-type': 'application/xml; charset=utf-8',
+      'content-type': 'application/xml',
     },
   })
 }
