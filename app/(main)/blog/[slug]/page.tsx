@@ -61,7 +61,7 @@ export default async function BlogPage({
   if (env.VERCEL_ENV === 'production') {
     views = await redis.incr(kvKeys.postViews(post._id))
   } else {
-    views = 35900
+    views = 30578
   }
 
   let reactions: number[] = []
