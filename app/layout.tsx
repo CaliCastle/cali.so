@@ -3,6 +3,7 @@ import '~/app/globals.css'
 import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
+import { url } from '~/lib'
 import { sansFont } from '~/lib/font'
 import { seo } from '~/lib/seo'
 
@@ -47,6 +48,12 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: seo.title,
     description: seo.description,
+  },
+  alternates: {
+    canonical: url('/'),
+    types: {
+      'application/rss+xml': [{ url: 'rss', title: 'RSS 订阅' }],
+    },
   },
 }
 
