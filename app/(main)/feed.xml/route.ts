@@ -1,26 +1,19 @@
-import { Feed } from 'feed'
+import RSS from 'rss'
 
 import { seo } from '~/lib/seo'
 import { getLatestBlogPosts } from '~/sanity/queries'
 
-export const revalidate = 60 * 60 * 12 // 12 hours
+export const revalidate = 60 * 60 // 1 hour
 
 export async function GET() {
-  const feed = new Feed({
+  const feed = new RSS({
     title: seo.title,
     description: seo.description,
-    id: seo.url.href,
-    link: seo.url.href,
+    site_url: seo.url.href,
+    feed_url: `${seo.url.href}feed.xml`,
     language: 'zh-CN',
-    image: `${seo.url.href}opengraph-image.png`,
-    favicon: `${seo.url.href}icon.png`,
-    copyright: '版权所有 2023, Cali Castle',
+    image_url: `${seo.url.href}opengraph-image.png`,
     generator: 'PHP 9.0',
-    author: {
-      name: 'Cali Castle',
-      email: 'hi@cali.so',
-      link: seo.url.href,
-    },
   })
 
   const data = await getLatestBlogPosts(999)
@@ -29,19 +22,21 @@ export async function GET() {
   }
 
   data.forEach((post) => {
-    feed.addItem({
+    feed.item({
       title: post.title,
-      id: post._id,
-      link: `${seo.url.href}blog/${post.slug}`,
+      guid: post._id,
+      url: `${seo.url.href}blog/${post.slug}`,
       description: post.description,
       date: new Date(post.publishedAt),
-      image: post.mainImage.asset.url,
+      enclosure: {
+        url: post.mainImage.asset.url,
+      },
     })
   })
 
-  return new Response(feed.rss2(), {
+  return new Response(feed.xml(), {
     headers: {
-      'content-type': 'application/xml; charset=utf-8',
+      'content-type': 'application/xml',
     },
   })
 }

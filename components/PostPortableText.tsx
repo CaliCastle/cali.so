@@ -2,6 +2,7 @@
 
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import React from 'react'
+import { Tweet } from 'react-tweet'
 
 import { NewCommentIcon } from '~/assets'
 import { BleedThroughImage } from '~/components/BleedThroughImage'
@@ -55,6 +56,11 @@ const components: PortableTextComponents = {
         dimensions={value.dimensions}
         lqip={value.lqip}
       />
+    ),
+    tweet: ({ value }) => (
+      <div className="flex justify-center">
+        <Tweet id={value.id} />
+      </div>
     ),
   },
 

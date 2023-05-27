@@ -16,8 +16,8 @@ export function BleedThroughImage({
   ...props
 }: BleedThroughImageProps) {
   return (
-    <div className="relative">
-      <div className="not-prose absolute z-10 h-full w-full opacity-80 blur-2xl saturate-150 after:absolute after:inset-0 after:block after:bg-white/50 dark:opacity-70 dark:after:bg-black/50">
+    <div className="group relative">
+      <div className="not-prose absolute z-10 hidden h-full w-full scale-[0.96] transform-gpu opacity-80 blur-2xl saturate-150 transition-transform after:absolute after:inset-0 after:block after:bg-white/50 group-hover:scale-105 dark:opacity-70 dark:after:bg-black/50 md:block">
         <Image
           width={dimensions.width}
           height={dimensions.height}
@@ -32,7 +32,7 @@ export function BleedThroughImage({
         unoptimized
         placeholder={lqip ? 'blur' : 'empty'}
         blurDataURL={lqip}
-        className={clsxm('relative z-20', className)}
+        className={clsxm('relative z-20 rounded-xl md:rounded-3xl', className)}
         {...props}
         alt={alt ?? ''}
       />
