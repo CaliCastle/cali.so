@@ -35,6 +35,7 @@ export async function BlogPosts({ limit = 5 }) {
           <Link
             key={idx}
             href={`/blog/${slug}`}
+            prefetch={false}
             className="group relative flex aspect-[240/135] w-full flex-col justify-end gap-16 rounded-3xl bg-white p-4 transition-shadow after:absolute after:inset-0 after:rounded-3xl after:bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.7)_55%,#000_82.5%,#000)] after:opacity-100 after:ring-2 after:ring-zinc-200 after:transition-opacity hover:shadow-xl hover:after:opacity-70 dark:after:ring-zinc-800/70 md:p-6"
           >
             <Image
@@ -44,6 +45,7 @@ export async function BlogPosts({ limit = 5 }) {
               placeholder="blur"
               blurDataURL={mainImage.asset.lqip}
               fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
             />
             <span className="z-10 flex w-full flex-col gap-2">
               <h2 className="text-base font-bold tracking-tight text-zinc-50 md:text-xl">
