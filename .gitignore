@@ -43,3 +43,7 @@ next-env.d.ts
 .turbo
 
 static/
+
+# Supabase
+**/supabase/.branches
+**/supabase/.temp

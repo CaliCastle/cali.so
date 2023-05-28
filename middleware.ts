@@ -1,9 +1,11 @@
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { get } from '@vercel/edge-config'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
 import countries from '~/lib/countries.json'
+import { type Database } from '~/lib/database.types'
 import { getIP } from '~/lib/ip'
 import { redis } from '~/lib/redis'
 
@@ -53,5 +55,9 @@ export async function middleware(req: NextRequest) {
     await redis.set(kvKeys.currentVisitor, { country, city, flag })
   }
 
-  return NextResponse.next()
+  const res = NextResponse.next()
+  const supabase = createMiddlewareClient<Database>({ req, res })
+  await supabase.auth.getSession()
+
+  return res
 }
