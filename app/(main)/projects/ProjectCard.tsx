@@ -56,7 +56,9 @@ export function ProjectCard({ project }: { project: Project }) {
         />
       </div>
       <h2 className="mt-6 text-base font-bold text-zinc-800 dark:text-zinc-100">
-        <Card.Link href={url}>{name}</Card.Link>
+        <Card.Link href={url} target="_blank">
+          {name}
+        </Card.Link>
       </h2>
       <Card.Description>{description}</Card.Description>
       <p className="pointer-events-none relative z-40 mt-6 flex items-center text-sm font-medium text-zinc-400 transition group-hover:-translate-y-0.5 group-hover:text-lime-600 dark:text-zinc-200 dark:group-hover:text-lime-400">
