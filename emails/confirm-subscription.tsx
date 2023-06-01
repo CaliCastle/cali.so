@@ -26,7 +26,7 @@ const ConfirmSubscriptionEmail = ({ link = 'link.com/confirm?fake-token' }) => {
       <Preview>{previewText}</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-zinc-50 pt-[32px] font-sans">
-          <Container className="mx-auto my-[40px] w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white p-[20px]">
+          <Container className="mx-auto my-[40px] w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white px-[24px] py-[20px]">
             <Section className="mt-[24px]">
               <Img
                 src={`${emailConfig.baseUrl}/subscription-email-header.jpg`}
@@ -56,12 +56,13 @@ const ConfirmSubscriptionEmail = ({ link = 'link.com/confirm?fake-token' }) => {
               </Button>
             </Section>
             <Text className="text-[14px] leading-[24px] text-black">
-              或者复制下面的链接到你的浏览器中进行访问：{' '}
+              或者复制下面的链接到你的浏览器中进行访问：
+              <br />
               <Link href={link} className="text-blue-600 no-underline">
                 {link}
               </Link>
             </Text>
-            <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
+            <Hr className="mx-0 my-[26px] h-px w-full bg-zinc-100" />
             <Text className="text-[12px] leading-[24px] text-[#666666]">
               如果不是你本人操作的可以无视本封邮件，如果你有任何疑问可以随时联系我。
             </Text>
@@ -86,6 +87,35 @@ const ConfirmSubscriptionEmail = ({ link = 'link.com/confirm?fake-token' }) => {
                 </Link>
                 <br />
                 开发者、设计师、细节控、创始人
+              </Text>
+              <Text className="text-center">
+                <Link
+                  href="https://cali.so/twitter"
+                  className="text-xs text-zinc-600 underline"
+                >
+                  Twitter
+                </Link>{' '}
+                |&nbsp;
+                <Link
+                  href="https://cali.so/youtube"
+                  className="text-xs text-zinc-600 underline"
+                >
+                  YouTube
+                </Link>{' '}
+                |&nbsp;
+                <Link
+                  href="https://cali.so/github"
+                  className="text-xs text-zinc-600 underline"
+                >
+                  GitHub
+                </Link>{' '}
+                |&nbsp;
+                <Link
+                  href="https://cali.so/bilibili"
+                  className="text-xs text-zinc-600 underline"
+                >
+                  哔哩哔哩
+                </Link>
               </Text>
             </Section>
           </Container>
