@@ -25,7 +25,7 @@ export default async function ConfirmPage({
 
   await db
     .update(subscribers)
-    .set({ subscribedAt: new Date() })
+    .set({ subscribedAt: new Date(), token: null })
     .where(eq(subscribers.id, subscriber.id))
 
   return (
