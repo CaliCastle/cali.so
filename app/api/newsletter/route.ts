@@ -36,17 +36,17 @@ export async function POST(req: NextRequest) {
     const { data } = await req.json()
     const parsed = newsletterFormSchema.parse(data)
 
-    // generate a random one-time token
-    const token = crypto.randomUUID()
-
     const [subscriber] = await db
       .select()
       .from(subscribers)
       .where(eq(subscribers.email, parsed.email))
 
-    if (subscriber && subscriber.subscribedAt) {
+    if (subscriber) {
       return NextResponse.json({ status: 'success' })
     }
+
+    // generate a random one-time token
+    const token = crypto.randomUUID()
 
     if (env.NODE_ENV === 'production') {
       await resend.sendEmail({
@@ -58,17 +58,10 @@ export async function POST(req: NextRequest) {
         }),
       })
 
-      if (!subscriber) {
-        await db.insert(subscribers).values({
-          email: parsed.email,
-          token,
-        })
-      } else {
-        await db
-          .update(subscribers)
-          .set({ token })
-          .where(eq(subscribers.email, parsed.email))
-      }
+      await db.insert(subscribers).values({
+        email: parsed.email,
+        token,
+      })
     }
 
     return NextResponse.json({ status: 'success' })
