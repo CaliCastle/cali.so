@@ -43,3 +43,5 @@ next-env.d.ts
 .turbo
 
 static/
+
+.react-email/

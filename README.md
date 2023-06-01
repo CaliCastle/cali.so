@@ -13,6 +13,8 @@
 - [Framer Motion](https://www.framer.com/motion/)
 - [Radix UI](https://www.radix-ui.com/)
 - [Sanity](https://www.sanity.io/)
+- [React Email](https://react.email)
+- [Resend](https://resend.com/)
 
 ### 本地开发
 
