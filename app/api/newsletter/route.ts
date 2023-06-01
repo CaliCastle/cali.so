@@ -1,40 +1,16 @@
 import { Ratelimit } from '@upstash/ratelimit'
 import { type NextRequest, NextResponse } from 'next/server'
+import { Resend } from 'resend'
 import { z } from 'zod'
 
+import { emailConfig } from '~/config/email'
+import ConfirmSubscriptionEmail from '~/emails/confirm-subscription'
 import { env } from '~/env.mjs'
 import { redis } from '~/lib/redis'
 
-const API_KEY = env.CONVERTKIT_API_KEY
-const BASE_URL = 'https://api.convertkit.com/v3'
-
 const newsletterFormSchema = z.object({
   email: z.string().email().nonempty(),
-  formId: z.string().nonempty(),
 })
-
-function subscribeToForm({ formId, email }: { formId: string; email: string }) {
-  const url = [BASE_URL, 'forms', formId, 'subscribe'].join('/')
-
-  const headers = new Headers({
-    'Content-Type': 'application/json; charset=utf-8',
-  })
-
-  return fetch(url, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      api_key: API_KEY,
-      email,
-      tags: [
-        // cali.so newsletter tag
-        3817600,
-        // Chinese newsletter tag
-        3817754,
-      ],
-    }),
-  })
-}
 
 export const runtime = 'edge'
 
@@ -53,12 +29,18 @@ export async function POST(req: NextRequest) {
   try {
     const { data } = await req.json()
     const parsed = newsletterFormSchema.parse(data)
-    const res = await subscribeToForm(parsed)
-    if (res.ok) {
-      return NextResponse.json({ status: 'success' })
-    }
 
-    return NextResponse.error()
+    // generate a random one-time token
+    const token = Math.random().toString(36).slice(2)
+
+    await new Resend(env.RESEND_API_KEY).sendEmail({
+      from: emailConfig.from,
+      to: parsed.email,
+      subject: '确认订阅 Cali 的动态吗？',
+      react: ConfirmSubscriptionEmail({ token }),
+    })
+
+    return NextResponse.json({ status: 'success' })
   } catch (error) {
     console.error('[Newsletter]', error)
 

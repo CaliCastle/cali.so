@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+import { emailConfig } from '../config/email'
 import {
   Body,
   Button,
@@ -16,15 +17,9 @@ import {
   Text,
 } from './_components'
 
-const baseUrl =
-  process.env.VERCEL_ENV === 'production'
-    ? `https://cali.so`
-    : 'http://localhost:3000'
-const confirmLink = new URL('/confirm', baseUrl)
+const confirmLink = new URL('/confirm', emailConfig.baseUrl)
 
-const ConfirmSubscriptionEmail: React.FC<{
-  token?: string
-}> = ({ token = 'fake-token' }) => {
+const ConfirmSubscriptionEmail = ({ token = 'fake-token' }) => {
   const previewText = `确认订阅 Cali 的动态吗？`
   confirmLink.searchParams.set('token', token)
   const link = confirmLink.toString()
@@ -38,7 +33,7 @@ const ConfirmSubscriptionEmail: React.FC<{
           <Container className="mx-auto my-[40px] w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white p-[20px]">
             <Section className="mt-[24px]">
               <Img
-                src={`${baseUrl}/subscription-email-header.jpg`}
+                src={`${emailConfig.baseUrl}/subscription-email-header.jpg`}
                 width="234"
                 height="121"
                 alt="Cali"
@@ -80,7 +75,7 @@ const ConfirmSubscriptionEmail: React.FC<{
             <Hr className="mx-0 my-[20px] h-px w-full bg-zinc-100" />
             <Section>
               <Img
-                src={`${baseUrl}/icon.png`}
+                src={`${emailConfig.baseUrl}/icon.png`}
                 width="24"
                 height="24"
                 alt="Cali"
