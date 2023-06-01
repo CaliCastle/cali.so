@@ -29,9 +29,9 @@ const ConfirmSubscriptionEmail = ({ link = 'link.com/confirm?fake-token' }) => {
           <Container className="mx-auto my-[40px] w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white px-[24px] py-[20px]">
             <Section className="mt-[24px]">
               <Img
-                src={`${emailConfig.baseUrl}/subscription-email-header.jpg`}
-                width="234"
-                height="121"
+                src={`${emailConfig.baseUrl}/confirm-subscription.png`}
+                width="465"
+                height="261.5625"
                 alt="Cali"
                 className="mx-auto my-0"
               />

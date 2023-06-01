@@ -9,6 +9,10 @@ import { SubbedCelebration } from './SubbedCelebration'
 
 export const runtime = 'edge'
 
+export const metadata = {
+  title: '感谢你的订阅',
+}
+
 export default async function ConfirmPage({
   params,
 }: {
