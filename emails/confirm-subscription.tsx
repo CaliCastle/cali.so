@@ -17,19 +17,15 @@ import {
   Text,
 } from './_components'
 
-const confirmLink = new URL('/confirm', emailConfig.baseUrl)
-
-const ConfirmSubscriptionEmail = ({ token = 'fake-token' }) => {
+const ConfirmSubscriptionEmail = ({ link = 'link.com/confirm?fake-token' }) => {
   const previewText = `确认订阅 Cali 的动态吗？`
-  confirmLink.searchParams.set('token', token)
-  const link = confirmLink.toString()
 
   return (
     <Html>
       <Head />
       <Preview>{previewText}</Preview>
       <Tailwind>
-        <Body className="mx-auto my-auto mt-[32px] bg-zinc-50 font-sans">
+        <Body className="mx-auto my-auto bg-zinc-50 pt-[32px] font-sans">
           <Container className="mx-auto my-[40px] w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white p-[20px]">
             <Section className="mt-[24px]">
               <Img
