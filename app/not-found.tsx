@@ -2,9 +2,14 @@
 
 import Spline from '@splinetool/react-spline'
 import { motion } from 'framer-motion'
+import { type Metadata } from 'next'
 import Link from 'next/link'
 
 import { url } from '~/lib'
+
+export const metadata = {
+  title: '404',
+} satisfies Metadata
 
 export default function NotFoundPage() {
   return (
