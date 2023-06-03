@@ -87,7 +87,7 @@ export function Newsletter() {
       <AnimatePresence mode="wait">
         {!isSubscribed ? (
           <motion.div
-            className="mt-6 flex"
+            className="mt-6 flex h-10"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit="initial"
@@ -110,7 +110,7 @@ export function Newsletter() {
           </motion.div>
         ) : (
           <motion.p
-            className="mt-6 text-center text-lg text-zinc-700 dark:text-zinc-300"
+            className="mt-6 h-10 text-center text-lg text-zinc-700 dark:text-zinc-300"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit="initial"
