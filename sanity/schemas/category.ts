@@ -1,9 +1,12 @@
 import { defineField, defineType } from 'sanity'
 
+import { ScriptIcon } from '~/assets'
+
 export default defineType({
   name: 'category',
   title: 'Category',
   type: 'document',
+  icon: ScriptIcon,
   fields: [
     defineField({
       name: 'title',

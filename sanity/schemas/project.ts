@@ -1,6 +1,8 @@
 import { defineField, defineType } from 'sanity'
 import { z } from 'zod'
 
+import { Layers3Icon } from '~/assets'
+
 export const Project = z.object({
   _id: z.string(),
   name: z.string(),
@@ -17,6 +19,7 @@ export default defineType({
   name: 'project',
   title: 'Project',
   type: 'document',
+  icon: Layers3Icon,
   fields: [
     defineField({
       name: 'name',
