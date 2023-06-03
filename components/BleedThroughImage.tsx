@@ -22,6 +22,7 @@ export function BleedThroughImage({
           width={dimensions.width}
           height={dimensions.height}
           unoptimized
+          aria-hidden={true}
           {...props}
           alt=""
         />

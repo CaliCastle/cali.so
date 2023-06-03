@@ -63,6 +63,7 @@ export function BlogPostPage({
                       className="select-none"
                       unoptimized
                       fill
+                      aria-hidden={true}
                     />
                   </div>
                   <Image

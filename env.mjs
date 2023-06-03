@@ -5,7 +5,10 @@ import { z } from 'zod'
  */
 const server = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']),
-  CONVERTKIT_API_KEY: z.string().min(1),
+  DATABASE_HOST: z.string().min(1),
+  DATABASE_USERNAME: z.string().min(1),
+  DATABASE_PASSWORD: z.string().min(1),
+  RESEND_API_KEY: z.string().min(1),
   VERCEL_ENV: z.enum(['development', 'preview', 'production']),
   UPSTASH_REDIS_REST_URL: z.string().min(1),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
@@ -16,8 +19,6 @@ const client = z.object({
   NEXT_PUBLIC_SANITY_PROJECT_ID: z.string().min(1),
   NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
   NEXT_PUBLIC_SANITY_USE_CDN: z.boolean(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
 })
 
 /**
@@ -28,7 +29,10 @@ const client = z.object({
  */
 const processEnv = {
   NODE_ENV: process.env.NODE_ENV,
-  CONVERTKIT_API_KEY: process.env.CONVERTKIT_API_KEY,
+  DATABASE_HOST: process.env.DATABASE_HOST,
+  DATABASE_USERNAME: process.env.DATABASE_USERNAME,
+  DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
+  RESEND_API_KEY: process.env.RESEND_API_KEY,
   VERCEL_ENV: process.env.VERCEL_ENV,
   UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
   UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -36,8 +40,6 @@ const processEnv = {
   NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
   NEXT_PUBLIC_SANITY_USE_CDN: process.env.NEXT_PUBLIC_SANITY_USE_CDN == 'true',
   LINK_PREVIEW_API_BASE_URL: process.env.LINK_PREVIEW_API_BASE_URL,
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 }
 
 // Don't touch the part below
