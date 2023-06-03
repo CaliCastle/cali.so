@@ -1,3 +1,4 @@
+import { authMiddleware } from '@clerk/nextjs'
 import { get } from '@vercel/edge-config'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -11,7 +12,7 @@ export const config = {
   matcher: ['/((?!_next|studio|.*\\..*).*)'],
 }
 
-export async function middleware(req: NextRequest) {
+async function beforeAuthMiddleware(req: NextRequest) {
   const { geo, nextUrl } = req
 
   const blockedIPs = await get<string[]>('blocked_ips')
@@ -35,23 +36,31 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(nextUrl)
   }
 
-  if (nextUrl.pathname === '/feed' || nextUrl.pathname === '/rss') {
-    nextUrl.pathname = '/feed.xml'
-    return NextResponse.rewrite(nextUrl)
-  }
-
   if (geo && !isApi && env.VERCEL_ENV === 'production') {
     const country = geo.country
     const city = geo.city
 
     const countryInfo = countries.find((x) => x.cca2 === country)
-    if (!countryInfo) {
-      return NextResponse.next()
+    if (countryInfo) {
+      const flag = countryInfo.flag
+      await redis.set(kvKeys.currentVisitor, { country, city, flag })
     }
-
-    const flag = countryInfo.flag
-    await redis.set(kvKeys.currentVisitor, { country, city, flag })
   }
 
   return NextResponse.next()
 }
+
+function afterAuthMiddleware(auth: unknown, req: NextRequest) {
+  const { nextUrl } = req
+
+  if (nextUrl.pathname === '/feed' || nextUrl.pathname === '/rss') {
+    nextUrl.pathname = '/feed.xml'
+    return NextResponse.rewrite(nextUrl)
+  }
+}
+
+export default authMiddleware({
+  beforeAuth: beforeAuthMiddleware,
+  afterAuth: afterAuthMiddleware,
+  publicRoutes: ['/', '/blog(.*)', '/project', '/about'],
+})
