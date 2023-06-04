@@ -7,18 +7,19 @@ import { type Project } from '~/sanity/schemas/project'
 
 export const getAllLatestBlogPostSlugsQuery = () =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().format(
-    'YYYY-MM-DD'
-  )}" && defined(slug.current)] | order(publishedAt desc).slug.current`
+  *[_type == "post" && !(_id in path("drafts.**"))
+  && publishedAt <="${getDate().toISOString()}"
+  && defined(slug.current)] | order(publishedAt desc).slug.current
+  `
+
 export const getAllLatestBlogPostSlugs = () => {
   return clientFetch<string[]>(getAllLatestBlogPostSlugsQuery())
 }
 
 export const getLatestBlogPostsQuery = (limit = 5) =>
   groq`
-  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().format(
-    'YYYY-MM-DD'
-  )}" && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
+  *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().toISOString()}"
+  && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
     _id,
     title,
     "slug": slug.current,
