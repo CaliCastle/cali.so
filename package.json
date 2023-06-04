@@ -57,6 +57,7 @@
     "drizzle-orm": "^0.26.5",
     "edge-cors": "^0.2.1",
     "framer-motion": "^10.12.16",
+    "hashids": "^2.3.0",
     "jotai": "^2.1.0",
     "next": "^13.4.4",
     "next-sanity": "^4.3.3",
@@ -73,8 +74,8 @@
     "resend": "^0.15.1",
     "rss": "^1.2.2",
     "sanity": "^3.11.5",
-    "zod": "^3.21.4",
-    "zustand": "^4.3.8"
+    "valtio": "^1.10.5",
+    "zod": "^3.21.4"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.9",

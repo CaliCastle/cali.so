@@ -76,6 +76,10 @@
     @apply bg-zinc-400/10;
   }
 
+  .cl-navbar {
+    @apply border-zinc-800;
+  }
+
   .cl-userPreviewSecondaryIdentifier, .cl-headerSubtitle, .cl-profileSectionContent__activeDevices p {
     @apply text-zinc-400;
   }
@@ -92,7 +96,7 @@
     @apply border-zinc-500/20 rounded-xl;
   }
 
-  .cl-socialButtonsProviderIcon__github {
+  .cl-socialButtonsProviderIcon__github, .cl-providerIcon__github {
     @apply invert;
   }
 

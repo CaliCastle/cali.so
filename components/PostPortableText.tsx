@@ -4,10 +4,10 @@ import { PortableText, type PortableTextComponents } from '@portabletext/react'
 import React from 'react'
 import { Tweet } from 'react-tweet'
 
-import { NewCommentIcon } from '~/assets'
 import { BleedThroughImage } from '~/components/BleedThroughImage'
+import { ClientOnly } from '~/components/ClientOnly'
+import { Commentable } from '~/components/Commentable'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
-import { HoverCard } from '~/components/ui/HoverCard'
 
 const components: PortableTextComponents = {
   block: {
@@ -18,7 +18,6 @@ const components: PortableTextComponents = {
           .map((child) => ('text' in child ? child.text : ''))
           .join('')
       )
-      const [isCommenting, setIsCommenting] = React.useState(false)
 
       return (
         <p
@@ -26,22 +25,9 @@ const components: PortableTextComponents = {
           className="group relative"
         >
           {!isEmpty && (
-            <HoverCard.Root open={isCommenting}>
-              <HoverCard.Trigger asChild>
-                <button
-                  type="button"
-                  className="absolute -left-8 top-[5px] flex h-full w-8 origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100"
-                  onClick={() => setIsCommenting((prev) => !prev)}
-                >
-                  <NewCommentIcon className="pointer-events-none h-5 w-5 select-none text-zinc-800 dark:text-zinc-300" />
-                </button>
-              </HoverCard.Trigger>
-              <HoverCard.Portal>
-                <HoverCard.Content side="top" align="start">
-                  You are commenting
-                </HoverCard.Content>
-              </HoverCard.Portal>
-            </HoverCard.Root>
+            <ClientOnly>
+              <Commentable blockId={value._key} />
+            </ClientOnly>
           )}
           {children}
         </p>
@@ -58,9 +44,11 @@ const components: PortableTextComponents = {
       />
     ),
     tweet: ({ value }) => (
-      <div className="flex justify-center">
-        <Tweet id={value.id} />
-      </div>
+      <ClientOnly>
+        <div className="flex justify-center">
+          <Tweet id={value.id} />
+        </div>
+      </ClientOnly>
     ),
   },
 

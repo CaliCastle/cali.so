@@ -37,7 +37,7 @@ export default function ReadingTimeInput(props: NumberInputProps) {
     // find the member that has the key of "body"
     const bodyMember = members.find((member) => {
       if (member.kind === 'field') {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comments
         // @ts-ignore
         return member.name === schemaType.options?.source ?? 'body'
       }

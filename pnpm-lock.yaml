@@ -133,6 +133,9 @@ dependencies:
   framer-motion:
     specifier: ^10.12.16
     version: 10.12.16(react-dom@18.2.0)(react@18.2.0)
+  hashids:
+    specifier: ^2.3.0
+    version: 2.3.0
   jotai:
     specifier: ^2.1.0
     version: 2.1.0(react@18.2.0)
@@ -181,12 +184,12 @@ dependencies:
   sanity:
     specifier: ^3.11.5
     version: 3.11.5(@types/node@18.16.15)(@types/react@18.2.7)(react-dom@18.2.0)(react@18.2.0)(styled-components@5.3.11)
+  valtio:
+    specifier: ^1.10.5
+    version: 1.10.5(react@18.2.0)
   zod:
     specifier: ^3.21.4
     version: 3.21.4
-  zustand:
-    specifier: ^4.3.8
-    version: 4.3.8(react@18.2.0)
 
 devDependencies:
   '@tailwindcss/typography':
@@ -7076,6 +7079,10 @@ packages:
     dependencies:
       function-bind: 1.1.1
 
+  /hashids@2.3.0:
+    resolution: {integrity: sha512-ljM73TE/avEhNnazxaj0Dw3BbEUuLC5yYCQ9RSkSUcT4ZSU6ZebdKCIBJ+xT/DnSYW36E9k82GH1Q6MydSIosQ==}
+    dev: false
+
   /hashlru@2.3.0:
     resolution: {integrity: sha512-0cMsjjIC8I+D3M44pOQdsy0OHXGLVz6Z0beRuufhKa0KfaD2wGwAev6jILzXsd3/vpnNQJmWyZtIILqM1N+n5A==}
     dev: false
@@ -9440,6 +9447,10 @@ packages:
     resolution: {integrity: sha512-vtK/94akxsTMhe0/cbfpR+syPuszcuwhqVjJq26CuNDgFGj682oRBXOP5MJpv2r7JtE8MsiepGIqvvOTBwn2vA==}
     dev: false
 
+  /proxy-compare@2.5.1:
+    resolution: {integrity: sha512-oyfc0Tx87Cpwva5ZXezSp5V9vht1c7dZBhvuV/y3ctkgMVUmiAGDVeeB0dKhGSyT0v1ZTEQYpe/RXlBVBNuCLA==}
+    dev: false
+
   /proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
     dev: false
@@ -11443,6 +11454,20 @@ packages:
       spdx-expression-parse: 3.0.1
     dev: false
 
+  /valtio@1.10.5(react@18.2.0):
+    resolution: {integrity: sha512-jTp0k63VXf4r5hPoaC6a6LCG4POkVSh629WLi1+d5PlajLsbynTMd7qAgEiOSPxzoX5iNvbN7iZ/k/g29wrNiQ==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      react: '>=16.8'
+    peerDependenciesMeta:
+      react:
+        optional: true
+    dependencies:
+      proxy-compare: 2.5.1
+      react: 18.2.0
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
   /vfile-message@3.1.4:
     resolution: {integrity: sha512-fa0Z6P8HUrQN4BZaX05SIVXic+7kE3b05PWAtPuYP9QLHsLKYR7/AlLW3NtOrpXRLeawpDLMsVkmk5DG0NXgWw==}
     dependencies:
@@ -11786,22 +11811,6 @@ packages:
         optional: true
     dependencies:
       react: 18.2.0
-    dev: false
-
-  /zustand@4.3.8(react@18.2.0):
-    resolution: {integrity: sha512-4h28KCkHg5ii/wcFFJ5Fp+k1J3gJoasaIbppdgZFO4BPJnsNxL0mQXBSFgOgAdCdBj35aDTPvdAJReTMntFPGg==}
-    engines: {node: '>=12.7.0'}
-    peerDependencies:
-      immer: '>=9.0'
-      react: '>=16.8'
-    peerDependenciesMeta:
-      immer:
-        optional: true
-      react:
-        optional: true
-    dependencies:
-      react: 18.2.0
-      use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
   /zwitch@2.0.4:

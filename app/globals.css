@@ -14,6 +14,10 @@ html.dark {
   --bg-color: theme('colors.primary.900');
 }
 
+[data-radix-popper-content-wrapper] {
+  z-index: 99999 !important;
+}
+
 ::selection {
   background-color: theme('colors.lime.500');
   color: theme('colors.lime.950');

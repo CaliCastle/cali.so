@@ -301,7 +301,7 @@ function UserInfo() {
 
   return (
     <AnimatePresence>
-      <SignedIn>
+      <SignedIn key="user-info">
         <motion.div
           className="pointer-events-auto flex h-10 items-center"
           initial={{ opacity: 0, x: 25 }}
@@ -309,16 +309,16 @@ function UserInfo() {
           exit={{ opacity: 0, x: 25 }}
         >
           <UserButton
-            afterSignOutUrl={url('/').href}
+            afterSignOutUrl={url(pathname).href}
             appearance={{
               elements: {
-                avatarBox: 'w-10 h-10',
+                avatarBox: 'w-9 h-9 ring-2 ring-white/20',
               },
             }}
           />
         </motion.div>
       </SignedIn>
-      <SignedOut>
+      <SignedOut key="sign-in">
         <motion.div
           className="pointer-events-auto"
           initial={{ opacity: 0, x: 25 }}
