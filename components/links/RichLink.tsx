@@ -1,3 +1,5 @@
+'use client'
+
 import { clsxm } from '@zolplay/utils'
 import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
@@ -11,6 +13,11 @@ type RichLinkProps = LinkProps &
   }
 export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
   ({ children, href, className, ...props }, ref) => {
+    const faviconUrl = React.useMemo(
+      () => `/api/favicon?url=${new URL(href).host}`,
+      [href]
+    )
+
     // if it's a relative link, use a fallback Link
     if (!href.startsWith('http')) {
       return (
@@ -34,7 +41,7 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
       >
         <span className="mr-px inline-flex translate-y-0.5">
           <Image
-            src={`/api/favicon?url=${new URL(href).host}`}
+            src={faviconUrl}
             alt=""
             aria-hidden="true"
             className="inline h-4 w-4 rounded"

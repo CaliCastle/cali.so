@@ -4,6 +4,7 @@ import { z } from 'zod'
 export const CommentDtoSchema = z.object({
   id: z.string(),
   postId: z.string(),
+  userId: z.string(),
   body: z.object({
     blockId: z.string().optional(),
     text: z.string().min(1),

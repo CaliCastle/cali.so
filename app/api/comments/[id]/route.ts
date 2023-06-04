@@ -1,5 +1,5 @@
 import { currentUser } from '@clerk/nextjs'
-import { desc, eq } from 'drizzle-orm'
+import { asc, eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -20,14 +20,14 @@ export async function GET(req: NextRequest, { params }: Params) {
     const data = await db
       .select({
         id: comments.id,
+        userId: comments.userId,
         userInfo: comments.userInfo,
         body: comments.body,
         createdAt: comments.createdAt,
       })
       .from(comments)
       .where(eq(comments.postId, postId))
-      .orderBy(desc(comments.createdAt))
-      .limit(100)
+      .orderBy(asc(comments.createdAt))
 
     return NextResponse.json(
       data.map(
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 const CreateCommentSchema = z.object({
   body: z.object({
     blockId: z.string().optional(),
-    text: z.string().min(1),
+    text: z.string().min(1).max(500),
   }),
 })
 
@@ -73,6 +73,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     const commentData = {
       postId,
+      userId: user.id,
       body,
       userInfo: {
         firstName: user.firstName,
@@ -80,10 +81,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         imageUrl: user.imageUrl,
       },
     }
-    const { insertId } = await db.insert(comments).values({
-      userId: user.id,
-      ...commentData,
-    })
+    const { insertId } = await db.insert(comments).values(commentData)
 
     return NextResponse.json({
       ...commentData,
