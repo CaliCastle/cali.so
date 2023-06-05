@@ -40,10 +40,11 @@ dayjs.extend(relativeTime)
 const MAX_COMMENT_LENGTH = 999
 
 type CommentableProps = {
+  className?: string
   blockId?: string
 }
 
-function Root({ blockId }: CommentableProps) {
+function Root({ className, blockId }: CommentableProps) {
   const pathname = usePathname()
   const { postId, comments } = useSnapshot(blogPostState)
   const { user: me } = useUser()
@@ -137,7 +138,10 @@ function Root({ blockId }: CommentableProps) {
       <AnimatePresence>
         {top3Users.length > 0 && (
           <motion.div
-            className="absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right items-center justify-end -space-x-1.5"
+            className={clsxm(
+              'absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right items-center justify-end -space-x-1.5',
+              className
+            )}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -159,7 +163,10 @@ function Root({ blockId }: CommentableProps) {
       <HoverCard.Trigger asChild>
         <button
           type="button"
-          className="absolute right-[calc(100%+6px)] top-[5px] flex h-full origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100"
+          className={clsxm(
+            'absolute right-[calc(100%+6px)] top-[5px] flex h-full origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100',
+            className
+          )}
           onClick={() => setIsCommenting((prev) => !prev)}
         >
           <NewCommentIcon className="pointer-events-none h-5 w-5 select-none text-zinc-800 dark:text-zinc-300" />
