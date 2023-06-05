@@ -52,6 +52,30 @@ function Root({ blockId }: CommentableProps) {
     () => comments.filter((c) => c.body.blockId === blockId),
     [comments, blockId]
   )
+  const top3Users = React.useMemo(() => {
+    if (currentComments.length === 0) {
+      return []
+    }
+
+    const users = new Set<PostIDLessCommentDto['userId']>()
+    const top3: PostIDLessCommentDto['userInfo'][] = []
+    for (const comment of currentComments) {
+      if (users.has(comment.userId)) {
+        continue
+      }
+
+      if (comment.userInfo.imageUrl) {
+        top3.push(comment.userInfo)
+        users.add(comment.userId)
+      }
+
+      if (top3.length >= 3) {
+        break
+      }
+    }
+
+    return top3
+  }, [currentComments])
 
   const formRef = React.useRef<HTMLFormElement>(null)
   const { mutate: createComment, isLoading } = useMutation(
@@ -110,10 +134,32 @@ function Root({ blockId }: CommentableProps) {
 
   return (
     <HoverCard.Root open={isCommenting}>
+      <AnimatePresence>
+        {top3Users.length > 0 && (
+          <motion.div
+            className="absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right items-center justify-end -space-x-1.5"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+          >
+            {top3Users.map((user, idx) => (
+              <Image
+                key={idx}
+                src={user.imageUrl ?? ''}
+                alt=""
+                width={20}
+                height={20}
+                unoptimized
+                className="pointer-events-none h-5 w-5 select-none rounded-full ring-2 ring-white dark:ring-zinc-800"
+              />
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <HoverCard.Trigger asChild>
         <button
           type="button"
-          className="absolute -left-8 top-[5px] flex h-full w-8 origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100"
+          className="absolute right-[calc(100%+6px)] top-[5px] flex h-full origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100"
           onClick={() => setIsCommenting((prev) => !prev)}
         >
           <NewCommentIcon className="pointer-events-none h-5 w-5 select-none text-zinc-800 dark:text-zinc-300" />
@@ -324,8 +370,8 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
           支持 <b>Markdown</b> 与{' '}
           <RichLink
             favicon={false}
-            href="https://github.github.com/gfm/"
-            className="font-bold"
+            href="https://docs.github.com/zh/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax"
+            className="font-bold hover:underline"
           >
             GFM
           </RichLink>
