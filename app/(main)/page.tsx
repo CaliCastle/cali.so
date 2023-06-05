@@ -34,5 +34,4 @@ export default function BlogHomePage() {
   )
 }
 
-export const runtime = 'edge'
 export const revalidate = 60

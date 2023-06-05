@@ -121,6 +121,3 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error }, { status: 400 })
   }
 }
-
-export const runtime = 'edge'
-export const preferredRegion = 'sin1'

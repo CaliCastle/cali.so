@@ -40,4 +40,4 @@ export default function ProjectsPage() {
   )
 }
 
-export const runtime = 'edge'
+export const revalidate = 3600
