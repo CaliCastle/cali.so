@@ -1,18 +1,8 @@
-import localFont from 'next/font/local'
+import { Manrope } from 'next/font/google'
 
-const sansFont = localFont({
-  src: [
-    {
-      path: './fonts/Satoshi-Variable.woff2',
-      weight: '300 900',
-      style: 'normal',
-    },
-    {
-      path: './fonts/Satoshi-VariableItalic.woff2',
-      weight: '300 900',
-      style: 'italic',
-    },
-  ],
+const sansFont = Manrope({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
   variable: '--font-sans',
   display: 'swap',
 })

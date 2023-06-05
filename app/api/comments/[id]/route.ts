@@ -46,7 +46,7 @@ export async function GET(req: NextRequest, { params }: Params) {
 const CreateCommentSchema = z.object({
   body: z.object({
     blockId: z.string().optional(),
-    text: z.string().min(1).max(500),
+    text: z.string().min(1).max(999),
   }),
 })
 

@@ -25,10 +25,11 @@ export function Card({
   as?: keyof JSX.IntrinsicElements
   className?: string
   children: React.ReactNode
-} & React.ComponentPropsWithoutRef<keyof JSX.IntrinsicElements>) {
+  onMouseMove?: React.MouseEventHandler
+  onMouseEnter?: React.MouseEventHandler
+  onMouseLeave?: React.MouseEventHandler
+}) {
   return (
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comments
-    // @ts-ignore
     <Component
       className={clsxm(className, 'group relative flex flex-col items-start')}
       {...props}

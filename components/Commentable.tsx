@@ -16,14 +16,18 @@ import { useSnapshot } from 'valtio'
 
 import { addComment, blogPostState } from '~/app/(main)/blog/blog-post.state'
 import {
+  EyeCloseIcon,
+  EyeOpenIcon,
   NewCommentIcon,
   TiltedSendIcon,
   UserArrowLeftIcon,
-  XSquareIcon,
+  XIcon,
 } from '~/assets'
-import { Markdown } from '~/components/Markdown'
+import { CommentMarkdown } from '~/components/CommentMarkdown'
+import { RichLink } from '~/components/links/RichLink'
 import { Button } from '~/components/ui/Button'
 import { HoverCard } from '~/components/ui/HoverCard'
+import { ElegantTooltip } from '~/components/ui/Tooltip'
 import {
   type CommentDto,
   type PostIDLessCommentDto,
@@ -33,12 +37,13 @@ import { parseDisplayName } from '~/lib/string'
 
 dayjs.extend(relativeTime)
 
-const MAX_COMMENT_LENGTH = 500
+const MAX_COMMENT_LENGTH = 999
 
 type CommentableProps = {
   blockId?: string
 }
-export function Commentable({ blockId }: CommentableProps) {
+
+function Root({ blockId }: CommentableProps) {
   const pathname = usePathname()
   const { postId, comments } = useSnapshot(blogPostState)
   const { user: me } = useUser()
@@ -79,18 +84,29 @@ export function Commentable({ blockId }: CommentableProps) {
     (e?: React.FormEvent<HTMLFormElement>) => {
       e?.preventDefault()
 
-      if (e?.currentTarget || formRef.current) {
-        const formData = new FormData(e?.currentTarget ?? formRef.current!)
-        const comment = formData.get('comment') as string
-        if (!comment.trim() || comment.length > MAX_COMMENT_LENGTH) return
+      const form = e?.currentTarget || formRef.current
+      if (form) {
+        const formData = new FormData(form)
+        const comment = formData.get('comment')
+        if (
+          !comment ||
+          typeof comment !== 'string' ||
+          !comment.trim() ||
+          comment.length > MAX_COMMENT_LENGTH
+        ) {
+          return
+        }
 
-        createComment(comment)
+        createComment(comment.trim())
       }
     },
     [createComment]
   )
 
-  const isMe = (comment: PostIDLessCommentDto) => comment.userId === me?.id
+  const isMe = React.useCallback(
+    (comment: PostIDLessCommentDto) => comment.userId === me?.id,
+    [me?.id]
+  )
 
   return (
     <HoverCard.Root open={isCommenting}>
@@ -120,68 +136,17 @@ export function Commentable({ blockId }: CommentableProps) {
               >
                 <button
                   type="button"
-                  className="absolute -right-1.5 -top-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800"
+                  className="group absolute inset-x-0 -top-3 z-50 flex justify-center"
                   onClick={() => setIsCommenting(false)}
                 >
-                  <XSquareIcon className="h-6 w-6 text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200" />
+                  <XIcon className="h-6 w-6 rounded-full border border-zinc-400/20 bg-white/95 p-1 text-zinc-500 backdrop-blur transition-all group-hover:w-12 group-hover:text-zinc-700 dark:border-zinc-500/30 dark:bg-zinc-800/95 dark:text-zinc-400 dark:group-hover:text-zinc-200" />
                 </button>
                 <main className="flex w-[clamp(200px,40vmax,320px)] flex-col">
                   {currentComments.length > 0 && (
-                    <header className="mb-3 border-b border-zinc-300/20 pb-3">
-                      <ul className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-y-scroll">
+                    <header className="-mx-4 -mt-4 mb-3 rounded-t-xl border-b border-zinc-400/20 bg-zinc-100/50 pb-2 dark:border-zinc-300/10 dark:bg-black/20">
+                      <ul className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-y-scroll p-4 pb-6 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_5%,black_93%,transparent_100%)]">
                         {currentComments.map((c) => (
-                          <li key={c.id}>
-                            <div
-                              className={clsxm(
-                                'flex w-full items-stretch gap-2',
-                                isMe(c) && 'flex-row-reverse'
-                              )}
-                            >
-                              <div className="flex w-6 items-end">
-                                <Image
-                                  src={c.userInfo.imageUrl ?? ''}
-                                  alt=""
-                                  className="h-6 w-6 select-none rounded-full"
-                                  width={24}
-                                  height={24}
-                                  unoptimized
-                                />
-                              </div>
-                              <div
-                                className={clsxm(
-                                  'flex flex-1 shrink-0 flex-col',
-                                  isMe(c) && 'items-end'
-                                )}
-                              >
-                                <span
-                                  className={clsxm(
-                                    'flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200',
-                                    isMe(c) && 'flex-row-reverse'
-                                  )}
-                                >
-                                  {!isMe(c) && (
-                                    <span>{parseDisplayName(c.userInfo)}</span>
-                                  )}
-                                  <span className="inline-flex select-none text-[12px] font-medium opacity-40">
-                                    {dayjs(c.createdAt)
-                                      .locale('zh-cn')
-                                      .fromNow()}
-                                  </span>
-                                </span>
-
-                                <div
-                                  className={clsxm(
-                                    'inline-block whitespace-pre-line rounded-xl px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200',
-                                    isMe(c)
-                                      ? 'rounded-br-sm bg-sky-200/30 dark:bg-sky-600/80'
-                                      : 'rounded-bl-sm bg-zinc-600/5 dark:bg-zinc-500/20'
-                                  )}
-                                >
-                                  <Markdown>{c.body.text}</Markdown>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
+                          <CommentItem key={c.id} {...c} isMe={isMe} />
                         ))}
                       </ul>
                     </header>
@@ -202,15 +167,17 @@ export function Commentable({ blockId }: CommentableProps) {
                     </SignedIn>
 
                     <SignedOut>
-                      <SignInButton
-                        mode="modal"
-                        redirectUrl={url(pathname).href}
-                      >
-                        <Button>
-                          <UserArrowLeftIcon className="mr-1 h-5 w-5" />
-                          登录后参与讨论
-                        </Button>
-                      </SignInButton>
+                      <div className="flex justify-center">
+                        <SignInButton
+                          mode="modal"
+                          redirectUrl={url(pathname).href}
+                        >
+                          <Button type="button">
+                            <UserArrowLeftIcon className="mr-1 h-5 w-5" />
+                            登录后参与讨论
+                          </Button>
+                        </SignInButton>
+                      </div>
                     </SignedOut>
                   </form>
                 </main>
@@ -223,6 +190,72 @@ export function Commentable({ blockId }: CommentableProps) {
   )
 }
 
+export const Commentable = React.memo(Root)
+Commentable.displayName = 'Commentable'
+Root.displayName = 'Commentable.Root'
+
+function Comment({
+  isMe,
+  ...c
+}: PostIDLessCommentDto & {
+  isMe: (comment: PostIDLessCommentDto) => boolean
+}) {
+  return (
+    <li data-commentid={c.id}>
+      <div
+        className={clsxm(
+          'flex w-full items-stretch gap-2',
+          isMe(c) ? 'flex-row-reverse' : 'flex-row'
+        )}
+      >
+        <div className="flex w-6 items-end">
+          <Image
+            src={c.userInfo.imageUrl ?? ''}
+            alt=""
+            className="h-6 w-6 select-none rounded-full"
+            width={24}
+            height={24}
+            unoptimized
+          />
+        </div>
+        <div
+          className={clsxm(
+            'flex flex-1 shrink-0 flex-col',
+            isMe(c) ? 'items-end' : 'items-start'
+          )}
+        >
+          <span
+            className={clsxm(
+              'flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200',
+              isMe(c) && 'flex-row-reverse'
+            )}
+          >
+            {!isMe(c) && <span>{parseDisplayName(c.userInfo)}</span>}
+            <span className="inline-flex select-none text-[10px] font-medium opacity-40">
+              {dayjs(c.createdAt).locale('zh-cn').fromNow()}
+            </span>
+          </span>
+
+          <div
+            className={clsxm(
+              'comment__message inline-block rounded-xl px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200',
+              isMe(c)
+                ? 'rounded-br-sm bg-sky-300/40 dark:bg-sky-600/80'
+                : 'rounded-bl-sm bg-zinc-600/5 dark:bg-zinc-500/20'
+            )}
+          >
+            <CommentMarkdown>{c.body.text}</CommentMarkdown>
+          </div>
+        </div>
+      </div>
+    </li>
+  )
+}
+
+const CommentItem = React.memo(Comment)
+CommentItem.displayName = 'Commentable.CommentItem'
+Comment.displayName = 'Commentable.Comment'
+
 type CommentTextareaProps = {
   isLoading?: boolean
   onSubmit?: () => void
@@ -230,6 +263,7 @@ type CommentTextareaProps = {
 function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
   const { user: me } = useUser()
   const [comment, setComment] = React.useState('')
+  const [isPreviewing, setIsPreviewing] = React.useState(false)
   const onKeydown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && e.metaKey) {
@@ -252,21 +286,25 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
 
   return (
     <>
-      <div className="flex w-full pb-1">
-        <TextareaAutosize
-          id="comment"
-          name="comment"
-          className="block w-full resize-none border-0 bg-transparent text-sm leading-6 text-zinc-800 placeholder-zinc-300 outline-none focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
-          placeholder="留下你的评论吧..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyDown={onKeydown}
-          disabled={isLoading}
-          maxRows={8}
-          autoFocus
-        />
-      </div>
-      <footer className="flex w-full items-center justify-between">
+      <div className="flex w-full items-end pb-1">
+        {isPreviewing ? (
+          <div className="comment__message flex-1 shrink-0 px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200">
+            <CommentMarkdown>{comment}</CommentMarkdown>
+          </div>
+        ) : (
+          <TextareaAutosize
+            id="comment"
+            name="comment"
+            className="block flex-1 shrink-0 resize-none border-0 bg-transparent text-sm leading-6 text-zinc-800 placeholder-zinc-300 outline-none focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+            placeholder="留下你的评论吧..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={onKeydown}
+            disabled={isLoading}
+            maxRows={8}
+            autoFocus
+          />
+        )}
         <Image
           src={me?.imageUrl ?? ''}
           alt=""
@@ -275,27 +313,72 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
           height={24}
           unoptimized
         />
+      </div>
+      <footer className="flex h-5 w-full items-center justify-between">
+        <span
+          className={clsxm(
+            'flex-1 shrink-0 select-none text-[10px] text-zinc-500 transition-opacity',
+            comment.length > 0 ? 'opacity-100' : 'opacity-0'
+          )}
+        >
+          支持 <b>Markdown</b> 与{' '}
+          <RichLink
+            favicon={false}
+            href="https://github.github.com/gfm/"
+            className="font-bold"
+          >
+            GFM
+          </RichLink>
+        </span>
         <AnimatePresence>
           {comment.length > 0 && (
             <motion.aside
               key="send-button-wrapper"
-              initial={{ opacity: 0, y: 12, height: 0 }}
-              animate={{ opacity: 1, y: 0, height: 'auto' }}
-              exit={{ opacity: 0, y: 20, height: 0 }}
-              className="flex items-center gap-2"
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 8 }}
+              className="flex select-none items-center gap-2.5"
             >
-              <span className="text-[12px] text-zinc-500">
+              <span
+                className={clsxm(
+                  'font-mono text-[10px]',
+                  comment.length > MAX_COMMENT_LENGTH
+                    ? 'text-red-500'
+                    : 'text-zinc-500'
+                )}
+              >
                 {comment.length}/{MAX_COMMENT_LENGTH}
               </span>
-              <motion.button
-                className="appearance-none"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type="submit"
-                disabled={isLoading}
-              >
-                <TiltedSendIcon className="h-5 w-5 text-zinc-800 dark:text-zinc-200" />
-              </motion.button>
+
+              <ElegantTooltip content={isPreviewing ? '关闭预览' : '预览一下'}>
+                <motion.button
+                  className="appearance-none"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  disabled={isLoading}
+                  onClick={() => setIsPreviewing((prev) => !prev)}
+                >
+                  {isPreviewing ? (
+                    <EyeCloseIcon className="h-5 w-5 text-zinc-800 dark:text-zinc-200" />
+                  ) : (
+                    <EyeOpenIcon className="h-5 w-5 text-zinc-800 dark:text-zinc-200" />
+                  )}
+                </motion.button>
+              </ElegantTooltip>
+
+              <ElegantTooltip content="发送">
+                <motion.button
+                  className="appearance-none"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  animate={{ opacity: isPreviewing ? 0.5 : 1 }}
+                  type="submit"
+                  disabled={isLoading || isPreviewing}
+                >
+                  <TiltedSendIcon className="h-5 w-5 text-zinc-800 dark:text-zinc-200" />
+                </motion.button>
+              </ElegantTooltip>
             </motion.aside>
           )}
         </AnimatePresence>

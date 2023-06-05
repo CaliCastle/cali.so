@@ -18,6 +18,10 @@ html.dark {
   z-index: 99999 !important;
 }
 
+[data-floating-ui-portal] {
+  z-index: 100000;
+}
+
 ::selection {
   background-color: theme('colors.lime.500');
   color: theme('colors.lime.950');

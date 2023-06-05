@@ -6,7 +6,7 @@ import remarkGfm from 'remark-gfm'
 
 import { RichLink } from '~/components/links/RichLink'
 
-export function Markdown({ children }: { children: string }) {
+export function CommentMarkdown({ children }: { children: string }) {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -17,7 +17,7 @@ export function Markdown({ children }: { children: string }) {
             <RichLink
               href={href ?? ''}
               rel={rel}
-              className="font-semibold text-zinc-800 hover:underline dark:text-zinc-100"
+              className="font-bold text-zinc-800 hover:underline dark:text-zinc-100"
             >
               {children}
             </RichLink>
