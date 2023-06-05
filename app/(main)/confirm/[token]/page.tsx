@@ -7,8 +7,6 @@ import { subscribers } from '~/db/schema'
 
 import { SubbedCelebration } from './SubbedCelebration'
 
-export const runtime = 'edge'
-
 export const metadata = {
   title: '感谢你的订阅',
 }

@@ -4,7 +4,7 @@ import { ImageResponse, type NextRequest, NextResponse } from 'next/server'
 import { ratelimit, redis } from '~/lib/redis'
 
 export const runtime = 'edge'
-export const revalidate = 60 * 60 * 24 * 3 // 3 days
+export const revalidate = 259200 // 3 days
 
 function getKey(url: string) {
   return `favicon:${url}`

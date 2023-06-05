@@ -1,5 +1,6 @@
 'use client'
 
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { clsxm } from '@zolplay/utils'
 import {
   AnimatePresence,
@@ -13,10 +14,12 @@ import React from 'react'
 import { Activity } from '~/app/(main)/Activity'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
+import { UserArrowLeftIcon } from '~/assets'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
+import { Tooltip } from '~/components/ui/Tooltip'
+import { url } from '~/lib'
 import { clamp } from '~/lib/math'
-
 export function Header() {
   const isHomePage = usePathname() === '/'
 
@@ -258,10 +261,11 @@ export function Header() {
                 <NavigationBar.Desktop className="pointer-events-auto relative z-50 hidden md:block" />
               </div>
               <motion.div
-                className="flex justify-end md:flex-1"
+                className="flex justify-end gap-3 md:flex-1"
                 initial={{ opacity: 0, y: -20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
               >
+                <UserInfo />
                 <div className="pointer-events-auto">
                   <ThemeSwitcher />
                 </div>
@@ -288,5 +292,71 @@ export function Header() {
       </motion.header>
       {isHomePage && <div className="h-[--content-offset]" />}
     </>
+  )
+}
+
+function UserInfo() {
+  const [tooltipOpen, setTooltipOpen] = React.useState(false)
+  const pathname = usePathname()
+
+  return (
+    <AnimatePresence>
+      <SignedIn key="user-info">
+        <motion.div
+          className="pointer-events-auto flex h-10 items-center"
+          initial={{ opacity: 0, x: 25 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 25 }}
+        >
+          <UserButton
+            afterSignOutUrl={url(pathname).href}
+            appearance={{
+              elements: {
+                avatarBox: 'w-9 h-9 ring-2 ring-white/20',
+              },
+            }}
+          />
+        </motion.div>
+      </SignedIn>
+      <SignedOut key="sign-in">
+        <motion.div
+          className="pointer-events-auto"
+          initial={{ opacity: 0, x: 25 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 25 }}
+        >
+          <Tooltip.Provider disableHoverableContent>
+            <Tooltip.Root open={tooltipOpen} onOpenChange={setTooltipOpen}>
+              <SignInButton mode="modal" redirectUrl={url(pathname).href}>
+                <Tooltip.Trigger asChild>
+                  <button
+                    type="button"
+                    className="group h-10 rounded-full bg-gradient-to-b from-zinc-50/50 to-white/90 px-3 text-sm shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur transition dark:from-zinc-900/50 dark:to-zinc-800/90 dark:ring-white/10 dark:hover:ring-white/20"
+                  >
+                    <UserArrowLeftIcon className="h-5 w-5" />
+                  </button>
+                </Tooltip.Trigger>
+              </SignInButton>
+
+              <AnimatePresence>
+                {tooltipOpen && (
+                  <Tooltip.Portal forceMount>
+                    <Tooltip.Content asChild>
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                      >
+                        登录
+                      </motion.div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </AnimatePresence>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        </motion.div>
+      </SignedOut>
+    </AnimatePresence>
   )
 }

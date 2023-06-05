@@ -1,9 +1,12 @@
 import '~/app/globals.css'
+import './clerk.css'
 
+import { ClerkProvider } from '@clerk/nextjs'
 import { type Metadata } from 'next'
 
 import { ThemeProvider } from '~/app/(main)/ThemeProvider'
 import { url } from '~/lib'
+import { zhCN } from '~/lib/clerkLocalizations'
 import { sansFont } from '~/lib/font'
 import { seo } from '~/lib/seo'
 
@@ -63,21 +66,23 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html
-      lang="zh-CN"
-      className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="flex h-full flex-col">
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
+    <ClerkProvider localization={zhCN}>
+      <html
+        lang="zh-CN"
+        className={`${sansFont.variable} m-0 h-full p-0 font-sans antialiased`}
+        suppressHydrationWarning
+      >
+        <body className="flex h-full flex-col">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { clsxm } from '@zolplay/utils'
 import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
@@ -8,9 +10,19 @@ import { ExternalLinkIcon } from '~/assets'
 type RichLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {
     children: React.ReactNode
+  } & {
+    favicon?: boolean
   }
 export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
-  ({ children, href, className, ...props }, ref) => {
+  ({ children, href, favicon = true, className, ...props }, ref) => {
+    const faviconUrl = React.useMemo(
+      () =>
+        href.startsWith('http')
+          ? `/api/favicon?url=${new URL(href).host}`
+          : null,
+      [href]
+    )
+
     // if it's a relative link, use a fallback Link
     if (!href.startsWith('http')) {
       return (
@@ -32,26 +44,30 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
         target="_blank"
         {...props}
       >
-        <span className="mr-px inline-flex translate-y-0.5">
-          <Image
-            src={`/api/favicon?url=${new URL(href).host}`}
-            alt=""
-            aria-hidden="true"
-            className="inline h-4 w-4 rounded"
-            width={16}
-            height={16}
-            unoptimized
-            priority={false}
-          />
-        </span>
+        {favicon && faviconUrl && (
+          <span className="mr-px inline-flex translate-y-0.5">
+            <Image
+              src={faviconUrl}
+              alt=""
+              aria-hidden="true"
+              className="inline h-4 w-4 rounded"
+              width={16}
+              height={16}
+              unoptimized
+              priority={false}
+            />
+          </span>
+        )}
 
         {children}
-        <ExternalLinkIcon
-          width="0.95em"
-          height="0.95em"
-          className="inline-block translate-y-0.5"
-          aria-hidden="true"
-        />
+        {faviconUrl && (
+          <ExternalLinkIcon
+            width="0.95em"
+            height="0.95em"
+            className="inline-block translate-y-0.5"
+            aria-hidden="true"
+          />
+        )}
       </Link>
     )
   }

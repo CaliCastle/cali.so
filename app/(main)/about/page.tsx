@@ -7,5 +7,3 @@ export default function AboutPage() {
     </Container>
   )
 }
-
-export const runtime = 'edge'

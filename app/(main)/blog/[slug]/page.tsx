@@ -1,3 +1,5 @@
+import './blog.css'
+
 import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
@@ -85,5 +87,4 @@ export default async function BlogPage({
   )
 }
 
-export const runtime = 'edge'
 export const revalidate = 60
