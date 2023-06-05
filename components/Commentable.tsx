@@ -106,24 +106,30 @@ function Root({ className, blockId }: CommentableProps) {
     }
   )
   const onSubmit = React.useCallback(
-    (e?: React.FormEvent<HTMLFormElement>) => {
-      e?.preventDefault()
+    (e?: React.FormEvent<HTMLFormElement> | string) => {
+      let comment = ''
+      if (typeof e === 'string') {
+        comment = e
+      } else {
+        e?.preventDefault()
 
-      const form = e?.currentTarget || formRef.current
-      if (form) {
-        const formData = new FormData(form)
-        const comment = formData.get('comment')
-        if (
-          !comment ||
-          typeof comment !== 'string' ||
-          !comment.trim() ||
-          comment.length > MAX_COMMENT_LENGTH
-        ) {
-          return
+        const form = e?.currentTarget || formRef.current
+        if (form) {
+          const formData = new FormData(form)
+          comment = formData.get('comment') as string
         }
-
-        createComment(comment.trim())
       }
+
+      if (
+        !comment ||
+        typeof comment !== 'string' ||
+        !comment.trim() ||
+        comment.length > MAX_COMMENT_LENGTH
+      ) {
+        return
+      }
+
+      createComment(comment.trim())
     },
     [createComment]
   )
@@ -137,7 +143,7 @@ function Root({ className, blockId }: CommentableProps) {
     <HoverCard.Root open={isCommenting}>
       <AnimatePresence>
         {top3Users.length > 0 && (
-          <motion.div
+          <motion.span
             className={clsxm(
               'absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right items-center justify-end -space-x-1.5',
               className
@@ -157,7 +163,7 @@ function Root({ className, blockId }: CommentableProps) {
                 className="pointer-events-none h-5 w-5 select-none rounded-full ring-2 ring-white dark:ring-zinc-800"
               />
             ))}
-          </motion.div>
+          </motion.span>
         )}
       </AnimatePresence>
       <HoverCard.Trigger asChild>
@@ -196,8 +202,8 @@ function Root({ className, blockId }: CommentableProps) {
                 </button>
                 <main className="flex w-[clamp(200px,40vmax,320px)] flex-col">
                   {currentComments.length > 0 && (
-                    <header className="-mx-4 -mt-4 mb-3 rounded-t-xl border-b border-zinc-400/20 bg-zinc-100/50 pb-2 dark:border-zinc-300/10 dark:bg-black/20">
-                      <ul className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-y-scroll p-4 pb-6 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_5%,black_93%,transparent_100%)]">
+                    <header className="-mx-4 -mt-4 rounded-t-xl border-b border-zinc-400/20 bg-zinc-100/50 dark:border-zinc-300/10 dark:bg-black/20">
+                      <ul className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-y-scroll p-4 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_28px,black_100%)]">
                         {currentComments.map((c) => (
                           <CommentItem key={c.id} {...c} isMe={isMe} />
                         ))}
@@ -206,7 +212,7 @@ function Root({ className, blockId }: CommentableProps) {
                   )}
                   <form
                     className={clsxm(
-                      'flex flex-col gap-2 transition-opacity',
+                      'flex flex-col gap-2 pt-2 transition-opacity',
                       isLoading && 'pointer-events-none opacity-50'
                     )}
                     ref={formRef}
@@ -311,24 +317,32 @@ Comment.displayName = 'Commentable.Comment'
 
 type CommentTextareaProps = {
   isLoading?: boolean
-  onSubmit?: () => void
+  onSubmit?: (comment: string) => void
 }
 function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
   const { user: me } = useUser()
   const [comment, setComment] = React.useState('')
   const [isPreviewing, setIsPreviewing] = React.useState(false)
+  const onClickSend = React.useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      onSubmit?.(comment)
+    },
+    [onSubmit, comment]
+  )
   const onKeydown = React.useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && e.metaKey) {
         e.preventDefault()
-        onSubmit?.()
+        onSubmit?.(comment)
       }
     },
-    [onSubmit]
+    [onSubmit, comment]
   )
   React.useEffect(() => {
     const handler = () => {
       setComment('')
+      setIsPreviewing(false)
     }
     window.addEventListener('clear-comment', handler)
 
@@ -425,9 +439,9 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
                   className="appearance-none"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  animate={{ opacity: isPreviewing ? 0.5 : 1 }}
                   type="submit"
-                  disabled={isLoading || isPreviewing}
+                  disabled={isLoading}
+                  onClick={onClickSend}
                 >
                   <TiltedSendIcon className="h-5 w-5 text-zinc-800 dark:text-zinc-200" />
                 </motion.button>
