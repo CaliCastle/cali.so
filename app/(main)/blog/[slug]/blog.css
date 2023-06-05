@@ -57,7 +57,7 @@
   }
 
   blockquote {
-    @apply border-zinc-600;
+    @apply border-zinc-50/50;
   }
 
   pre, code:not([class^="language-"]) {
