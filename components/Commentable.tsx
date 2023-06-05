@@ -261,7 +261,7 @@ function Comment({
           isMe(c) ? 'flex-row-reverse' : 'flex-row'
         )}
       >
-        <div className="flex w-6 items-end">
+        <div className="flex w-6 shrink-0 items-end">
           <Image
             src={c.userInfo.imageUrl ?? ''}
             alt=""
@@ -273,7 +273,7 @@ function Comment({
         </div>
         <div
           className={clsxm(
-            'flex flex-1 shrink-0 flex-col',
+            'flex flex-1 flex-col',
             isMe(c) ? 'items-end' : 'items-start'
           )}
         >
