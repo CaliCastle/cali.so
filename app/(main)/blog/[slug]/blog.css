@@ -39,7 +39,7 @@
   }
 
   pre {
-    @apply my-1.5;
+    @apply my-1.5 whitespace-break-spaces;
   }
 
   pre, code:not([class^="language-"]) {
