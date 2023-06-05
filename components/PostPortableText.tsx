@@ -73,6 +73,16 @@ const components: PortableTextComponents = {
         </h4>
       )
     },
+    blockquote: ({ value, children }) => {
+      return (
+        <blockquote data-blockid={value._key} className="group relative">
+          <ClientOnly>
+            <Commentable blockId={value._key} />
+          </ClientOnly>
+          {children}
+        </blockquote>
+      )
+    },
   },
   listItem: ({ value, children }) => {
     return (
