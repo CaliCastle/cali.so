@@ -32,53 +32,63 @@ const NewReplyCommentEmail = ({
     <Layout previewText={title}>
       <Heading>{title}</Heading>
       <Section className="mt-[24px]">
-        <Img
-          src={postImageUrl}
-          alt="Cali"
-          width="100%"
-          className="mx-auto my-0"
-        />
-        <Text className="text-[14px] leading-[24px] text-black">
+        {postImageUrl && (
           <Img
-            src={userImageUrl}
+            src={postImageUrl}
             alt=""
-            width="24"
-            height="24"
-            className="rounded-full"
+            width="100%"
+            className="mx-auto my-0"
           />
-        </Text>
+        )}
         <Text className="text-[14px] leading-[24px] text-black">
-          <b>{user}</b>&nbsp;在 「
-          <Link href={postLink} className="font-bold underline">
-            {postTitle}
-          </Link>
-          」中回复了你：
+          {userImageUrl && (
+            <Img
+              src={userImageUrl}
+              alt=""
+              width="24"
+              height="24"
+              className="rounded-full"
+            />
+          )}
         </Text>
+        {postLink && (
+          <Text className="text-[14px] leading-[24px] text-black">
+            <b>{user}</b>&nbsp;在 「
+            <Link href={postLink} className="font-bold underline">
+              {postTitle}
+            </Link>
+            」中回复了你：
+          </Text>
+        )}
       </Section>
 
       <Section className="px-2 text-[14px] leading-[16px] text-zinc-700">
-        <ReactMarkdown>{commentContent}</ReactMarkdown>
+        {commentContent && <ReactMarkdown>{commentContent}</ReactMarkdown>}
       </Section>
 
       <Hr className="mx-0 my-[26px] h-px w-full bg-zinc-100" />
 
       <Section className="mb-[32px] mt-[32px] text-center">
-        <Button
-          pX={20}
-          pY={12}
-          className="rounded-xl bg-zinc-900 text-center text-[12px] font-semibold text-white no-underline"
-          href={postLink}
-        >
-          查看文章
-        </Button>
+        {postLink && (
+          <Button
+            pX={20}
+            pY={12}
+            className="rounded-xl bg-zinc-900 text-center text-[12px] font-semibold text-white no-underline"
+            href={postLink}
+          >
+            查看文章
+          </Button>
+        )}
       </Section>
-      <Text className="text-[14px] leading-[24px] text-black">
-        或者复制下面的链接到你的浏览器中进行访问：
-        <br />
-        <Link href={postLink} className="text-blue-600 no-underline">
-          {postLink}
-        </Link>
-      </Text>
+      {postLink && (
+        <Text className="text-[14px] leading-[24px] text-black">
+          或者复制下面的链接到你的浏览器中进行访问：
+          <br />
+          <Link href={postLink} className="text-blue-600 no-underline">
+            {postLink}
+          </Link>
+        </Text>
+      )}
     </Layout>
   )
 }
