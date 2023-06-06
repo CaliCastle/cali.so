@@ -88,13 +88,15 @@ function Root({ className, blockId }: CommentableProps) {
   const formRef = React.useRef<HTMLFormElement>(null)
   const commentsRef = React.useRef<HTMLUListElement>(null)
   const scrollToComment = React.useCallback((id: string) => {
-    if (commentsRef.current) {
-      commentsRef.current
-        .querySelector(`[data-commentid="${id}"]`)
-        ?.scrollIntoView({
-          behavior: 'smooth',
-        })
-    }
+    setTimeout(() => {
+      if (commentsRef.current) {
+        commentsRef.current
+          .querySelector(`[data-commentid="${id}"]`)
+          ?.scrollIntoView({
+            behavior: 'smooth',
+          })
+      }
+    }, 300)
   }, [])
 
   const { mutate: createComment, isLoading } = useMutation(
