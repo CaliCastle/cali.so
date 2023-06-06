@@ -150,9 +150,9 @@ export async function POST(req: NextRequest, { params }: Params) {
               postTitle: post.title,
               postLink: url(`/blog/${post.slug}`).href,
               postImageUrl: post.imageUrl,
-              userFirstName: firstName,
-              userLastName: lastName,
-              userImageUrl: imageUrl,
+              userFirstName: user.firstName,
+              userLastName: user.lastName,
+              userImageUrl: user.imageUrl,
               commentContent: body.text,
             }),
           })
