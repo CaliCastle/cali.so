@@ -62,7 +62,7 @@ export async function GET(req: NextRequest, { params }: Params) {
           ({
             ...rest,
             id: CommentHashids.encode(id),
-            parentId: CommentHashids.encode(parentId),
+            parentId: parentId ? CommentHashids.encode(parentId) : null,
           } as PostIDLessCommentDto)
       )
     )
