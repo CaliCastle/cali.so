@@ -13,6 +13,14 @@ const NewReplyCommentEmail = ({
   userLastName = 'Castle',
   userImageUrl = 'https://cali.so/icon.png',
   commentContent = '*测试评论*\n- Wow wtf\n- Cool',
+}: {
+  postLink?: string | null
+  postTitle?: string | null
+  postImageUrl?: string | null
+  userFirstName?: string | null
+  userLastName?: string | null
+  userImageUrl?: string | null
+  commentContent?: string | null
 }) => {
   const user = parseDisplayName({
     firstName: userFirstName,
