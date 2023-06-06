@@ -168,15 +168,16 @@ function Root({ className, blockId }: CommentableProps) {
   }, [isCommenting])
 
   React.useEffect(() => {
-    const handler = (e: CustomEvent) => {
-      if (typeof e.detail === 'string') {
+    const event = 'scroll-to-comment'
+    const handler = (e: Event) => {
+      if (e instanceof CustomEvent && typeof e.detail === 'string') {
         scrollToComment(e.detail)
       }
     }
-    window.addEventListener('scroll-to-comment', handler)
+    window.addEventListener(event, handler)
 
     return () => {
-      window.removeEventListener('scroll-to-comment', handler)
+      window.removeEventListener(event, handler)
     }
   }, [scrollToComment])
 
