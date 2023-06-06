@@ -14,6 +14,7 @@ export const CommentDtoSchema = z.object({
     lastName: z.string().nullable().optional(),
     imageUrl: z.string().nullable().optional(),
   }),
+  parentId: z.string().nullable().optional(),
   createdAt: z.date().or(z.string()),
 })
 export type CommentDto = z.infer<typeof CommentDtoSchema>

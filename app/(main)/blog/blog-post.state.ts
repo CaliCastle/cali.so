@@ -6,11 +6,21 @@ type PostID = string
 export const blogPostState = proxy<{
   postId: PostID
   comments: PostIDLessCommentDto[]
+  replyingTo: PostIDLessCommentDto | null
 }>({
   postId: '',
   comments: [],
+  replyingTo: null,
 })
 
 export function addComment(comment: PostIDLessCommentDto) {
   blogPostState.comments.push(comment)
+}
+
+export function replyTo(comment: PostIDLessCommentDto) {
+  blogPostState.replyingTo = comment
+}
+
+export function clearReply() {
+  blogPostState.replyingTo = null
 }

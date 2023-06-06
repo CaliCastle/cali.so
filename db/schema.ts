@@ -1,4 +1,5 @@
 import {
+  bigint,
   datetime,
   index,
   json,
@@ -24,6 +25,7 @@ export const comments = mysqlTable(
     userId: varchar('user_id', { length: 200 }).notNull(),
     userInfo: json('user_info'),
     postId: varchar('post_id', { length: 100 }).notNull(),
+    parentId: bigint('parent_id', { mode: 'bigint' }),
     body: json('body'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),

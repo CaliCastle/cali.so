@@ -1,15 +1,15 @@
 import { Ratelimit } from '@upstash/ratelimit'
 import { eq } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { z } from 'zod'
 
 import { emailConfig } from '~/config/email'
 import { db } from '~/db'
 import { subscribers } from '~/db/schema'
-import ConfirmSubscriptionEmail from '~/emails/confirm-subscription'
+import ConfirmSubscriptionEmail from '~/emails/ConfirmSubscription'
 import { env } from '~/env.mjs'
 import { url } from '~/lib'
+import { resend } from '~/lib/mail'
 import { redis } from '~/lib/redis'
 
 const newsletterFormSchema = z.object({
@@ -21,8 +21,6 @@ const ratelimit = new Ratelimit({
   limiter: Ratelimit.slidingWindow(1, '10 s'),
   analytics: true,
 })
-
-const resend = new Resend(env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   if (env.NODE_ENV === 'production') {

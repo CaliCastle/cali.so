@@ -14,14 +14,21 @@ import { useMutation } from 'react-query'
 import TextareaAutosize from 'react-textarea-autosize'
 import { useSnapshot } from 'valtio'
 
-import { addComment, blogPostState } from '~/app/(main)/blog/blog-post.state'
+import {
+  addComment,
+  blogPostState,
+  clearReply,
+  replyTo,
+} from '~/app/(main)/blog/blog-post.state'
 import {
   EyeCloseIcon,
   EyeOpenIcon,
   NewCommentIcon,
   TiltedSendIcon,
   UserArrowLeftIcon,
+  UTurnLeftIcon,
   XIcon,
+  XSquareIcon,
 } from '~/assets'
 import { CommentMarkdown } from '~/components/CommentMarkdown'
 import { RichLink } from '~/components/links/RichLink'
@@ -79,6 +86,17 @@ function Root({ className, blockId }: CommentableProps) {
   }, [currentComments])
 
   const formRef = React.useRef<HTMLFormElement>(null)
+  const commentsRef = React.useRef<HTMLUListElement>(null)
+  const scrollToComment = React.useCallback((id: string) => {
+    if (commentsRef.current) {
+      commentsRef.current
+        .querySelector(`[data-commentid="${id}"]`)
+        ?.scrollIntoView({
+          behavior: 'smooth',
+        })
+    }
+  }, [])
+
   const { mutate: createComment, isLoading } = useMutation(
     ['comment', postId],
     async (comment: string) => {
@@ -92,6 +110,7 @@ function Root({ className, blockId }: CommentableProps) {
             blockId,
             text: comment,
           } satisfies CommentDto['body'],
+          parentId: blogPostState.replyingTo?.id,
         }),
       })
       const data: CommentDto = await res.json()
@@ -100,6 +119,10 @@ function Root({ className, blockId }: CommentableProps) {
     {
       onSuccess: (data) => {
         addComment(data)
+
+        window.requestAnimationFrame(() => {
+          scrollToComment(data.id)
+        })
 
         window.dispatchEvent(new CustomEvent('clear-comment'))
       },
@@ -138,19 +161,39 @@ function Root({ className, blockId }: CommentableProps) {
     (comment: PostIDLessCommentDto) => comment.userId === me?.id,
     [me?.id]
   )
+  React.useEffect(() => {
+    if (!isCommenting) {
+      clearReply()
+    }
+  }, [isCommenting])
+
+  React.useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      if (typeof e.detail === 'string') {
+        scrollToComment(e.detail)
+      }
+    }
+    window.addEventListener('scroll-to-comment', handler)
+
+    return () => {
+      window.removeEventListener('scroll-to-comment', handler)
+    }
+  }, [scrollToComment])
 
   return (
     <HoverCard.Root open={isCommenting}>
       <AnimatePresence>
         {top3Users.length > 0 && (
-          <motion.span
+          <motion.button
+            type="button"
             className={clsxm(
-              'absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right items-center justify-end -space-x-1.5',
+              'absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right appearance-none items-center justify-end -space-x-1.5',
               className
             )}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
+            onClick={() => setIsCommenting((prev) => !prev)}
           >
             {top3Users.map((user, idx) => (
               <Image
@@ -163,7 +206,7 @@ function Root({ className, blockId }: CommentableProps) {
                 className="pointer-events-none h-5 w-5 select-none rounded-full ring-2 ring-white dark:ring-zinc-800"
               />
             ))}
-          </motion.span>
+          </motion.button>
         )}
       </AnimatePresence>
       <HoverCard.Trigger asChild>
@@ -203,7 +246,10 @@ function Root({ className, blockId }: CommentableProps) {
                 <main className="flex w-[clamp(200px,40vmax,320px)] flex-col">
                   {currentComments.length > 0 && (
                     <header className="-mx-4 -mt-4 rounded-t-xl border-b border-zinc-400/20 bg-zinc-100/50 dark:border-zinc-300/10 dark:bg-black/20">
-                      <ul className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-y-scroll p-4 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_28px,black_100%)]">
+                      <ul
+                        ref={commentsRef}
+                        className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-x-hidden overflow-y-scroll p-4 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_28px,black_100%)]"
+                      >
                         {currentComments.map((c) => (
                           <CommentItem key={c.id} {...c} isMe={isMe} />
                         ))}
@@ -259,12 +305,24 @@ function Comment({
 }: PostIDLessCommentDto & {
   isMe: (comment: PostIDLessCommentDto) => boolean
 }) {
+  const isMyself = React.useMemo(() => isMe(c), [c, isMe])
+  const onClickReply = React.useCallback(() => {
+    replyTo(c)
+  }, [c])
+  const parentComment = React.useMemo(
+    () =>
+      c.parentId
+        ? blogPostState.comments.find(({ id }) => id === c.parentId)
+        : null,
+    [c]
+  )
+
   return (
-    <li data-commentid={c.id}>
+    <li data-commentid={c.id} data-parentid={parentComment?.id}>
       <div
         className={clsxm(
           'flex w-full items-stretch gap-2',
-          isMe(c) ? 'flex-row-reverse' : 'flex-row'
+          isMyself ? 'flex-row-reverse' : 'flex-row'
         )}
       >
         <div className="flex w-6 shrink-0 items-end">
@@ -280,16 +338,16 @@ function Comment({
         <div
           className={clsxm(
             'flex flex-1 flex-col',
-            isMe(c) ? 'items-end' : 'items-start'
+            isMyself ? 'items-end' : 'items-start'
           )}
         >
           <span
             className={clsxm(
               'flex items-center gap-2 text-xs font-semibold text-zinc-800 dark:text-zinc-200',
-              isMe(c) && 'flex-row-reverse'
+              isMyself && 'flex-row-reverse'
             )}
           >
-            {!isMe(c) && <span>{parseDisplayName(c.userInfo)}</span>}
+            {!isMyself && <span>{parseDisplayName(c.userInfo)}</span>}
             <span className="inline-flex select-none text-[10px] font-medium opacity-40">
               {dayjs(c.createdAt).locale('zh-cn').fromNow()}
             </span>
@@ -297,12 +355,52 @@ function Comment({
 
           <div
             className={clsxm(
-              'comment__message inline-block rounded-xl px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200',
-              isMe(c)
+              'comment__message group relative inline-block rounded-xl px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200',
+              isMyself
                 ? 'rounded-br-sm bg-sky-300/40 dark:bg-sky-600/80'
                 : 'rounded-bl-sm bg-zinc-600/5 dark:bg-zinc-500/20'
             )}
           >
+            {!isMyself && (
+              <div className="absolute inset-y-0 -right-4 flex h-full translate-x-0.5 transform-gpu items-center opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100">
+                <ElegantTooltip content="回复">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.96 }}
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                    onClick={onClickReply}
+                  >
+                    <UTurnLeftIcon className="h-4 w-4" />
+                  </motion.button>
+                </ElegantTooltip>
+              </div>
+            )}
+            {parentComment && (
+              <div
+                className={clsxm(
+                  'border-l-2 pl-1.5 text-[12px] !leading-3',
+                  isMyself
+                    ? 'border-zinc-500 text-zinc-600 dark:border-zinc-400 dark:text-zinc-300'
+                    : 'border-zinc-500 text-zinc-600 dark:border-zinc-400 dark:text-zinc-300'
+                )}
+                role="button"
+                tabIndex={0}
+                onClick={() =>
+                  window.dispatchEvent(
+                    new CustomEvent('scroll-to-comment', {
+                      detail: parentComment.id,
+                    })
+                  )
+                }
+              >
+                <span className="font-semibold">
+                  {parseDisplayName(parentComment.userInfo)}
+                </span>
+                <span className="line-clamp-1 w-full">
+                  {parentComment.body.text}
+                </span>
+              </div>
+            )}
             <CommentMarkdown>{c.body.text}</CommentMarkdown>
           </div>
         </div>
@@ -321,8 +419,12 @@ type CommentTextareaProps = {
 }
 function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
   const { user: me } = useUser()
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
   const [comment, setComment] = React.useState('')
   const [isPreviewing, setIsPreviewing] = React.useState(false)
+
+  const { replyingTo } = useSnapshot(blogPostState)
+
   const onClickSend = React.useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault()
@@ -343,6 +445,7 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
     const handler = () => {
       setComment('')
       setIsPreviewing(false)
+      clearReply()
     }
     window.addEventListener('clear-comment', handler)
 
@@ -351,8 +454,40 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
     }
   }, [])
 
+  React.useEffect(() => {
+    if (replyingTo) {
+      textareaRef.current?.focus()
+    }
+  }, [replyingTo])
+
   return (
     <>
+      <AnimatePresence>
+        {replyingTo && (
+          <motion.header
+            className="flex w-full items-stretch justify-between gap-1.5"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <div className="flex items-center">
+              <UTurnLeftIcon className="h-4 w-4 text-zinc-500" />
+            </div>
+            <span className="line-clamp-1 flex-1 shrink-0 border-l-2 border-zinc-300 pl-1.5 text-xs text-zinc-600 dark:border-zinc-600 dark:text-zinc-400">
+              {replyingTo.body.text}
+            </span>
+            <div className="flex items-center">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={clearReply}
+              >
+                <XSquareIcon className="h-5 w-5" />
+              </motion.button>
+            </div>
+          </motion.header>
+        )}
+      </AnimatePresence>
       <div className="flex w-full items-end pb-1">
         {isPreviewing ? (
           <div className="comment__message flex-1 shrink-0 px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200">
@@ -360,10 +495,15 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
           </div>
         ) : (
           <TextareaAutosize
+            ref={textareaRef}
             id="comment"
             name="comment"
             className="block flex-1 shrink-0 resize-none border-0 bg-transparent text-sm leading-6 text-zinc-800 placeholder-zinc-300 outline-none focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
-            placeholder="留下你的评论吧..."
+            placeholder={
+              replyingTo
+                ? `回复 ${parseDisplayName(replyingTo.userInfo)} 的评论...`
+                : '留下你的评论吧...'
+            }
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={onKeydown}
