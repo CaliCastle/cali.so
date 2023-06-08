@@ -13,7 +13,7 @@
 - [Framer Motion](https://www.framer.com/motion/)
 - [Radix UI](https://www.radix-ui.com/)
 - [PlanetScale](https://planetscale.com/)
-- [Drizzle ORM](https://ore.drizzle.team/)
+- [Drizzle ORM](https://orm.drizzle.team/)
 - [Sanity](https://www.sanity.io/)
 - [React Email](https://react.email)
 - [Resend](https://resend.com/)
