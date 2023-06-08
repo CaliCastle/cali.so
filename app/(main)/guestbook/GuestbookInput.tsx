@@ -125,7 +125,12 @@ export function GuestbookInput() {
         style={{ background }}
         aria-hidden="true"
       />
-      <div className="absolute inset-0 z-0 overflow-hidden rounded-xl mix-blend-overlay">
+      <div
+        className={clsxm(
+          'absolute inset-0 z-0 overflow-hidden rounded-xl mix-blend-overlay',
+          isLoading && 'opacity-0'
+        )}
+      >
         <svg
           aria-hidden="true"
           className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/80 stroke-zinc-900 dark:fill-[hsla(0,0%,100%,.03)] dark:stroke-white/10"
