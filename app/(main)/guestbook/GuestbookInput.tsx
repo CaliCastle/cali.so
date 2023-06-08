@@ -172,37 +172,25 @@ export function GuestbookInput() {
       </div>
 
       <div className="z-10 ml-2 flex-1 shrink-0 md:ml-4">
-        <AnimatePresence mode="wait">
-          {isPreviewing ? (
-            <motion.div
-              className="comment__message flex-1 shrink-0 px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              key="preview"
-            >
-              <CommentMarkdown>{message}</CommentMarkdown>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              key="input"
-            >
-              <TextareaAutosize
-                ref={textareaRef}
-                className="block w-full shrink-0 resize-none border-0 bg-transparent text-sm leading-6 text-zinc-800 placeholder-zinc-400 outline-none transition-[height] will-change-[height] focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
-                value={message}
-                onChange={(event) => setMessage(event.target.value)}
-                placeholder="说点什么吧，万一火不了呢..."
-                onKeyDown={handleKeyDown}
-                maxRows={8}
-                autoFocus
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {isPreviewing ? (
+          <div
+            className="comment__message flex-1 shrink-0 px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200"
+            key="preview"
+          >
+            <CommentMarkdown>{message}</CommentMarkdown>
+          </div>
+        ) : (
+          <TextareaAutosize
+            ref={textareaRef}
+            className="block w-full shrink-0 resize-none border-0 bg-transparent text-sm leading-6 text-zinc-800 placeholder-zinc-400 outline-none transition-[height] will-change-[height] focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            placeholder="说点什么吧，万一火不了呢..."
+            onKeyDown={handleKeyDown}
+            maxRows={8}
+            autoFocus
+          />
+        )}
 
         <footer className="-mb-1.5 mt-3 flex h-5 w-full items-center justify-between">
           <span
