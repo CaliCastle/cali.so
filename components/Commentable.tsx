@@ -17,7 +17,9 @@ import { useSnapshot } from 'valtio'
 import {
   addComment,
   blogPostState,
+  clearBlockFocus,
   clearReply,
+  focusBlock,
   replyTo,
 } from '~/app/(main)/blog/blog-post.state'
 import {
@@ -53,7 +55,7 @@ type CommentableProps = {
 
 function Root({ className, blockId }: CommentableProps) {
   const pathname = usePathname()
-  const { postId, comments } = useSnapshot(blogPostState)
+  const { postId, comments, currentBlockId } = useSnapshot(blogPostState)
   const { user: me } = useUser()
   const [isCommenting, setIsCommenting] = React.useState(false)
   const currentComments = React.useMemo(
@@ -183,6 +185,18 @@ function Root({ className, blockId }: CommentableProps) {
     }
   }, [scrollToComment])
 
+  const handleToggleCommenting = React.useCallback(() => {
+    if (isCommenting) {
+      clearBlockFocus()
+    } else {
+      focusBlock(blockId ?? null)
+    }
+  }, [blockId, isCommenting])
+
+  React.useEffect(() => {
+    setIsCommenting(currentBlockId === blockId)
+  }, [blockId, currentBlockId])
+
   return (
     <HoverCard.Root open={isCommenting}>
       <AnimatePresence>
@@ -196,7 +210,7 @@ function Root({ className, blockId }: CommentableProps) {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            onClick={() => setIsCommenting((prev) => !prev)}
+            onClick={handleToggleCommenting}
           >
             {top3Users.map((user, idx) => (
               <Image
@@ -219,7 +233,7 @@ function Root({ className, blockId }: CommentableProps) {
             'absolute right-[calc(100%+6px)] top-[5px] flex h-full origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100',
             className
           )}
-          onClick={() => setIsCommenting((prev) => !prev)}
+          onClick={handleToggleCommenting}
         >
           <NewCommentIcon className="pointer-events-none h-5 w-5 select-none text-zinc-800 dark:text-zinc-300" />
         </button>
@@ -242,7 +256,7 @@ function Root({ className, blockId }: CommentableProps) {
                 <button
                   type="button"
                   className="group absolute inset-x-0 -top-3 z-50 flex justify-center"
-                  onClick={() => setIsCommenting(false)}
+                  onClick={handleToggleCommenting}
                 >
                   <XIcon className="h-6 w-6 rounded-full border border-zinc-400/20 bg-white/95 p-1 text-zinc-500 backdrop-blur transition-all group-hover:w-12 group-hover:text-zinc-700 dark:border-zinc-500/30 dark:bg-zinc-800/95 dark:text-zinc-400 dark:group-hover:text-zinc-200" />
                 </button>
