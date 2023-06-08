@@ -13,6 +13,7 @@ const server = z.object({
   UPSTASH_REDIS_REST_URL: z.string().min(1),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
   LINK_PREVIEW_API_BASE_URL: z.string().min(1),
+  SITE_NOTIFICATION_EMAIL_TO: z.string().optional(),
 })
 
 const client = z.object({

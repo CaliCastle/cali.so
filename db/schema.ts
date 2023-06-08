@@ -5,6 +5,7 @@ import {
   json,
   mysqlTable,
   serial,
+  text,
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core'
@@ -34,3 +35,12 @@ export const comments = mysqlTable(
     postIdx: index('post_idx').on(table.postId),
   })
 )
+
+export const guestbook = mysqlTable('guestbook', {
+  id: serial('id').primaryKey(),
+  userId: varchar('user_id', { length: 200 }).notNull(),
+  userInfo: json('user_info'),
+  message: text('message').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})

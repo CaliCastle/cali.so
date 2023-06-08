@@ -1,3 +1,5 @@
+import './blog/[slug]/blog.css'
+
 import { Analytics } from '@vercel/analytics/react'
 
 import { Footer } from '~/app/(main)/Footer'
