@@ -75,7 +75,7 @@ export function GuestbookInput() {
       onSuccess: (data) => {
         setMessage('')
         setIsPreviewing(false)
-        signBook(data, false)
+        signBook(data, true)
         reward()
       },
     }

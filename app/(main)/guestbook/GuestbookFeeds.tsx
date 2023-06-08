@@ -14,7 +14,7 @@ import { CommentMarkdown } from '~/components/CommentMarkdown'
 import { type GuestbookDto } from '~/db/dto/guestbook.dto'
 import { parseDisplayName } from '~/lib/string'
 
-import { guestbookState, signBook } from './guestbook.state'
+import { guestbookState, signBook, sortMessages } from './guestbook.state'
 
 dayjs.extend(relativeTime)
 
@@ -35,9 +35,10 @@ export function GuestbookFeeds() {
   React.useEffect(() => {
     feed?.forEach((message) => {
       if (!messages.find((m) => m.id === message.id)) {
-        signBook(message, true)
+        signBook(message)
       }
     })
+    sortMessages()
   }, [feed, messages])
 
   return (
