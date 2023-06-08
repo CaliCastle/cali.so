@@ -6,6 +6,10 @@ export function parseDisplayName({
   readonly lastName?: string | null
 }) {
   if (firstName && lastName) {
+    if (firstName === lastName) {
+      return firstName
+    }
+
     return `${firstName} ${lastName}`
   }
 
