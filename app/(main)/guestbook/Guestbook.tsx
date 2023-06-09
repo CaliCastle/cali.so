@@ -6,12 +6,13 @@ import React from 'react'
 
 import { UserArrowLeftIcon } from '~/assets'
 import { Button } from '~/components/ui/Button'
+import { type GuestbookDto } from '~/db/dto/guestbook.dto'
 import { url } from '~/lib'
 
 import { GuestbookFeeds } from './GuestbookFeeds'
 import { GuestbookInput } from './GuestbookInput'
 
-export function Guestbook() {
+export function Guestbook(props: { messages?: GuestbookDto[] }) {
   const pathname = usePathname()
 
   return (
@@ -29,7 +30,7 @@ export function Guestbook() {
         <GuestbookInput />
       </SignedIn>
 
-      <GuestbookFeeds />
+      <GuestbookFeeds messages={props.messages} />
     </section>
   )
 }

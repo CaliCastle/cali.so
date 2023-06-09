@@ -75,8 +75,8 @@ export function GuestbookInput() {
       onSuccess: (data) => {
         setMessage('')
         setIsPreviewing(false)
-        signBook(data, true)
         reward()
+        signBook(data)
       },
     }
   )
@@ -109,7 +109,9 @@ export function GuestbookInput() {
   const background = useMotionTemplate`radial-gradient(320px circle at ${mouseX}px ${mouseY}px, var(--spotlight-color) 0%, transparent 85%)`
 
   if (!user) {
-    return null
+    return (
+      <div className="h-[82px] animate-pulse rounded-xl bg-white/70 ring-2 ring-zinc-200/30 dark:bg-zinc-800/80 dark:ring-zinc-700/30" />
+    )
   }
 
   return (
@@ -127,7 +129,7 @@ export function GuestbookInput() {
       />
       <div
         className={clsxm(
-          'absolute inset-0 z-0 overflow-hidden rounded-xl mix-blend-overlay',
+          'pointer-events-none absolute inset-0 z-0 select-none overflow-hidden rounded-xl mix-blend-overlay',
           isLoading && 'opacity-0'
         )}
       >

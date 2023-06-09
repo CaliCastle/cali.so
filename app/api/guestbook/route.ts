@@ -1,11 +1,11 @@
 import { currentUser } from '@clerk/nextjs'
-import { desc } from 'drizzle-orm'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { emailConfig } from '~/config/email'
 import { db } from '~/db'
 import { type GuestbookDto, GuestbookHashids } from '~/db/dto/guestbook.dto'
+import { fetchGuestbookMessages } from '~/db/queries/guestbook'
 import { guestbook } from '~/db/schema'
 import NewGuestbookEmail from '~/emails/NewGuestbook'
 import { env } from '~/env.mjs'
@@ -26,27 +26,7 @@ export async function GET(req: NextRequest) {
       })
     }
 
-    const data = await db
-      .select({
-        id: guestbook.id,
-        userId: guestbook.userId,
-        userInfo: guestbook.userInfo,
-        message: guestbook.message,
-        createdAt: guestbook.createdAt,
-      })
-      .from(guestbook)
-      .orderBy(desc(guestbook.createdAt))
-      .limit(100)
-
-    return NextResponse.json(
-      data.map(
-        ({ id, ...rest }) =>
-          ({
-            ...rest,
-            id: GuestbookHashids.encode(id),
-          } as GuestbookDto)
-      )
-    )
+    return NextResponse.json(await fetchGuestbookMessages())
   } catch (error) {
     return NextResponse.json({ error }, { status: 400 })
   }
@@ -100,11 +80,16 @@ export async function POST(req: NextRequest) {
 
     const { insertId } = await db.insert(guestbook).values(guestbookData)
 
-    return NextResponse.json({
-      ...guestbookData,
-      id: GuestbookHashids.encode(insertId),
-      createdAt: new Date(),
-    } satisfies GuestbookDto)
+    return NextResponse.json(
+      {
+        ...guestbookData,
+        id: GuestbookHashids.encode(insertId),
+        createdAt: new Date(),
+      } satisfies GuestbookDto,
+      {
+        status: 201,
+      }
+    )
   } catch (error) {
     return NextResponse.json({ error }, { status: 400 })
   }

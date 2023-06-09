@@ -2,6 +2,7 @@ import { type Metadata } from 'next'
 import Balancer from 'react-wrap-balancer'
 
 import { Container } from '~/components/ui/Container'
+import { fetchGuestbookMessages } from '~/db/queries/guestbook'
 
 import { Guestbook } from './Guestbook'
 
@@ -22,7 +23,9 @@ export const metadata = {
   },
 } satisfies Metadata
 
-export default function GuestBookPage() {
+export default async function GuestBookPage() {
+  const messages = await fetchGuestbookMessages()
+
   return (
     <Container className="mt-16 sm:mt-32">
       <header className="max-w-2xl">
@@ -34,7 +37,7 @@ export default function GuestBookPage() {
         </p>
       </header>
       <div className="mt-16 sm:mt-20">
-        <Guestbook />
+        <Guestbook messages={messages} />
       </div>
     </Container>
   )
