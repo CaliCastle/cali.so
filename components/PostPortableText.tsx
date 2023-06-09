@@ -1,127 +1,36 @@
 'use client'
 
 import { PortableText, type PortableTextComponents } from '@portabletext/react'
-import Image from 'next/image'
 import React from 'react'
-import { Tweet } from 'react-tweet'
 
-import { ClientOnly } from '~/components/ClientOnly'
-import { Commentable } from '~/components/Commentable'
 import { PeekabooLink } from '~/components/links/PeekabooLink'
+import {
+  PortableTextBlocksBlockquote,
+  PortableTextBlocksH1,
+  PortableTextBlocksH2,
+  PortableTextBlocksH3,
+  PortableTextBlocksH4,
+  PortableTextBlocksListItem,
+  PortableTextBlocksNormal,
+} from '~/components/portable-text/PortableTextBlocks'
+import { PortableTextCodeBlock } from '~/components/portable-text/PortableTextCodeBlock'
+import { PortableTextImage } from '~/components/portable-text/PortableTextImage'
+import { PortableTextTweet } from '~/components/portable-text/PortableTextTweet'
 
 const components: PortableTextComponents = {
   block: {
-    normal: ({ value, children }) => {
-      const isEmpty = !Boolean(
-        value.children
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-          .map((child) => ('text' in child ? child.text : ''))
-          .join('')
-      )
-
-      return (
-        <p
-          data-blockid={isEmpty ? undefined : value._key}
-          className="group relative"
-        >
-          {!isEmpty && (
-            <ClientOnly>
-              <Commentable blockId={value._key} />
-            </ClientOnly>
-          )}
-          {children}
-        </p>
-      )
-    },
-    h1: ({ value, children }) => {
-      return (
-        <h1 data-blockid={value._key} className="group relative">
-          <ClientOnly>
-            <Commentable blockId={value._key} />
-          </ClientOnly>
-          {children}
-        </h1>
-      )
-    },
-    h2: ({ value, children }) => {
-      return (
-        <h2 data-blockid={value._key} className="group relative">
-          <ClientOnly>
-            <Commentable blockId={value._key} />
-          </ClientOnly>
-          {children}
-        </h2>
-      )
-    },
-    h3: ({ value, children }) => {
-      return (
-        <h3 data-blockid={value._key} className="group relative">
-          <ClientOnly>
-            <Commentable blockId={value._key} />
-          </ClientOnly>
-          {children}
-        </h3>
-      )
-    },
-    h4: ({ value, children }) => {
-      return (
-        <h4 data-blockid={value._key} className="group relative">
-          <ClientOnly>
-            <Commentable blockId={value._key} />
-          </ClientOnly>
-          {children}
-        </h4>
-      )
-    },
-    blockquote: ({ value, children }) => {
-      return (
-        <blockquote data-blockid={value._key} className="group relative">
-          <ClientOnly>
-            <Commentable blockId={value._key} />
-          </ClientOnly>
-          {children}
-        </blockquote>
-      )
-    },
+    normal: PortableTextBlocksNormal,
+    h1: PortableTextBlocksH1,
+    h2: PortableTextBlocksH2,
+    h3: PortableTextBlocksH3,
+    h4: PortableTextBlocksH4,
+    blockquote: PortableTextBlocksBlockquote,
   },
-  listItem: ({ value, children }) => {
-    return (
-      <li data-blockid={value._key} className="group relative">
-        <ClientOnly>
-          <Commentable className="mr-5" blockId={value._key} />
-        </ClientOnly>
-        {children}
-      </li>
-    )
-  },
+  listItem: PortableTextBlocksListItem,
   types: {
-    image: ({ value }) => {
-      return (
-        <div data-blockid={value._key} className="group relative">
-          <ClientOnly>
-            <Commentable blockId={value._key} />
-          </ClientOnly>
-
-          <Image
-            src={value.url}
-            width={value.dimensions.width}
-            height={value.dimensions.height}
-            unoptimized
-            placeholder={value.lqip ? 'blur' : 'empty'}
-            blurDataURL={value.lqip}
-            className="relative z-20 rounded-xl md:rounded-3xl"
-            alt=""
-          />
-        </div>
-      )
-    },
-    tweet: ({ value }) => (
-      <ClientOnly>
-        <div className="flex justify-center">
-          <Tweet id={value.id} />
-        </div>
-      </ClientOnly>
-    ),
+    image: PortableTextImage,
+    tweet: PortableTextTweet,
+    codeBlock: PortableTextCodeBlock,
   },
 
   marks: {

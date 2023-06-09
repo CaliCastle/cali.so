@@ -91,7 +91,20 @@ export default defineType({
         },
       ],
       components: {
-        block: Tweet,
+        preview: Tweet as any,
+      },
+      preview: {
+        select: {
+          id: 'id',
+        },
+      },
+    }),
+    defineArrayMember({
+      type: 'code',
+      name: 'codeBlock',
+      title: 'Code Block',
+      options: {
+        withFilename: true,
       },
     }),
   ],
