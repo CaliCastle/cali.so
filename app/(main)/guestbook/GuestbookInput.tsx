@@ -133,7 +133,7 @@ export function GuestbookInput() {
       >
         <svg
           aria-hidden="true"
-          className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/80 stroke-zinc-900 dark:fill-[hsla(0,0%,100%,.03)] dark:stroke-white/10"
+          className="absolute inset-x-0 inset-y-[-30%] h-[160%] w-full skew-y-[-18deg] fill-black/5 stroke-zinc-900/10 dark:fill-[hsla(0,0%,100%,.03)] dark:stroke-white/10"
         >
           <defs>
             <pattern
