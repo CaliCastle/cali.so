@@ -19,9 +19,9 @@ export function PortableTextImage({
   lqip?: string
 }>) {
   return (
-    <div data-blockid={value._key} className="group relative">
+    <div data-blockid={value._key} className="group relative pr-3 md:pr-0">
       <ClientOnly>
-        <Commentable blockId={value._key} />
+        <Commentable className="z-30" blockId={value._key} />
       </ClientOnly>
 
       <Image

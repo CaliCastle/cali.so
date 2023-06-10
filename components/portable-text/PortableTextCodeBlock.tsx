@@ -36,10 +36,10 @@ export function PortableTextCodeBlock({
     <div
       data-blockid={value._key}
       data-filename={value.filename}
-      className="group relative rounded-3xl border border-[--tw-prose-pre-border] dark:bg-zinc-800/80"
+      className="group relative mr-3 rounded-3xl border border-[--tw-prose-pre-border] dark:bg-zinc-800/80 md:mr-0"
     >
       <ClientOnly>
-        <Commentable blockId={value._key} />
+        <Commentable className="z-30 -mr-1.5 md:mr-0" blockId={value._key} />
       </ClientOnly>
       <ClientOnly>
         <>
