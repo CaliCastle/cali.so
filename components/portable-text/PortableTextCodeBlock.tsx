@@ -35,7 +35,8 @@ export function PortableTextCodeBlock({
   return (
     <div
       data-blockid={value._key}
-      className="group relative overflow-hidden rounded-3xl border border-[--tw-prose-pre-border] dark:bg-zinc-800/80"
+      data-filename={value.filename}
+      className="group relative rounded-3xl border border-[--tw-prose-pre-border] dark:bg-zinc-800/80"
     >
       <ClientOnly>
         <Commentable blockId={value._key} />
@@ -43,7 +44,7 @@ export function PortableTextCodeBlock({
       <ClientOnly>
         <>
           <div className="relative flex text-xs leading-6 text-slate-400">
-            {value.filename && (
+            {Boolean(value.filename) && (
               <>
                 <div className="mt-2 flex flex-none items-center border-b border-t border-b-emerald-700 border-t-transparent px-4 py-1 font-medium text-emerald-700 dark:border-b-emerald-200 dark:text-emerald-200">
                   {value.filename}

@@ -2,6 +2,20 @@
   --tw-prose-pre-bg: rgba(245, 245, 245, .05);
   --tw-prose-pre-code: theme('colors.zinc.600');
   background: linear-gradient(to top, rgba(235, 235, 235, .3) 0%, rgba(255, 255, 255, 0.1) 100%);
+  font-size: 12px;
+  padding: 1rem;
+  @apply antialiased;
+}
+
+[data-blockid]:not([data-filename]) > .prismjs {
+  @apply rounded-t-3xl;
+}
+
+@screen md {
+  .prismjs {
+    font-size: 0.875rem;
+    padding: 1.5rem;
+  }
 }
 
 .dark {
