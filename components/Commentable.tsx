@@ -204,7 +204,7 @@ function Root({ className, blockId }: CommentableProps) {
           <motion.button
             type="button"
             className={clsxm(
-              'absolute right-[calc(100%+1.65rem)] top-[4px] flex w-16 origin-top-right appearance-none items-center justify-end -space-x-1.5',
+              'absolute -right-2 top-[4px] flex origin-top-right appearance-none flex-col items-center justify-end -space-y-1 md:right-[calc(100%+1.65rem)] md:w-16 md:flex-row md:-space-x-1.5 md:space-y-0',
               className
             )}
             initial={{ opacity: 0, scale: 0.95 }}
@@ -230,12 +230,12 @@ function Root({ className, blockId }: CommentableProps) {
         <button
           type="button"
           className={clsxm(
-            'absolute right-[calc(100%+6px)] top-[5px] flex h-full origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100',
+            'absolute -right-1 top-[5px] flex h-full origin-top-right translate-x-1.5 scale-95 transform-gpu appearance-none items-start opacity-0 transition-all group-hover:translate-x-0 group-hover:scale-100 group-hover:opacity-100 md:right-[calc(100%+6px)]',
             className
           )}
           onClick={handleToggleCommenting}
         >
-          <NewCommentIcon className="pointer-events-none h-5 w-5 select-none text-zinc-800 dark:text-zinc-300" />
+          <NewCommentIcon className="pointer-events-none h-5 w-5 select-none rounded-xl text-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 md:rounded-none md:bg-transparent" />
         </button>
       </HoverCard.Trigger>
       <AnimatePresence>
@@ -260,12 +260,12 @@ function Root({ className, blockId }: CommentableProps) {
                 >
                   <XIcon className="h-6 w-6 rounded-full border border-zinc-400/20 bg-white/95 p-1 text-zinc-500 backdrop-blur transition-all group-hover:w-12 group-hover:text-zinc-700 dark:border-zinc-500/30 dark:bg-zinc-800/95 dark:text-zinc-400 dark:group-hover:text-zinc-200" />
                 </button>
-                <main className="flex w-[clamp(200px,40vmax,320px)] flex-col">
+                <main className="flex w-[clamp(140px,75vw,300px)] flex-col">
                   {currentComments.length > 0 && (
                     <header className="-mx-4 -mt-4 rounded-t-xl border-b border-zinc-400/20 bg-zinc-100/50 dark:border-zinc-300/10 dark:bg-black/20">
                       <ul
                         ref={commentsRef}
-                        className="flex max-h-[70vh] w-full flex-col space-y-0.5 overflow-x-hidden overflow-y-scroll p-4 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_28px,black_100%)]"
+                        className="flex max-h-[50vh] w-full flex-col space-y-0.5 overflow-x-hidden overflow-y-scroll p-4 [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_28px,black_100%)]"
                       >
                         {currentComments.map((c) => (
                           <CommentItem key={c.id} {...c} isMe={isMe} />

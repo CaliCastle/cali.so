@@ -83,7 +83,7 @@
     "@types/eslint": "^8.40.1",
     "@types/node": "^18.16.15",
     "@types/prettier": "^2.7.3",
-    "@types/react": "^18.2.10",
+    "@types/react": "18.2.7",
     "@types/react-dom": "^18.2.4",
     "@types/react-syntax-highlighter": "^15.5.7",
     "@types/rss": "^0.0.30",

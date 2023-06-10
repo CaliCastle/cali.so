@@ -18,7 +18,7 @@ export function PortableTextBlocksNormal({
   return (
     <p
       data-blockid={isEmpty ? undefined : value._key}
-      className="group relative"
+      className="group relative pr-3 md:pr-0"
     >
       {!isEmpty && (
         <ClientOnly>
@@ -35,7 +35,7 @@ export function PortableTextBlocksH1({
   children,
 }: PortableTextComponentProps<any>) {
   return (
-    <h1 data-blockid={value._key} className="group relative">
+    <h1 data-blockid={value._key} className="group relative pr-3 md:pr-0">
       <ClientOnly>
         <Commentable blockId={value._key} />
       </ClientOnly>
@@ -49,7 +49,7 @@ export function PortableTextBlocksH2({
   children,
 }: PortableTextComponentProps<any>) {
   return (
-    <h2 data-blockid={value._key} className="group relative">
+    <h2 data-blockid={value._key} className="group relative pr-3 md:pr-0">
       <ClientOnly>
         <Commentable blockId={value._key} />
       </ClientOnly>
@@ -63,7 +63,7 @@ export function PortableTextBlocksH3({
   children,
 }: PortableTextComponentProps<any>) {
   return (
-    <h3 data-blockid={value._key} className="group relative">
+    <h3 data-blockid={value._key} className="group relative pr-3 md:pr-0">
       <ClientOnly>
         <Commentable blockId={value._key} />
       </ClientOnly>
@@ -77,7 +77,7 @@ export function PortableTextBlocksH4({
   children,
 }: PortableTextComponentProps<any>) {
   return (
-    <h4 data-blockid={value._key} className="group relative">
+    <h4 data-blockid={value._key} className="group relative pr-3 md:pr-0">
       <ClientOnly>
         <Commentable blockId={value._key} />
       </ClientOnly>
@@ -91,7 +91,10 @@ export function PortableTextBlocksBlockquote({
   children,
 }: PortableTextComponentProps<any>) {
   return (
-    <blockquote data-blockid={value._key} className="group relative">
+    <blockquote
+      data-blockid={value._key}
+      className="group relative pr-3 md:pr-0"
+    >
       <ClientOnly>
         <Commentable blockId={value._key} />
       </ClientOnly>
@@ -105,7 +108,7 @@ export function PortableTextBlocksListItem({
   children,
 }: PortableTextComponentProps<any>) {
   return (
-    <li data-blockid={value._key} className="group relative">
+    <li data-blockid={value._key} className="group relative pr-3 md:pr-0">
       <ClientOnly>
         <Commentable className="mr-5" blockId={value._key} />
       </ClientOnly>
