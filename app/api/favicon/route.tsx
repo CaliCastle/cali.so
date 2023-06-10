@@ -17,6 +17,7 @@ const faviconMapper: { [key: string]: string } = {
   '((?:t.co)|(?:twitter.com))': 'https://cali.so/favicons/twitter.png',
   'coolshell.cn': 'https://cali.so/favicons/coolshell.png',
   'vercel.com': 'https://cali.so/favicons/vercel.png',
+  'nextjs.org': 'https://cali.so/favicons/nextjs.png',
 }
 
 function getPredefinedIconForUrl(url: string): string | undefined {
