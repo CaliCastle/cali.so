@@ -26,11 +26,6 @@ export function ProjectCard({ project }: { project: Project }) {
       mouseX.set(clientX - bounds.left)
       mouseY.set(clientY - bounds.top)
       radius.set(Math.sqrt(bounds.width ** 2 + bounds.height ** 2) / 2)
-      console.log({
-        mouseX: mouseX.get(),
-        mouseY: mouseY.get(),
-        radius: radius.get(),
-      })
     },
     [mouseX, mouseY, radius]
   )
