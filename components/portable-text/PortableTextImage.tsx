@@ -31,7 +31,7 @@ export function PortableTextImage({
         unoptimized
         placeholder={value.lqip ? 'blur' : 'empty'}
         blurDataURL={value.lqip}
-        className="relative z-20 rounded-xl md:rounded-3xl"
+        className="relative z-20 rounded-xl dark:brightness-75 dark:transition-[filter] dark:hover:brightness-100 md:rounded-3xl"
         alt=""
       />
     </div>
