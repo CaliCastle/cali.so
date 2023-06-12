@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { BlogPostPage } from '~/app/(main)/blog/BlogPostPage'
 import { kvKeys } from '~/config/kv'
 import { env } from '~/env.mjs'
+import { url } from '~/lib'
 import { redis } from '~/lib/redis'
 import { getBlogPost } from '~/sanity/queries'
 
@@ -66,12 +67,15 @@ export default async function BlogPage({
 
   let reactions: number[] = []
   try {
-    const res = await fetch(`https://cali.so/api/reactions?id=${post._id}`, {
+    const res = await fetch(url(`/api/reactions?id=${post._id}`), {
       next: {
         tags: [`reactions:${post._id}`],
       },
     })
-    reactions = await res.json()
+    const data = await res.json()
+    if (Array.isArray(data)) {
+      reactions = data
+    }
   } catch (error) {
     console.error(error)
   }
