@@ -50,17 +50,7 @@ async function beforeAuthMiddleware(req: NextRequest) {
   return NextResponse.next()
 }
 
-function afterAuthMiddleware(auth: unknown, req: NextRequest) {
-  const { nextUrl } = req
-
-  if (nextUrl.pathname === '/feed' || nextUrl.pathname === '/rss') {
-    nextUrl.pathname = '/feed.xml'
-    return NextResponse.rewrite(nextUrl)
-  }
-}
-
 export default authMiddleware({
   beforeAuth: beforeAuthMiddleware,
-  afterAuth: afterAuthMiddleware,
   publicRoutes: ['/', '/blog(.*)', '/project', '/about'],
 })

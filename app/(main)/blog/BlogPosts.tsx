@@ -15,7 +15,7 @@ import { redis } from '~/lib/redis'
 import { getLatestBlogPosts } from '~/sanity/queries'
 
 export async function BlogPosts({ limit = 5 }) {
-  const posts = await getLatestBlogPosts(limit)
+  const posts = await getLatestBlogPosts({ limit, forDisplay: true })
   const postIdKeys = posts.map(({ _id }) => kvKeys.postViews(_id))
 
   let views: number[] = []
@@ -36,7 +36,13 @@ export async function BlogPosts({ limit = 5 }) {
             key={idx}
             href={`/blog/${slug}`}
             prefetch={false}
-            className="group relative flex aspect-[240/135] w-full flex-col justify-end gap-16 rounded-3xl bg-white p-4 transition-shadow after:absolute after:inset-0 after:rounded-3xl after:bg-[linear-gradient(180deg,transparent,rgba(0,0,0,.7)_55%,rgba(0,0,0,.85)_82.5%,rgba(0,0,0,.9))] after:opacity-90 after:ring-2 after:ring-zinc-200 after:transition-opacity hover:shadow-xl hover:after:opacity-60 dark:after:ring-zinc-800/70 md:p-6"
+            className="group relative flex aspect-[240/135] w-full flex-col justify-end gap-16 rounded-3xl bg-white p-4 transition-shadow after:absolute after:inset-0 after:rounded-3xl after:bg-gradient-to-b after:from-transparent after:via-[--post-image-bg] after:via-80% after:to-[--post-image-bg] after:opacity-90 after:ring-2 after:ring-zinc-200 after:transition-opacity hover:shadow-xl hover:after:opacity-60 dark:after:ring-zinc-800/70 md:p-6"
+            style={
+              {
+                '--post-image-fg': mainImage.asset.dominant?.foreground,
+                '--post-image-bg': mainImage.asset.dominant?.background,
+              } as React.CSSProperties
+            }
           >
             <Image
               src={mainImage.asset.url}
@@ -48,24 +54,24 @@ export async function BlogPosts({ limit = 5 }) {
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
             />
             <span className="z-10 flex w-full flex-col gap-2">
-              <h2 className="text-base font-bold tracking-tight text-zinc-50 md:text-xl">
+              <h2 className="text-base font-bold tracking-tight text-[--post-image-fg] md:text-xl">
                 <Balancer>{title}</Balancer>
               </h2>
               <span className="flex items-center justify-between">
                 <span className="inline-flex items-center space-x-3">
-                  <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-zinc-400 md:text-sm">
+                  <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] opacity-50 md:text-sm">
                     <CalendarIcon />
                     <span>
                       {Intl.DateTimeFormat('zh').format(new Date(publishedAt))}
                     </span>
                   </span>
 
-                  <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-zinc-400 md:text-sm">
+                  <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] opacity-60 md:text-sm">
                     <ScriptIcon />
                     <span>{categories.join(', ')}</span>
                   </span>
                 </span>
-                <span className="inline-flex items-center space-x-3 text-[12px] font-medium text-zinc-300/60 md:text-xs">
+                <span className="inline-flex items-center space-x-3 text-[12px] font-medium text-[--post-image-fg] opacity-50 md:text-xs">
                   <span className="inline-flex items-center space-x-1">
                     <CursorClickIcon />
                     <span>{prettifyNumber(views[idx] ?? 0, true)}</span>

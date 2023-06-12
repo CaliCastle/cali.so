@@ -16,7 +16,7 @@ export async function GET() {
     generator: 'PHP 9.0',
   })
 
-  const data = await getLatestBlogPosts(999)
+  const data = await getLatestBlogPosts({ limit: 999 })
   if (!data) {
     return new Response('Not found', { status: 404 })
   }

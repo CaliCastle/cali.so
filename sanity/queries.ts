@@ -16,7 +16,15 @@ export const getAllLatestBlogPostSlugs = () => {
   return clientFetch<string[]>(getAllLatestBlogPostSlugsQuery())
 }
 
-export const getLatestBlogPostsQuery = (limit = 5) =>
+type GetBlogPostsOptions = {
+  limit?: number
+  offset?: number
+  forDisplay?: boolean
+}
+export const getLatestBlogPostsQuery = ({
+  limit = 5,
+  forDisplay = true,
+}: GetBlogPostsOptions) =>
   groq`
   *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().toISOString()}"
   && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
@@ -31,13 +39,16 @@ export const getLatestBlogPostsQuery = (limit = 5) =>
       _ref,
       asset->{
         url,
-        "lqip": metadata.lqip
+        ${
+          forDisplay
+            ? '"lqip": metadata.lqip, "vibrant": metadata.palette.vibrant, "dominant": metadata.palette.dominant,'
+            : ''
+        }
       }
     }
   }`
-export const getLatestBlogPosts = (limit = 5) => {
-  return clientFetch<Post[]>(getLatestBlogPostsQuery(limit))
-}
+export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
+  clientFetch<Post[]>(getLatestBlogPostsQuery(options))
 
 export const getBlogPostQuery = (slug: string) =>
   groq`
