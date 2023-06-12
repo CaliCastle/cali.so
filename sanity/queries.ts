@@ -41,7 +41,7 @@ export const getLatestBlogPostsQuery = ({
         url,
         ${
           forDisplay
-            ? '"lqip": metadata.lqip, "vibrant": metadata.palette.vibrant, "dominant": metadata.palette.dominant,'
+            ? '"lqip": metadata.lqip, "dominant": metadata.palette.dominant,'
             : ''
         }
       }

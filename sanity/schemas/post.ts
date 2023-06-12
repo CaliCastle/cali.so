@@ -13,12 +13,6 @@ export const Post = z.object({
     asset: z.object({
       url: z.string(),
       lqip: z.string().optional(),
-      vibrant: z
-        .object({
-          background: z.string(),
-          foreground: z.string(),
-        })
-        .optional(),
       dominant: z
         .object({
           background: z.string(),
