@@ -22,3 +22,12 @@ export function parseDisplayName({
 
   return '匿名用户'
 }
+
+export function truncate(str: string, maxLength = 50): string {
+  if (str.length <= maxLength) {
+    return str
+  }
+
+  const truncatedStr = str.slice(0, maxLength)
+  return truncatedStr + '...'
+}
