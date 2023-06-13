@@ -14,6 +14,7 @@
 - [Tailwind CSS](https://tailwindcss.com/)
 - [Framer Motion](https://www.framer.com/motion/)
 - [Radix UI](https://www.radix-ui.com/)
+- [Clerk](https://clerk.com/)
 - [PlanetScale](https://planetscale.com/)
 - [Drizzle ORM](https://orm.drizzle.team/)
 - [Sanity](https://www.sanity.io/)
