@@ -54,6 +54,7 @@ export default authMiddleware({
   beforeAuth: beforeAuthMiddleware,
   publicRoutes: [
     '/',
+    '/api(.*)',
     '/blog(.*)',
     '/confirm(.*)',
     '/projects',
