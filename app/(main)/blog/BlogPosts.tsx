@@ -54,7 +54,7 @@ export async function BlogPosts({ limit = 5 }) {
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
               />
             </div>
-            <span className="relative z-10 flex w-full flex-col gap-2 p-4 after:pointer-events-none after:absolute after:inset-0 after:select-none after:rounded-b-3xl after:bg-[--post-image-bg] after:from-transparent after:to-[--post-image-bg] after:backdrop-blur-lg after:transition-opacity md:p-5">
+            <span className="relative z-10 flex w-full flex-col gap-0.5 p-4 after:pointer-events-none after:absolute after:inset-0 after:select-none after:rounded-b-3xl after:bg-[--post-image-bg] after:from-transparent after:to-[--post-image-bg] after:backdrop-blur-lg after:transition-opacity md:p-5">
               <h2 className="z-20 text-base font-bold tracking-tight text-[--post-image-fg] md:text-xl">
                 {title}
               </h2>
