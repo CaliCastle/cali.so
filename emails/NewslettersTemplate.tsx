@@ -2,7 +2,7 @@ import * as React from 'react'
 import ReactMarkdown from 'react-markdown'
 
 import { Heading, Section } from './_components'
-import { Layout } from './Layout'
+import Layout from './Layout'
 
 const NewslettersTemplate = (props: {
   subject?: string | null
@@ -10,9 +10,8 @@ const NewslettersTemplate = (props: {
 }) => {
   const {
     subject = '测试主题',
-    body = `# 你好，世界
-  - 你好
-  - 世界
+    body = `## 最近的一些更新与变化
+  ![](https://zolplay.com/api/og?title=Some+Recent+Changes)
   `,
   } = props
 
@@ -21,8 +20,22 @@ const NewslettersTemplate = (props: {
       <Heading>{subject}</Heading>
 
       {body && (
-        <Section className="px-2 text-[14px] leading-[16px] text-zinc-700">
-          <ReactMarkdown>{body}</ReactMarkdown>
+        <Section className="max-w-[465px] px-2 text-[14px] leading-[16px] text-zinc-700">
+          <ReactMarkdown
+            components={{
+              img: ({ src, alt }) => {
+                return (
+                  <img
+                    src={src}
+                    alt={alt}
+                    className="mx-auto my-0 max-w-[420px]"
+                  />
+                )
+              },
+            }}
+          >
+            {body}
+          </ReactMarkdown>
         </Section>
       )}
     </Layout>

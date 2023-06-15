@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 
 import { parseDisplayName } from '../lib/string'
 import { Button, Heading, Hr, Img, Section, Text } from './_components'
-import { Layout } from './Layout'
+import Layout from './Layout'
 
 const NewGuestbookEmail = ({
   link = 'https://caliso/guestbook',

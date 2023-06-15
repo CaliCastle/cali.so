@@ -42,6 +42,7 @@ export function Sidebar() {
                 {navigation.map((item) => (
                   <li key={item.name}>
                     <Link
+                      prefetch={false}
                       href={`/admin${item.href}`}
                       className={clsxm(
                         isActive(item.href)
