@@ -10,14 +10,16 @@ import {
   HomeIcon,
   NewCommentIcon,
   SubscriberIcon,
+  TiltedSendIcon,
 } from '~/assets'
 
 import logo from './../apple-icon.png'
 
 const navigation = [
   { name: '仪表盘', href: '', icon: DashboardIcon },
-  { name: '订阅', href: '/subscribers', icon: SubscriberIcon },
   { name: '评论', href: '/comments', icon: NewCommentIcon },
+  { name: '订阅', href: '/subscribers', icon: SubscriberIcon },
+  { name: 'Newsletters', href: '/newsletters', icon: TiltedSendIcon },
 ]
 
 export function Sidebar() {

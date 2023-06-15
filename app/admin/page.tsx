@@ -2,7 +2,6 @@ import { Card, Grid, Metric, Text, Title } from '@tremor/react'
 import { sql } from 'drizzle-orm'
 import React from 'react'
 
-import { Container } from '~/components/ui/Container'
 import { db } from '~/db'
 
 export default async function AdminPage() {
@@ -16,7 +15,7 @@ export default async function AdminPage() {
   )
 
   return (
-    <Container className="mt-12 pb-12">
+    <>
       <Title>后台仪表盘</Title>
 
       <Grid numItemsMd={2} numItemsLg={3} className="mt-6 gap-6">
@@ -36,6 +35,6 @@ export default async function AdminPage() {
           {count && 'guestbook' in count && <Metric>{count.guestbook}</Metric>}
         </Card>
       </Grid>
-    </Container>
+    </>
   )
 }

@@ -15,7 +15,6 @@ import { desc, sql } from 'drizzle-orm'
 import Link from 'next/link'
 import React from 'react'
 
-import { Container } from '~/components/ui/Container'
 import { db } from '~/db'
 import { comments } from '~/db/schema'
 import { url } from '~/lib'
@@ -50,7 +49,7 @@ export default async function AdminCommentsPage() {
   const postMap = new Map(posts.map((post) => [post._id, post]))
 
   return (
-    <Container className="py-12">
+    <>
       <Title>评论</Title>
 
       <Grid numItemsMd={2} numItemsLg={3} className="mt-6 gap-6">
@@ -108,6 +107,6 @@ export default async function AdminCommentsPage() {
           </TableBody>
         </Table>
       </Card>
-    </Container>
+    </>
   )
 }
