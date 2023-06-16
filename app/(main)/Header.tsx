@@ -1,6 +1,12 @@
 'use client'
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useUser,
+} from '@clerk/nextjs'
 import { clsxm } from '@zolplay/utils'
 import {
   AnimatePresence,
@@ -14,7 +20,12 @@ import React from 'react'
 import { Activity } from '~/app/(main)/Activity'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
-import { UserArrowLeftIcon } from '~/assets'
+import {
+  GitHubBrandIcon,
+  GoogleBrandIcon,
+  MailIcon,
+  UserArrowLeftIcon,
+} from '~/assets'
 import { Avatar } from '~/components/Avatar'
 import { Container } from '~/components/ui/Container'
 import { Tooltip } from '~/components/ui/Tooltip'
@@ -298,12 +309,30 @@ export function Header() {
 function UserInfo() {
   const [tooltipOpen, setTooltipOpen] = React.useState(false)
   const pathname = usePathname()
+  const { user } = useUser()
+  const StrategyIcon = React.useMemo(() => {
+    const strategy = user?.primaryEmailAddress?.verification.strategy
+    if (!strategy) {
+      return null
+    }
+
+    switch (strategy) {
+      case 'from_oauth_github':
+        return GitHubBrandIcon as (
+          props: React.ComponentProps<'svg'>
+        ) => JSX.Element
+      case 'from_oauth_google':
+        return GoogleBrandIcon
+      default:
+        return MailIcon
+    }
+  }, [user?.primaryEmailAddress?.verification.strategy])
 
   return (
     <AnimatePresence>
       <SignedIn key="user-info">
         <motion.div
-          className="pointer-events-auto flex h-10 items-center"
+          className="pointer-events-auto relative flex h-10 items-center"
           initial={{ opacity: 0, x: 25 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 25 }}
@@ -316,6 +345,11 @@ function UserInfo() {
               },
             }}
           />
+          {StrategyIcon && (
+            <span className="pointer-events-none absolute -bottom-1 -right-1 flex h-4 w-4 select-none items-center justify-center rounded-full bg-white dark:bg-zinc-900">
+              <StrategyIcon className="h-3 w-3" />
+            </span>
+          )}
         </motion.div>
       </SignedIn>
       <SignedOut key="sign-in">
