@@ -17,14 +17,20 @@ const config = {
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-assignment': 'off',
-      }
+      },
     },
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: path.join(__dirname, 'tsconfig.json'),
   },
-  plugins: ['turbo', '@typescript-eslint', 'simple-import-sort', 'unused-imports'],
+  ignorePatterns: ['**/*.md'],
+  plugins: [
+    'turbo',
+    '@typescript-eslint',
+    'simple-import-sort',
+    'unused-imports',
+  ],
   extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended'],
   rules: {
     '@typescript-eslint/consistent-type-imports': [

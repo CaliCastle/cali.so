@@ -8,19 +8,14 @@ const NewslettersTemplate = (props: {
   subject?: string | null
   body?: string | null
 }) => {
-  const {
-    subject = '测试主题',
-    body = `## 最近的一些更新与变化
-  ![](https://zolplay.com/api/og?title=Some+Recent+Changes)
-  `,
-  } = props
+  const { subject = '测试主题', body = `## 测试内容` } = props
 
   return (
     <Layout previewText={subject ?? ''}>
       <Heading>{subject}</Heading>
 
       {body && (
-        <Section className="max-w-[465px] px-2 text-[14px] leading-[16px] text-zinc-700">
+        <Section className="max-w-[465px] px-2 text-[14px] leading-loose text-zinc-700">
           <ReactMarkdown
             components={{
               img: ({ src, alt }) => {
@@ -28,7 +23,7 @@ const NewslettersTemplate = (props: {
                   <img
                     src={src}
                     alt={alt}
-                    className="mx-auto my-0 max-w-[420px]"
+                    className="mx-auto my-0 max-w-[465px]"
                   />
                 )
               },

@@ -76,6 +76,7 @@
     "resend": "^0.15.1",
     "rss": "^1.2.2",
     "sanity": "^3.12.0",
+    "sanity-plugin-media": "^2.0.5",
     "valtio": "^1.10.5",
     "zod": "^3.21.4"
   },
