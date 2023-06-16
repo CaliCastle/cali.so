@@ -6,6 +6,7 @@ import { codeInput } from '@sanity/code-input'
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
 import { deskTool } from 'sanity/desk'
+import { media } from 'sanity-plugin-media'
 
 import { settingsPlugin, settingsStructure } from '~/sanity/plugins/settings'
 
@@ -30,6 +31,7 @@ export default defineConfig({
     settingsPlugin({
       type: settingsType.name,
     }),
+    media(),
     codeInput(),
   ],
 })

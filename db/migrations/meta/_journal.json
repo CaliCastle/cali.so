@@ -57,6 +57,13 @@
       "when": 1686234041099,
       "tag": "0007_robust_sersi",
       "breakpoints": false
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1686736025347,
+      "tag": "0008_violet_the_enforcers",
+      "breakpoints": false
     }
   ]
 }

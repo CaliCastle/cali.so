@@ -7,6 +7,8 @@ import React from 'react'
 
 import { ExternalLinkIcon } from '~/assets'
 
+const hostsThatNeedInvertedFavicons = ['github.com']
+
 type RichLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {
     children: React.ReactNode
@@ -15,12 +17,10 @@ type RichLinkProps = LinkProps &
   }
 export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
   ({ children, href, favicon = true, className, ...props }, ref) => {
+    const hrefHost = new URL(href).host
     const faviconUrl = React.useMemo(
-      () =>
-        href.startsWith('http')
-          ? `/api/favicon?url=${new URL(href).host}`
-          : null,
-      [href]
+      () => (href.startsWith('http') ? `/api/favicon?url=${hrefHost}` : null),
+      [hrefHost]
     )
 
     // if it's a relative link, use a fallback Link
@@ -45,7 +45,12 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
         {...props}
       >
         {favicon && faviconUrl && (
-          <span className="mr-px inline-flex translate-y-0.5">
+          <span
+            className={clsxm(
+              'mr-px inline-flex translate-y-0.5',
+              hostsThatNeedInvertedFavicons.includes(hrefHost) && 'dark:invert'
+            )}
+          >
             <Image
               src={faviconUrl}
               alt=""

@@ -19,6 +19,15 @@ export const subscribers = mysqlTable('subscribers', {
   updatedAt: timestamp('updated_at').defaultNow(),
 })
 
+export const newsletters = mysqlTable('newsletters', {
+  id: serial('id').primaryKey(),
+  subject: varchar('subject', { length: 200 }),
+  body: text('body'),
+  sentAt: datetime('sent_at'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+})
+
 export const comments = mysqlTable(
   'comments',
   {

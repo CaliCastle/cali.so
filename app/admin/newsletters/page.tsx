@@ -9,49 +9,49 @@ import {
   Title,
 } from '@tremor/react'
 import { parseDateTime } from '@zolplay/utils'
-import { desc, lte, sql } from 'drizzle-orm'
-import React from 'react'
+import { desc, sql } from 'drizzle-orm'
 
+import { Button } from '~/components/ui/Button'
 import { db } from '~/db'
-import { subscribers } from '~/db/schema'
+import { newsletters } from '~/db/schema'
 
-export default async function AdminSubscribersPage() {
+export default async function AdminNewslettersPage() {
   const {
     rows: [count],
   } = await db.execute<{ today_count: number }>(
     sql`SELECT 
-  (SELECT COUNT(*) FROM subscribers WHERE subscribed_at IS NOT NULL) as total`
+  (SELECT COUNT(*) FROM newsletters) as total`
   )
-  const subs = await db
+  const nl = await db
     .select()
-    .from(subscribers)
-    .where(lte(subscribers.subscribedAt, new Date()))
-    .limit(30)
-    .orderBy(desc(subscribers.subscribedAt))
+    .from(newsletters)
+    .limit(100)
+    .orderBy(desc(newsletters.sentAt))
 
   return (
     <>
-      <Title>
-        总订阅{' '}
+      <Title className="mb-3">
+        Total newsletters{' '}
         {typeof count === 'object' && 'total' in count && (
           <span>{count.total}</span>
         )}
       </Title>
+      <Button href="newsletters/new">New</Button>
 
       <Card className="mt-6">
         <Table className="mt-5">
           <TableHead>
             <TableRow>
-              <TableHeaderCell>Email</TableHeaderCell>
-              <TableHeaderCell>订阅时间</TableHeaderCell>
+              <TableHeaderCell>Subject</TableHeaderCell>
+              <TableHeaderCell>Time</TableHeaderCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {subs.map((sub) => (
-              <TableRow key={sub.id}>
-                <TableCell>{sub.email}</TableCell>
+            {nl.map((newsletter) => (
+              <TableRow key={newsletter.id}>
+                <TableCell>{newsletter.subject}</TableCell>
                 <TableCell>
-                  {parseDateTime({ date: sub.subscribedAt })?.format(
+                  {parseDateTime({ date: newsletter.sentAt })?.format(
                     'YYYY-MM-DD HH:mm'
                   )}
                 </TableCell>

@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { emailConfig } from '../config/email'
 import { Button, Heading, Hr, Img, Link, Section, Text } from './_components'
-import { Layout } from './Layout'
+import Layout from './Layout'
 
 const ConfirmSubscriptionEmail = ({ link = 'link.com/confirm?fake-token' }) => {
   const previewText = `确认订阅 Cali 的动态吗？`

@@ -15,7 +15,7 @@ import {
   Text,
 } from './_components'
 
-export function Layout({
+export default function Layout({
   previewText,
   children,
 }: {
@@ -28,7 +28,7 @@ export function Layout({
       <Preview>{previewText}</Preview>
       <Tailwind>
         <Body className="mx-auto my-auto bg-zinc-50 pt-[32px] font-sans">
-          <Container className="mx-auto my-[40px] w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white px-[24px] py-[20px]">
+          <Container className="mx-auto my-[40px] w-[465px] max-w-[465px] rounded-2xl border border-solid border-zinc-100 bg-white px-[24px] py-[20px]">
             {children}
           </Container>
 
