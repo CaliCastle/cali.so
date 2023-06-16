@@ -33,15 +33,20 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
   return {
     title: newsletter.subject,
+    description: newsletter.subject,
     openGraph: {
-      images: imageUrl,
+      images: imageUrl ? [{ url: imageUrl }] : undefined,
       title: newsletter.subject ?? '',
+      description: newsletter.subject ?? '',
       type: 'article',
     },
     twitter: {
       card: 'summary_large_image',
       title: newsletter.subject ?? '',
-      images: imageUrl,
+      description: newsletter.subject ?? '',
+      images: imageUrl ? [{ url: imageUrl }] : undefined,
+      site: '@thecalicastle',
+      creator: '@thecalicastle',
     },
   } satisfies Metadata
 }
