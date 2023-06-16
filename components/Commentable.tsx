@@ -515,7 +515,7 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
             ref={textareaRef}
             id="comment"
             name="comment"
-            className="block flex-1 shrink-0 resize-none border-0 bg-transparent text-sm leading-6 text-zinc-800 placeholder-zinc-400 outline-none focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+            className="block flex-1 shrink-0 resize-none border-0 bg-transparent p-0 text-sm leading-6 text-zinc-800 placeholder-zinc-400 outline-none focus:outline-none focus:ring-0 dark:text-zinc-200 dark:placeholder-zinc-500"
             placeholder={
               replyingTo
                 ? `回复 ${parseDisplayName(replyingTo.userInfo)} 的评论...`
