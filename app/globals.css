@@ -2,9 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html,
+body {
   text-rendering: optimizeLegibility;
   background-color: var(--bg-color);
+  scroll-behavior: smooth;
+  scroll-padding-top: 3rem;
 }
 
 html.light {
@@ -28,7 +31,8 @@ html.dark {
 }
 
 @keyframes typing-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
