@@ -1,6 +1,5 @@
 'use client'
 
-import { Portal } from '@headlessui/react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
@@ -188,12 +187,12 @@ export function BlogPostPage({
 
       {post.related && post.related.length > 0 ? (
         <section className="mb-12 mt-32">
-          <h2 className="flex items-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
+          <h2 className="mb-6 flex items-center justify-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
             <PencilSwooshIcon className="h-5 w-5 flex-none" />
             <span className="ml-2">相关文章</span>
           </h2>
 
-          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
+          <div className="mt-6 grid grid-cols-1 justify-center gap-6 md:grid-cols-[repeat(auto-fit,75%)] lg:grid-cols-[repeat(auto-fit,45%)] lg:gap-8">
             {post.related.map((post, idx) => (
               <BlogPostCard
                 post={post}
@@ -207,19 +206,6 @@ export function BlogPostPage({
 
       <ClientOnly>
         <BlogPostStateLoader post={post} />
-      </ClientOnly>
-
-      <ClientOnly>
-        <Portal>
-          <div className="pointer-events-none fixed inset-0 z-50 h-full w-full sm:px-8">
-            <div className="mx-auto h-full max-w-7xl px-4 sm:px-8 lg:px-12">
-              <div className="mx-auto flex h-full max-w-2xl justify-between lg:max-w-5xl">
-                <div className="hidden h-full flex-col items-center justify-center lg:flex"></div>
-                <div className="hidden h-full flex-col items-center justify-center lg:flex"></div>
-              </div>
-            </div>
-          </div>
-        </Portal>
       </ClientOnly>
     </Container>
   )
