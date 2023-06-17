@@ -86,10 +86,21 @@ export default async function BlogPage({
     console.error(error)
   }
 
+  let relatedViews: number[] = []
+  if (typeof post.related !== 'undefined' && post.related.length > 0) {
+    if (env.VERCEL_ENV === 'development') {
+      relatedViews = post.related.map(() => Math.floor(Math.random() * 1000))
+    } else {
+      const postIdKeys = post.related.map(({ _id }) => kvKeys.postViews(_id))
+      relatedViews = await redis.mget<number[]>(...postIdKeys)
+    }
+  }
+
   return (
     <BlogPostPage
       post={post}
       views={views}
+      relatedViews={relatedViews}
       reactions={reactions.length > 0 ? reactions : undefined}
     />
   )

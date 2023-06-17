@@ -29,6 +29,9 @@ export const Post = z.object({
   mood: z.enum(['happy', 'sad', 'neutral']),
 })
 export type Post = z.infer<typeof Post>
+export type PostDetail = Post & {
+  related?: Post[]
+}
 
 export default defineType({
   name: 'post',
