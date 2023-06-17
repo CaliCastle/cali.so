@@ -40,13 +40,13 @@ export function BlogPostPage({
 }) {
   return (
     <Container className="mt-16 lg:mt-32">
-      <div className="flex w-full justify-between xl:relative">
+      <div className="w-full md:flex md:justify-between xl:relative">
         <aside className="hidden w-[160px] shrink-0 lg:block">
           <div className="sticky top-2 pt-20">
-            <BlogPostTableOfContents body={post.body} />
+            <BlogPostTableOfContents headings={post.headings} />
           </div>
         </aside>
-        <div className="max-w-2xl flex-1 shrink-0">
+        <div className="max-w-2xl md:flex-1 md:shrink-0">
           <Button
             href="/blog"
             variant="secondary"

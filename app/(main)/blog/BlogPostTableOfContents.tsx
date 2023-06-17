@@ -13,8 +13,8 @@ interface Node {
   children?: HeadingNode[]
 }
 
-const parseOutline = (body: Node[]) => {
-  return body
+const parseOutline = (nodes: Node[]) => {
+  return nodes
     .filter((node) => node._type === 'block' && node.style.startsWith('h'))
     .map((node) => {
       return {
@@ -26,8 +26,8 @@ const parseOutline = (body: Node[]) => {
     })
 }
 
-export function BlogPostTableOfContents({ body }: { body: Node[] }) {
-  const outline = parseOutline(body)
+export function BlogPostTableOfContents({ headings }: { headings: Node[] }) {
+  const outline = parseOutline(headings)
 
   return (
     <ul className="group pointer-events-auto flex flex-col space-y-2 text-zinc-500">
