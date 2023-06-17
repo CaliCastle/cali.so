@@ -31,6 +31,7 @@ export function Newsletter() {
     resolver: zodResolver(newsletterFormSchema),
   })
   const [isSubscribed, setIsSubscribed] = React.useState(false)
+  const [subCount, setSubCount] = React.useState<string>()
   const { reward } = useReward('newsletter-rewards', 'emoji', {
     position: 'absolute',
     emoji: ['🤓', '😊', '🥳', '🤩', '🤪', '🤯', '🥰', '😎', '🤑', '🤗', '😇'],
@@ -68,6 +69,18 @@ export function Newsletter() {
     }
   }, [isSubscribed])
 
+  React.useEffect(() => {
+    async function getSubCount() {
+      const response = await fetch('/api/subscribers')
+      if (response.ok) {
+        const { count } = await response.json()
+        setSubCount(count as string)
+      }
+    }
+
+    void getSubCount()
+  }, [])
+
   return (
     <form
       className={clsxm(
@@ -81,8 +94,15 @@ export function Newsletter() {
         <TiltedSendIcon className="h-5 w-5 flex-none" />
         <span className="ml-2">动态更新</span>
       </h2>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        获取我最新发布的内容通知，随时可以取消订阅。
+      <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-400 md:text-sm">
+        <span>喜欢我的内容的话不妨订阅支持一下 🫶</span>
+        <br />
+        {subCount && (
+          <span>
+            加入其他 <span className="font-medium">{subCount}</span> 位订阅者，
+          </span>
+        )}
+        <span>每月一封，随时可以取消订阅。</span>
       </p>
       <AnimatePresence mode="wait">
         {!isSubscribed ? (

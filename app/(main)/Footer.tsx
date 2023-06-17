@@ -10,6 +10,8 @@ import { env } from '~/env.mjs'
 import { prettifyNumber } from '~/lib/math'
 import { redis } from '~/lib/redis'
 
+import { Newsletter } from './Newsletter'
+
 function NavLink({
   href,
   children,
@@ -99,6 +101,9 @@ export function Footer() {
       <Container.Outer>
         <div className="border-t border-zinc-100 pb-16 pt-10 dark:border-zinc-700/40">
           <Container.Inner>
+            <div className="mx-auto mb-8 max-w-md">
+              <Newsletter />
+            </div>
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
               <p className="text-sm text-zinc-500/80 dark:text-zinc-400/80">
                 &copy; {new Date().getFullYear()} Cali Castle. 网站已开源：
