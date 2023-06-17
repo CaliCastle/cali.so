@@ -1,6 +1,7 @@
 import './blog/[slug]/blog.css'
 
 import { Analytics } from '@vercel/analytics/react'
+import { Suspense } from 'react'
 
 import { Footer } from '~/app/(main)/Footer'
 import { Header } from '~/app/(main)/Header'
@@ -26,7 +27,9 @@ export default function BlogLayout({
         <div className="relative text-zinc-800 dark:text-zinc-200">
           <Header />
           <main>{children}</main>
-          <Footer />
+          <Suspense>
+            <Footer />
+          </Suspense>
         </div>
       </QueryProvider>
 

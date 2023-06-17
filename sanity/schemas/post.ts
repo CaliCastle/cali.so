@@ -30,6 +30,7 @@ export const Post = z.object({
 })
 export type Post = z.infer<typeof Post>
 export type PostDetail = Post & {
+  headings: any[]
   related?: Post[]
 }
 

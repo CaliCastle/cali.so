@@ -20,7 +20,7 @@ export const newsletterFormSchema = z.object({
 })
 export type NewsletterForm = z.infer<typeof newsletterFormSchema>
 
-export function Newsletter() {
+export function Newsletter({ subCount }: { subCount?: string }) {
   const {
     register,
     handleSubmit,
@@ -31,7 +31,6 @@ export function Newsletter() {
     resolver: zodResolver(newsletterFormSchema),
   })
   const [isSubscribed, setIsSubscribed] = React.useState(false)
-  const [subCount, setSubCount] = React.useState<string>()
   const { reward } = useReward('newsletter-rewards', 'emoji', {
     position: 'absolute',
     emoji: ['🤓', '😊', '🥳', '🤩', '🤪', '🤯', '🥰', '😎', '🤑', '🤗', '😇'],
@@ -68,18 +67,6 @@ export function Newsletter() {
       setTimeout(() => setIsSubscribed(false), 60000)
     }
   }, [isSubscribed])
-
-  React.useEffect(() => {
-    async function getSubCount() {
-      const response = await fetch('/api/subscribers')
-      if (response.ok) {
-        const { count } = await response.json()
-        setSubCount(count as string)
-      }
-    }
-
-    void getSubCount()
-  }, [])
 
   return (
     <form

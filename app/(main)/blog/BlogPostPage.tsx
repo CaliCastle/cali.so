@@ -25,6 +25,7 @@ import { prettifyNumber } from '~/lib/math'
 import { type PostDetail } from '~/sanity/schemas/post'
 
 import { BlogPostCard } from './BlogPostCard'
+import { BlogPostTableOfContents } from './BlogPostTableOfContents'
 
 export function BlogPostPage({
   post,
@@ -39,8 +40,13 @@ export function BlogPostPage({
 }) {
   return (
     <Container className="mt-16 lg:mt-32">
-      <div className="xl:relative">
-        <div className="mx-auto max-w-2xl">
+      <div className="flex w-full justify-between xl:relative">
+        <aside className="hidden w-[160px] shrink-0 lg:block">
+          <div className="sticky top-2 pt-20">
+            <BlogPostTableOfContents body={post.body} />
+          </div>
+        </aside>
+        <div className="max-w-2xl flex-1 shrink-0">
           <Button
             href="/blog"
             variant="secondary"
@@ -169,6 +175,15 @@ export function BlogPostPage({
             </Prose>
           </article>
         </div>
+        <aside className="hidden w-[90px] shrink-0 lg:block">
+          <div className="sticky top-2 flex justify-end pt-20">
+            <BlogReactions
+              _id={post._id}
+              mood={post.mood}
+              reactions={reactions}
+            />
+          </div>
+        </aside>
       </div>
 
       {post.related && post.related.length > 0 ? (
@@ -199,14 +214,8 @@ export function BlogPostPage({
           <div className="pointer-events-none fixed inset-0 z-50 h-full w-full sm:px-8">
             <div className="mx-auto h-full max-w-7xl px-4 sm:px-8 lg:px-12">
               <div className="mx-auto flex h-full max-w-2xl justify-between lg:max-w-5xl">
-                <div className=""></div>
-                <div className="hidden h-full flex-col items-center justify-center lg:flex">
-                  <BlogReactions
-                    _id={post._id}
-                    mood={post.mood}
-                    reactions={reactions}
-                  />
-                </div>
+                <div className="hidden h-full flex-col items-center justify-center lg:flex"></div>
+                <div className="hidden h-full flex-col items-center justify-center lg:flex"></div>
               </div>
             </div>
           </div>

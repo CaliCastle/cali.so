@@ -68,6 +68,7 @@ export const getBlogPostQuery = groq`
         "dimensions": asset->metadata.dimensions
       }
     },
+    "headings": body[length(style) == 2 && string::startsWith(style, "h")],
     mainImage {
       _ref,
       asset->{
