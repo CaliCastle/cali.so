@@ -113,11 +113,12 @@ export function BlogPostTableOfContents({ headings }: { headings: Node[] }) {
           key={node.id}
           variants={itemVariants}
           className={clsxm(
-            'text-[12px] font-medium leading-[18px] transition-colors duration-300 hover:text-zinc-900 dark:hover:text-zinc-200 group-hover:[&:not(:hover)]:text-zinc-400 dark:group-hover:[&:not(:hover)]:text-zinc-600',
+            'text-[12px] font-medium leading-[18px] transition-colors duration-300',
             node.style === 'h3' && 'ml-1',
             node.style === 'h4' && 'ml-2',
-            node.id === highlightedHeadingId &&
-              'text-zinc-900 dark:text-zinc-200'
+            node.id === highlightedHeadingId
+              ? 'text-zinc-900 dark:text-zinc-200'
+              : 'hover:text-zinc-700 dark:hover:text-zinc-400 group-hover:[&:not(:hover)]:text-zinc-400 dark:group-hover:[&:not(:hover)]:text-zinc-600'
           )}
           aria-label={node.id === highlightedHeadingId ? '当前位置' : undefined}
         >
