@@ -73,7 +73,7 @@ export function BlogReactions({
         rotateY: 0,
       }}
       transition={{
-        delay: 0.3,
+        delay: 0.5,
         duration: 0.55,
         type: 'spring',
         damping: 15,
