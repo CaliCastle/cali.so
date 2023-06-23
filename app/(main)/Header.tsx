@@ -17,7 +17,6 @@ import {
 import { usePathname } from 'next/navigation'
 import React from 'react'
 
-import { Activity } from '~/app/(main)/Activity'
 import { NavigationBar } from '~/app/(main)/NavigationBar'
 import { ThemeSwitcher } from '~/app/(main)/ThemeSwitcher'
 import {
@@ -281,7 +280,7 @@ export function Header() {
                   <ThemeSwitcher />
                 </div>
               </motion.div>
-
+              {/* 
               <AnimatePresence>
                 {!isHomePage && (
                   <motion.div
@@ -296,7 +295,7 @@ export function Header() {
                     <Activity />
                   </motion.div>
                 )}
-              </AnimatePresence>
+              </AnimatePresence> */}
             </div>
           </Container>
         </div>
