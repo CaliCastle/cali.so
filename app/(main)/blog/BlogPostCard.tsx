@@ -1,3 +1,4 @@
+import { parseDateTime } from '@zolplay/utils'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -47,7 +48,9 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
             <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
               <CalendarIcon />
               <span>
-                {Intl.DateTimeFormat('zh').format(new Date(publishedAt))}
+                {parseDateTime({ date: new Date(publishedAt) })?.format(
+                  'YYYY/MM/DD'
+                )}
               </span>
             </span>
 

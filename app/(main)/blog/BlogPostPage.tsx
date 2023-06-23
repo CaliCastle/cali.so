@@ -1,5 +1,6 @@
 'use client'
 
+import { parseDateTime } from '@zolplay/utils'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
@@ -105,9 +106,9 @@ export function BlogPostPage({
                 >
                   <CalendarIcon />
                   <span>
-                    {Intl.DateTimeFormat('zh').format(
-                      new Date(post.publishedAt)
-                    )}
+                    {parseDateTime({
+                      date: new Date(post.publishedAt),
+                    })?.format('YYYY/MM/DD')}
                   </span>
                 </time>
                 <span className="inline-flex items-center space-x-1.5">
