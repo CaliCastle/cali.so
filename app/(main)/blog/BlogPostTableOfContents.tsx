@@ -99,7 +99,7 @@ export function BlogPostTableOfContents({ headings }: { headings: Node[] }) {
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [outline])
+  }, [outline, scrollY])
 
   return (
     <motion.ul

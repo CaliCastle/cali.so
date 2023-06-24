@@ -20,7 +20,7 @@ export const RichLink = React.forwardRef<HTMLAnchorElement, RichLinkProps>(
     const hrefHost = new URL(href).host
     const faviconUrl = React.useMemo(
       () => (href.startsWith('http') ? `/api/favicon?url=${hrefHost}` : null),
-      [hrefHost]
+      [href, hrefHost]
     )
 
     // if it's a relative link, use a fallback Link
