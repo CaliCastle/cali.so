@@ -77,6 +77,11 @@ export default defineType({
           type: 'string',
           title: 'Alternative Text',
         },
+        {
+          name: 'label',
+          type: 'string',
+          title: 'Label',
+        },
       ],
     }),
     defineArrayMember({
