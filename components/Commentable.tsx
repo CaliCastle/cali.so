@@ -413,7 +413,7 @@ function Comment({
                 <span className="font-semibold">
                   {parseDisplayName(parentComment.userInfo)}
                 </span>
-                <span className="line-clamp-1 w-full">
+                <span className="line-clamp-1 w-full max-w-[240px]">
                   {parentComment.body.text}
                 </span>
               </div>
