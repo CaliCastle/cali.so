@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const url = searchParams.get('url')
 
-  if (!url) {
+  if (!url || !env.LINK_PREVIEW_API_BASE_URL) {
     return NextResponse.error()
   }
 

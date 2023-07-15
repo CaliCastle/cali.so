@@ -11,6 +11,9 @@ import { RichLink } from '~/components/links/RichLink'
 import { HoverCard } from '~/components/ui/HoverCard'
 import { makeBlurDataURL } from '~/lib/image'
 
+// 改成 false 就可以关闭链接预览快照图了
+const supportsPreview = true
+
 type PeekabooLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {
     children: React.ReactNode
@@ -29,6 +32,22 @@ export function PeekabooLink({
       <Link href={href} className={clsxm(className)} {...props}>
         {children}
       </Link>
+    )
+  }
+
+  if (!supportsPreview) {
+    return (
+      <RichLink
+        href={href}
+        className={clsxm(
+          'font-semibold text-zinc-800 hover:underline dark:text-zinc-100',
+          className
+        )}
+        target="_blank"
+        {...props}
+      >
+        {children}
+      </RichLink>
     )
   }
 

@@ -12,7 +12,7 @@ const server = z.object({
   VERCEL_ENV: z.enum(['development', 'preview', 'production']),
   UPSTASH_REDIS_REST_URL: z.string().min(1),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
-  LINK_PREVIEW_API_BASE_URL: z.string().min(1),
+  LINK_PREVIEW_API_BASE_URL: z.string().optional(),
   SITE_NOTIFICATION_EMAIL_TO: z.string().optional(),
 })
 
