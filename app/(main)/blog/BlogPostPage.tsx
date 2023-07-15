@@ -142,7 +142,7 @@ export function BlogPostPage({
                   delay: 0.23,
                 }}
               >
-                <Balancer>{post.description}</Balancer>
+                {post.description}
               </motion.p>
               <motion.div
                 className="flex w-full items-center space-x-4 text-sm font-medium text-zinc-700/50 dark:text-zinc-300/50"
