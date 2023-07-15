@@ -21,6 +21,10 @@
 - [React Email](https://react.email)
 - [Resend](https://resend.com/)
 
+### 教程
+
+想部署成自己的网站？可以查看 Cali 的[官方教程](https://cali.so/blog/guide-for-cloning-my-site)
+
 ### 本地开发
 
 ```bash
