@@ -372,7 +372,7 @@ function Comment({
 
           <div
             className={clsxm(
-              'comment__message group relative inline-block rounded-xl px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200',
+              'comment__message group relative inline-block break-all rounded-xl px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200',
               isMyself
                 ? 'rounded-br-sm bg-sky-300/40 dark:bg-sky-600/80'
                 : 'rounded-bl-sm bg-zinc-600/5 dark:bg-zinc-500/20'
@@ -507,7 +507,7 @@ function CommentTextarea({ isLoading, onSubmit }: CommentTextareaProps) {
       </AnimatePresence>
       <div className="flex w-full items-end pb-1">
         {isPreviewing ? (
-          <div className="comment__message flex-1 shrink-0 px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200">
+          <div className="comment__message flex-1 shrink-0 break-all px-2 py-1 text-sm text-zinc-800 dark:text-zinc-200">
             <CommentMarkdown>{comment}</CommentMarkdown>
           </div>
         ) : (
