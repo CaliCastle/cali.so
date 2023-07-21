@@ -45,3 +45,4 @@ next-env.d.ts
 static/
 
 .react-email/
+/.idea

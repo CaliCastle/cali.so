@@ -54,10 +54,12 @@ export function BlogPostCard({ post, views }: { post: Post; views: number }) {
               </span>
             </span>
 
-            <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
-              <ScriptIcon />
-              <span>{categories.join(', ')}</span>
-            </span>
+            {Array.isArray(categories) && (
+              <span className="inline-flex items-center space-x-1 text-[12px] font-medium text-[--post-image-fg] md:text-sm">
+                <ScriptIcon />
+                <span>{categories.join(', ')}</span>
+              </span>
+            )}
           </span>
           <span className="inline-flex items-center space-x-3 text-[12px] font-medium text-[--post-image-fg] md:text-xs">
             <span className="inline-flex items-center space-x-1">
