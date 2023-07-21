@@ -14,6 +14,11 @@
 
 .cl-modalBackdrop {
   @apply backdrop-blur-sm backdrop-saturate-150;
+  @apply bg-zinc-100/40;
+}
+
+.dark .cl-modalBackdrop {
+  @apply bg-zinc-900/40;
 }
 
 .cl-userButtonPopoverCard {
