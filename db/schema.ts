@@ -16,7 +16,7 @@ export const subscribers = mysqlTable('subscribers', {
   token: varchar('token', { length: 50 }),
   subscribedAt: datetime('subscribed_at'),
   unsubscribedAt: datetime('unsubscribed_at'),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 })
 
 export const newsletters = mysqlTable('newsletters', {
@@ -25,7 +25,7 @@ export const newsletters = mysqlTable('newsletters', {
   body: text('body'),
   sentAt: datetime('sent_at'),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 })
 
 export const comments = mysqlTable(
@@ -38,7 +38,7 @@ export const comments = mysqlTable(
     parentId: bigint('parent_id', { mode: 'bigint' }),
     body: json('body'),
     createdAt: timestamp('created_at').defaultNow(),
-    updatedAt: timestamp('updated_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
   },
   (table) => ({
     postIdx: index('post_idx').on(table.postId),
@@ -51,5 +51,5 @@ export const guestbook = mysqlTable('guestbook', {
   userInfo: json('user_info'),
   message: text('message').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 })
