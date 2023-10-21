@@ -27,7 +27,7 @@ export const getLatestBlogPostsQuery = ({
 }: GetBlogPostsOptions) =>
   groq`
   *[_type == "post" && !(_id in path("drafts.**")) && publishedAt <= "${getDate().toISOString()}"
-  && defined(slug.current)][0...${limit}] | order(publishedAt desc) {
+  && defined(slug.current)] | order(publishedAt desc)[0...${limit}] {
     _id,
     title,
     "slug": slug.current,
