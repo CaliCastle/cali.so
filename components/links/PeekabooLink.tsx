@@ -1,8 +1,7 @@
 'use client'
 
 import { clsxm } from '@zolplay/utils'
-import { AnimatePresence } from 'framer-motion'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link, { type LinkProps } from 'next/link'
 import React from 'react'
@@ -73,7 +72,10 @@ export function PeekabooLink({
       <AnimatePresence mode="wait">
         {isOpen && (
           <HoverCard.Portal forceMount>
-            <HoverCard.Content asChild>
+            <HoverCard.Content
+              asChild
+              collisionPadding={250}
+            >
               <motion.div
                 className="pointer-events-none relative z-50 w-[400px] origin-top overflow-hidden !p-0"
                 initial={{
