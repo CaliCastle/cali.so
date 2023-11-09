@@ -74,7 +74,7 @@ export function PeekabooLink({
           <HoverCard.Portal forceMount>
             <HoverCard.Content
               asChild
-              collisionBoundary={250}
+              collisionBoundary={[250]}
             >
               <motion.div
                 className="pointer-events-none relative z-50 w-[400px] origin-top overflow-hidden !p-0"
