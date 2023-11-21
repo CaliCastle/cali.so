@@ -11,13 +11,13 @@ function getKey(url: string) {
 }
 
 const faviconMapper: { [key: string]: string } = {
-  '((?:zolplay.cn)|(?:zolplay.com)|(?:cn.zolplay.com))':
-    'https://cali.so/favicons/zolplay.png',
-  '(?:github.com)': 'https://cali.so/favicons/github.png',
-  '((?:t.co)|(?:twitter.com))': 'https://cali.so/favicons/twitter.png',
-  'coolshell.cn': 'https://cali.so/favicons/coolshell.png',
-  'vercel.com': 'https://cali.so/favicons/vercel.png',
-  'nextjs.org': 'https://cali.so/favicons/nextjs.png',
+  '((?:suremotoo.cc)|(?:suremotoo.site)|(?:notes.suremotoo.site))':
+    'https://suremotoo.cc/favicons/faviconName.png',
+  '(?:github.com)': 'https://suremotoo.cc/favicons/github.png',
+  '((?:t.co)|(?:twitter.com))': 'https://suremotoo.cc/favicons/twitter.png',
+  'coolshell.cn': 'https://suremotoo.cc/favicons/coolshell.png',
+  'vercel.com': 'https://suremotoo.cc/favicons/vercel.png',
+  'nextjs.org': 'https://suremotoo.cc/favicons/nextjs.png',
 }
 
 function getPredefinedIconForUrl(url: string): string | undefined {
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.error()
   }
 
-  let iconUrl = 'https://cali.so/favicon_blank.png'
+  let iconUrl = 'https://suremotoo.cc/favicon_blank.png'
 
   try {
     const predefinedIcon = getPredefinedIconForUrl(url)

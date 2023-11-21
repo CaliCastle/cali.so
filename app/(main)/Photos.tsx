@@ -4,21 +4,21 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import React from 'react'
 
-import image5 from '~/assets/highlights/highlight-cali.jpeg'
-import image1 from '~/assets/highlights/highlight-cat.jpeg'
-import image3 from '~/assets/highlights/highlight-controller.jpg'
-import image6 from '~/assets/highlights/highlight-push.png'
-import image2 from '~/assets/highlights/highlight-workshop.jpg'
-import image4 from '~/assets/highlights/highlight-zolplay.jpg'
+import image3 from '~/assets/highlights/highlight-afternoon.jpg'
+import image1 from '~/assets/highlights/highlight-monring.jpg'
+import image2 from '~/assets/highlights/highlight-scallop.jpg'
+import image5 from '~/assets/highlights/highlight-suremotoo.jpg'
+import image6 from '~/assets/highlights/highlight-suremotooyoung.jpg'
+import image4 from '~/assets/highlights/highlight-travel.jpg'
 
 const images = [image1, image2, image3, image4, image5, image6]
 const alts = [
-  '我的猫躺在我的工作台桌子上的键盘旁边',
-  '我在西雅图城市大学举办的技术演讲',
-  'Xbox 团队给我专属定制的控制器',
-  '佐玩的办公室大厅，背景墙挂着一个黑色的佐玩氛围布',
-  '我举着酒杯看着手机',
-  '我在用 Ableton Push 制作电子乐',
+  '雨后上班途中的港湾风景',
+  '我在吃红油扇贝',
+  '下班途中的傍晚港湾风景',
+  '去爬山旅游，在山脚留下的记录',
+  '我的贴脸放大照片',
+  '年轻时的我',
 ]
 
 export function Photos() {

@@ -80,10 +80,9 @@ export function Headline() {
         }}
       >
         <Balancer>
-          我是 Cali，
-          <PeekabooLink href="https://zolplay.cn">佐玩</PeekabooLink>
-          创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。
-          我热爱开发，设计，创新，享受生活，以及在未知领域中探索。
+          我是{' '}
+          <PeekabooLink href="https://suremotoo.cc">Suremotoo</PeekabooLink>,
+          我热爱开发🙅，设计❓，创新🤔，享受生活💆，以及在未知领域中探索👋。
         </Balancer>
       </motion.p>
       <motion.div
@@ -98,34 +97,34 @@ export function Headline() {
           delay: 0.25,
         }}
       >
-        <SocialLink
-          href="https://cali.so/twitter"
+        {/* <SocialLink
+          href="https://suremotoo.cc/twitter"
           aria-label="我的推特"
           platform="twitter"
-        />
-        <SocialLink
-          href="https://cali.so/youtube"
+        /> */}
+        {/* <SocialLink
+          href="https://suremotoo.cc/youtube"
           aria-label="我的 YouTube"
           platform="youtube"
-        />
+        /> */}
         <SocialLink
-          href="https://cali.so/bilibili"
+          href="https://suremotoo.cc/bilibili"
           aria-label="我的 Bilibili"
           platform="bilibili"
         />
         <SocialLink
-          href="https://cali.so/github"
+          href="https://suremotoo.cc/github"
           aria-label="我的 GitHub"
           platform="github"
         />
-        <SocialLink
-          href="https://cali.so/tg"
+        {/* <SocialLink
+          href="https://suremotoo.cc/tg"
           aria-label="我的 Telegram"
           platform="telegram"
-        />
+        /> */}
         <SocialLink href="/feed.xml" platform="rss" aria-label="RSS 订阅" />
         <SocialLink
-          href="mailto:hi@cali.so"
+          href="mailto:suremotoo@gmail.com"
           aria-label="我的邮箱"
           platform="mail"
         />
