@@ -11,7 +11,7 @@ import { HoverCard } from '~/components/ui/HoverCard'
 import { makeBlurDataURL } from '~/lib/image'
 
 // 改成 false 就可以关闭链接预览快照图了
-const supportsPreview = true
+const supportsPreview = false
 
 type PeekabooLinkProps = LinkProps &
   React.ComponentPropsWithoutRef<'a'> & {
