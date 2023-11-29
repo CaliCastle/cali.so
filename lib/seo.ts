@@ -1,10 +1,10 @@
 export const seo = {
-  title: 'Cali Castle | 开发者、设计师、细节控、创始人',
+  title: '马克孙 | 物理学生,创始人,开发者',
   description:
-    '我叫 Cali，一名开发者，设计师，细节控，同时也是佐玩创始人，目前带领着佐玩致力于创造一个充满创造力的工作环境，同时鼓励团队创造影响世界的产品。',
+    '我是孙霄逸，你可以叫我马克。一名物理学生，梦想家。我希望我的创造物日后可以改变世界。',
   url: new URL(
     process.env.NODE_ENV === 'production'
-      ? 'https://cali.so'
+      ? 'https://marksun.co.uk'
       : 'http://localhost:3000'
   ),
 } as const
