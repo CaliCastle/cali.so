@@ -84,7 +84,7 @@ export function Activity() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                 >
-                  Cali 在使用 {appLabels[app] ?? app}
+                  在使用 {appLabels[app] ?? app}
                 </motion.div>
               </Tooltip.Content>
             </Tooltip.Portal>
