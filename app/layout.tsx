@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     url: 'https://mark.sun.co.uk',
   },
   twitter: {
-    site: '@thecalicastle',
-    creator: '@thecalicastle',
+    site: '@marksun111',
+    creator: '@marksun111',
     card: 'summary_large_image',
     title: seo.title,
     description: seo.description,
