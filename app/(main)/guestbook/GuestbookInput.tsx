@@ -187,7 +187,7 @@ export function GuestbookInput() {
             className="block w-full shrink-0 resize-none border-0 bg-transparent p-0 text-sm leading-6 text-zinc-800 placeholder-zinc-400 outline-none transition-[height] will-change-[height] focus:outline-none focus:ring-0 dark:text-zinc-200 dark:placeholder-zinc-500"
             value={message}
             onChange={(event) => setMessage(event.target.value)}
-            placeholder="说点什么吧，万一火不了呢..."
+            placeholder="老铁，留个言不？"
             onKeyDown={handleKeyDown}
             maxRows={8}
             autoFocus

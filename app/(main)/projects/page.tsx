@@ -25,12 +25,11 @@ export default function ProjectsPage() {
     <Container className="mt-16 sm:mt-32">
       <header className="max-w-2xl">
         <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-          我过去的项目冒险之旅。
+          我的项目们。
         </h1>
         <p className="mt-6 text-base text-zinc-600 dark:text-zinc-400">
-          多年来，我一直在做各种各样的小项目，有<b>开源</b>的，有<b>实验</b>
-          的，也有 <b>just for fun </b>
-          的，下面就是我筛选出来我觉得还不错的项目合集，也是我在技术领域中尝试和探索的最好见证。
+          我自己没事就会做一些小项目来实现一下自己的想法，绝大多数都是 just for fun 的。但是谁知道这些小项目会不会成为下一个大项目呢？
+          虽然现在项目的数量还不多，也不够专业，但只要不断进步，总有一天会成为大牛的❤。
         </p>
       </header>
       <div className="mt-16 sm:mt-20">
