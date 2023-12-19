@@ -48,7 +48,7 @@ export const getLatestBlogPostsQuery = ({
     }
   }`
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
-  clientFetch<Post[]>(getLatestBlogPostsQuery(options))
+  clientFetch<Post[] | null>(getLatestBlogPostsQuery(options))
 
 export const getBlogPostQuery = groq`
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
@@ -109,4 +109,4 @@ export const getSettingsQuery = () =>
     }
 }`
 export const getSettings = () =>
-  clientFetch<{ projects: Project[] }>(getSettingsQuery())
+  clientFetch<{ projects: Project[] | null }>(getSettingsQuery())

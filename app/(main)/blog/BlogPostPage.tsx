@@ -113,7 +113,7 @@ export function BlogPostPage({
                 </time>
                 <span className="inline-flex items-center space-x-1.5">
                   <ScriptIcon />
-                  <span>{post.categories.join(', ')}</span>
+                  <span>{post.categories?.join(', ')}</span>
                 </span>
               </motion.div>
               <motion.h1
