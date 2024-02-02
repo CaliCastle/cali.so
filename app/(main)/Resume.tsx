@@ -4,7 +4,7 @@ import React from 'react'
 import { BriefcaseIcon } from '~/assets'
 import MiraclePlusLogo from '~/assets/company/MiraclePlusLogo.jpg'
 import ImperialLogo from '~/assets/company/Shield_of_Imperial_College_London.svg'
-import DifyLogo from '~/assets/company/dify-logo(512x200).svg'
+import DifyLogo from '~/assets/company/dify-logo.png'
 
 type Resume = {
   company: string
