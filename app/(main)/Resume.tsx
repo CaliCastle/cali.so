@@ -4,6 +4,7 @@ import React from 'react'
 import { BriefcaseIcon } from '~/assets'
 import MiraclePlusLogo from '~/assets/company/MiraclePlusLogo.jpg'
 import ImperialLogo from '~/assets/company/Shield_of_Imperial_College_London.svg'
+import DifyLogo from '~/assets/company/dify-logo(512x200).svg'
 
 type Resume = {
   company: string
@@ -29,6 +30,13 @@ const resume: Resume[] = [
     logo: MiraclePlusLogo,
     start: '2023年7月',
     end: '2023年9月',
+  },
+  {
+    company: 'Dify.AI',
+    title: '开发者关系',
+    logo: DifyLogo,
+    start: '2024年1月',
+    end: '至今',
   },
 ]
 
