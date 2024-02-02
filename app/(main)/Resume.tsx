@@ -6,6 +6,8 @@ import eightNinthsLogo from '~/assets/company/8ninths.jpeg'
 import abletiveLogo from '~/assets/company/abletive.png'
 import vvsLogo from '~/assets/company/vvs.png'
 import zolplayLogo from '~/assets/company/zolplay.png'
+import tieba from '~/assets/tieba.png'
+import baidu from '~/assets/baidu.png'
 
 type Resume = {
   company: string
@@ -33,18 +35,18 @@ const resume: Resume[] = [
     end: '2020',
   },
   {
-    company: '8ninths Inc.',
-    title: 'AR & 全栈工程师',
-    logo: eightNinthsLogo,
+    company: 'Baidu',
+    title: '高级大数据工程师&后端开发',
+    logo: baidu,
     start: '2017',
-    end: '2018',
+    end: '2019',
   },
   {
-    company: 'Abletive',
-    title: '创始人',
-    logo: abletiveLogo,
-    start: '2014',
-    end: '2016',
+    company: 'Baidu Tieba',
+    title: '大数据工程师',
+    logo: tieba,
+    start: '2016',
+    end: '2017',
   },
 ]
 
