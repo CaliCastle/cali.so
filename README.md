@@ -1,6 +1,6 @@
 ## 我的个人网站
 
-我的个人网站 [https://cali.so/](https://cali.so/) 的源代码。
+我的个人网站 [https://lemondy.org/](https://lemondy.org/) 的源代码。
 
 需要其他服务商的环境变量才能正常运行，所以如果你想要在本地运行，需要自己配置。
 
