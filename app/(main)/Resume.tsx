@@ -19,10 +19,11 @@ const resume: Resume[] = [
     title: '学生',
     logo: ImperialLogo,
     start: '2022',
-    end: {
-      label: '2026',
-      dateTime: new Date().getFullYear(),
-    },
+    end: '2026',
+    // end: {
+    //   label: '2026',
+    //   dateTime: new Date().getFullYear(),
+    // },
   },
   {
     company: '奇绩创坛',
