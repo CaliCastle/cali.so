@@ -19,10 +19,6 @@ const CreateNewsletterSchema = z.object({
   subject: z.string().nonempty(),
   body: z.string().nonempty(),
 })
-
-// 问题：改用resend的audience功能发newsletter。数据库里一直不显示newsletter，但是邮件应该是发送了。现在估计是db.insert(newsletters).values({})这里有问题。
-// 在这里CreateNewsletterSchema创建之后一直是空的，在这里需要往数据库里插入数据。但是不知道怎么插入新publish的newsletter也不知道这个东西在哪里import。
-
 export default function CreateNewsletterPage() {
   async function addNewsletter(formData: FormData) {
     'use server'
