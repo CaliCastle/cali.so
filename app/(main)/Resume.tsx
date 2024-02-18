@@ -2,9 +2,9 @@ import Image, { type StaticImageData } from 'next/image'
 import React from 'react'
 
 import { BriefcaseIcon } from '~/assets'
+import DifyLogo from '~/assets/company/dify-logo.png'
 import MiraclePlusLogo from '~/assets/company/MiraclePlusLogo.jpg'
 import ImperialLogo from '~/assets/company/Shield_of_Imperial_College_London.svg'
-import DifyLogo from '~/assets/company/dify-logo.png'
 
 type Resume = {
   company: string
