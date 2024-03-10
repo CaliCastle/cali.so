@@ -1,69 +1,13 @@
 {
   "version": "5",
-  "dialect": "mysql",
+  "dialect": "pg",
   "entries": [
     {
       "idx": 0,
       "version": "5",
-      "when": 1685604945558,
-      "tag": "0000_sweet_king_cobra",
-      "breakpoints": false
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1685606673974,
-      "tag": "0001_worried_crystal",
-      "breakpoints": false
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1685855688664,
-      "tag": "0002_square_jasper_sitwell",
-      "breakpoints": false
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1685856859159,
-      "tag": "0003_talented_jane_foster",
-      "breakpoints": false
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1685858598031,
-      "tag": "0004_cold_snowbird",
-      "breakpoints": false
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1685858811727,
-      "tag": "0005_dapper_red_ghost",
-      "breakpoints": false
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1685976649770,
-      "tag": "0006_messy_starjammers",
-      "breakpoints": false
-    },
-    {
-      "idx": 7,
-      "version": "5",
-      "when": 1686234041099,
-      "tag": "0007_robust_sersi",
-      "breakpoints": false
-    },
-    {
-      "idx": 8,
-      "version": "5",
-      "when": 1686736025347,
-      "tag": "0008_violet_the_enforcers",
-      "breakpoints": false
+      "when": 1710044001674,
+      "tag": "0000_shallow_iron_fist",
+      "breakpoints": true
     }
   ]
 }

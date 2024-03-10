@@ -120,7 +120,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         lastName: user.lastName,
         imageUrl: user.imageUrl,
       },
-      parentId: parentId ? (parentId as bigint) : null,
+      parentId: parentId ? (parentId as number) : null,
     }
 
     if (parentId && env.NODE_ENV === 'production') {
@@ -160,11 +160,16 @@ export async function POST(req: NextRequest, { params }: Params) {
       }
     }
 
-    const { insertId } = await db.insert(comments).values(commentData)
+    const [newComment] = await db
+      .insert(comments)
+      .values(commentData)
+      .returning({
+        newId: comments.id,
+      })
 
     return NextResponse.json({
       ...commentData,
-      id: CommentHashids.encode(insertId),
+      id: CommentHashids.encode(newComment!.newId),
       createdAt: new Date(),
       parentId: hashedParentId,
     } satisfies CommentDto)

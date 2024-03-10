@@ -25,6 +25,8 @@ export default defineType({
       // set corresponds with HTML tags, but you can set any title or value
       // you want, and decide how you want to deal with it where you want to
       // use your content.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       styles: [
         { title: 'Normal', value: 'normal' },
         { title: 'H1', value: 'h1' },
@@ -71,6 +73,8 @@ export default defineType({
     defineArrayMember({
       type: 'image',
       options: { hotspot: true },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       fields: [
         {
           name: 'alt',
@@ -88,6 +92,8 @@ export default defineType({
       type: 'object',
       name: 'tweet',
       title: 'Tweet',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       fields: [
         {
           name: 'id',

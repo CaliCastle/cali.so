@@ -18,7 +18,7 @@ import { newsletters } from '~/db/schema'
 export default async function AdminNewslettersPage() {
   const {
     rows: [count],
-  } = await db.execute<{ today_count: number }>(
+  } = await db.execute<{ total: number }>(
     sql`SELECT 
   (SELECT COUNT(*) FROM newsletters) as total`
   )

@@ -78,12 +78,17 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const { insertId } = await db.insert(guestbook).values(guestbookData)
+    const [newGuestbook] = await db
+      .insert(guestbook)
+      .values(guestbookData)
+      .returning({
+        newId: guestbook.id,
+      })
 
     return NextResponse.json(
       {
         ...guestbookData,
-        id: GuestbookHashids.encode(insertId),
+        id: GuestbookHashids.encode(newGuestbook!.newId),
         createdAt: new Date(),
       } satisfies GuestbookDto,
       {

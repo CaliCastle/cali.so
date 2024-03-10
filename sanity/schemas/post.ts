@@ -60,6 +60,8 @@ export default defineType({
       name: 'categories',
       title: 'Categories',
       type: 'array',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       of: [{ type: 'reference', to: { type: 'category' } }],
     }),
     defineField({
@@ -82,6 +84,8 @@ export default defineType({
       name: 'description',
       title: 'Description',
       type: 'text',
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       rows: 3,
       validation: (Rule) => Rule.required(),
     }),
