@@ -1,4 +1,4 @@
-import { get } from '@vercel/edge-config'
+import redirects from './config/redirects.json'
 
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
@@ -16,13 +16,7 @@ const nextConfig = {
     domains: ['cdn.sanity.io'],
   },
 
-  async redirects() {
-    try {
-      return (await get('redirects')) ?? []
-    } catch {
-      return []
-    }
-  },
+  redirects,
 
   rewrites() {
     return [

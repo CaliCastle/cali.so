@@ -14,26 +14,28 @@ export const config = {
 
 async function beforeAuthMiddleware(req: NextRequest) {
   const { geo, nextUrl } = req
-
-  const blockedIPs = await get<string[]>('blocked_ips')
-  const ip = getIP(req)
   const isApi = nextUrl.pathname.startsWith('/api/')
 
-  if (blockedIPs?.includes(ip)) {
-    if (isApi) {
-      return NextResponse.json(
-        { error: 'You have been blocked.' },
-        { status: 403 }
-      )
+  if (process.env.EDGE_CONFIG) {
+    const blockedIPs = await get<string[]>('blocked_ips')
+    const ip = getIP(req)
+
+    if (blockedIPs?.includes(ip)) {
+      if (isApi) {
+        return NextResponse.json(
+          { error: 'You have been blocked.' },
+          { status: 403 }
+        )
+      }
+
+      nextUrl.pathname = '/blocked'
+      return NextResponse.rewrite(nextUrl)
     }
 
-    nextUrl.pathname = '/blocked'
-    return NextResponse.rewrite(nextUrl)
-  }
-
-  if (nextUrl.pathname === '/blocked') {
-    nextUrl.pathname = '/'
-    return NextResponse.redirect(nextUrl)
+    if (nextUrl.pathname === '/blocked') {
+      nextUrl.pathname = '/'
+      return NextResponse.redirect(nextUrl)
+    }
   }
 
   if (geo && !isApi && env.VERCEL_ENV === 'production') {
