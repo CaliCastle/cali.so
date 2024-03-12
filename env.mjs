@@ -20,6 +20,7 @@ const client = z.object({
   NEXT_PUBLIC_SANITY_USE_CDN: z.boolean(),
   NEXT_PUBLIC_SITE_URL: z.string().min(1),
   NEXT_PUBLIC_SITE_EMAIL_FROM: z.string().min(1),
+  NEXT_PUBLIC_SITE_LINK_PREVIEW_ENABLED: z.boolean().optional().default(false),
 })
 
 /**
@@ -40,6 +41,7 @@ const processEnv = {
   NEXT_PUBLIC_SANITY_USE_CDN: process.env.NEXT_PUBLIC_SANITY_USE_CDN == 'true',
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NEXT_PUBLIC_SITE_EMAIL_FROM: process.env.NEXT_PUBLIC_SITE_EMAIL_FROM,
+  NEXT_PUBLIC_SITE_LINK_PREVIEW_ENABLED: process.env.NEXT_PUBLIC_SITE_LINK_PREVIEW_ENABLED == 'true',
   LINK_PREVIEW_API_BASE_URL: process.env.LINK_PREVIEW_API_BASE_URL,
   SITE_NOTIFICATION_EMAIL_TO: process.env.SITE_NOTIFICATION_EMAIL_TO,
 }
