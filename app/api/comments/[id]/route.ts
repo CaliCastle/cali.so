@@ -63,7 +63,7 @@ export async function GET(req: NextRequest, { params }: Params) {
             ...rest,
             id: CommentHashids.encode(id),
             parentId: parentId ? CommentHashids.encode(parentId) : null,
-          } as PostIDLessCommentDto)
+          }) as PostIDLessCommentDto
       )
     )
   } catch (error) {
@@ -131,18 +131,13 @@ export async function POST(req: NextRequest, { params }: Params) {
         .from(comments)
         .where(eq(comments.id, parentId as number))
       if (parentUserFromDb && parentUserFromDb.userId !== user.id) {
-        const {
-          primaryEmailAddressId,
-          emailAddresses,
-          imageUrl,
-          firstName,
-          lastName,
-        } = await clerkClient.users.getUser(parentUserFromDb.userId)
+        const { primaryEmailAddressId, emailAddresses } =
+          await clerkClient.users.getUser(parentUserFromDb.userId)
         const primaryEmailAddress = emailAddresses.find(
           (emailAddress) => emailAddress.id === primaryEmailAddressId
         )
         if (primaryEmailAddress) {
-          await resend.sendEmail({
+          await resend.emails.send({
             from: emailConfig.from,
             to: primaryEmailAddress.emailAddress,
             subject: '👋 有人回复了你的评论',

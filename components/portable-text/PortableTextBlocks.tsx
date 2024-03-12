@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { type PortableTextComponentProps } from '@portabletext/react'
 import React from 'react'
 

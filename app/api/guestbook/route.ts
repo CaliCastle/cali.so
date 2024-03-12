@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (env.NODE_ENV === 'production' && env.SITE_NOTIFICATION_EMAIL_TO) {
-      await resend.sendEmail({
+      await resend.emails.send({
         from: emailConfig.from,
         to: env.SITE_NOTIFICATION_EMAIL_TO,
         subject: '👋 有人刚刚在留言墙留言了',

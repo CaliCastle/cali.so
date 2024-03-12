@@ -9,6 +9,7 @@ import { emailConfig } from '~/config/email'
 import { db } from '~/db'
 import { newsletters, subscribers } from '~/db/schema'
 import NewslettersTemplate from '~/emails/NewslettersTemplate'
+import { env } from '~/env.mjs'
 import { resend } from '~/lib/mail'
 
 extendDateTime({
@@ -16,8 +17,8 @@ extendDateTime({
 })
 
 const CreateNewsletterSchema = z.object({
-  subject: z.string().nonempty(),
-  body: z.string().nonempty(),
+  subject: z.string().min(1),
+  body: z.string().min(1),
 })
 export default function CreateNewsletterPage() {
   async function addNewsletter(formData: FormData) {
@@ -39,10 +40,10 @@ export default function CreateNewsletterPage() {
         .map((sub) => sub.email!),
     ])
 
-    await resend.sendEmail({
+    await resend.emails.send({
       subject: data.subject,
       from: emailConfig.from,
-      to: 'hi@cali.so',
+      to: env.SITE_NOTIFICATION_EMAIL_TO ?? [],
       reply_to: emailConfig.from,
       bcc: Array.from(subscriberEmails),
       react: NewslettersTemplate({

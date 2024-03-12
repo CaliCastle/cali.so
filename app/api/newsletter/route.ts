@@ -13,7 +13,7 @@ import { resend } from '~/lib/mail'
 import { redis } from '~/lib/redis'
 
 const newsletterFormSchema = z.object({
-  email: z.string().email().nonempty(),
+  email: z.string().email().min(1),
 })
 
 const ratelimit = new Ratelimit({
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const token = crypto.randomUUID()
 
     if (env.NODE_ENV === 'production') {
-      await resend.sendEmail({
+      await resend.emails.send({
         from: emailConfig.from,
         to: parsed.email,
         subject: '来自 Cali 的订阅确认',
