@@ -67,6 +67,7 @@ export function PortableTextImage({
                     )}
                     alt={value.alt || ''}
                     fetchPriority="high"
+                    unoptimized
                   />
                 </Dialog.Trigger>
               </motion.div>

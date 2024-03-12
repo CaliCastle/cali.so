@@ -30,6 +30,7 @@ export const Post = z.object({
 })
 export type Post = z.infer<typeof Post>
 export type PostDetail = Post & {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   headings: any[]
   related?: Post[]
 }
@@ -120,6 +121,7 @@ export default defineType({
   initialValue: () => ({
     publishedAt: new Date().toISOString(),
     mood: 'neutral',
+    readingTime: 0,
   }),
 
   preview: {

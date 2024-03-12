@@ -7,7 +7,7 @@ const server = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']),
   DATABASE_URL: z.string().min(1),
   RESEND_API_KEY: z.string().min(1),
-  VERCEL_ENV: z.enum(['development', 'preview', 'production']),
+  VERCEL_ENV: z.enum(['development', 'preview', 'production']).default('development'),
   UPSTASH_REDIS_REST_URL: z.string().min(1),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
   LINK_PREVIEW_API_BASE_URL: z.string().optional(),

@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio'
-import { ImageResponse, type NextRequest, NextResponse } from 'next/server'
+import { ImageResponse } from 'next/og'
+import { type NextRequest, NextResponse } from 'next/server'
 
 import { ratelimit, redis } from '~/lib/redis'
 

@@ -6,51 +6,56 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverActions: true,
-  },
-
   images: {
-    domains: ['cdn.sanity.io'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+        port: '',
+        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/**`,
+      }
+    ],
   },
 
-  redirects: [
-    {
-      "source": "/twitter",
-      "destination": "https://x.com/thecalicastle",
-      "permanent": true
-    },
-    {
-      "source": "/x",
-      "destination": "https://x.com/thecalicastle",
-      "permanent": true
-    },
-    {
-      "source": "/youtube",
-      "destination": "https://youtube.com/@calicastle",
-      "permanent": true
-    },
-    {
-      "source": "/tg",
-      "destination": "https://t.me/cali_so",
-      "permanent": true
-    },
-    {
-      "source": "/linkedin",
-      "destination": "https://www.linkedin.com/in/calicastle/",
-      "permanent": true
-    },
-    {
-      "source": "/github",
-      "destination": "https://github.com/CaliCastle",
-      "permanent": true
-    },
-    {
-      "source": "/bilibili",
-      "destination": "https://space.bilibili.com/8350251",
-      "permanent": true
-    }
-  ],
+  redirects() {
+    return [
+      {
+        "source": "/twitter",
+        "destination": "https://x.com/thecalicastle",
+        "permanent": true
+      },
+      {
+        "source": "/x",
+        "destination": "https://x.com/thecalicastle",
+        "permanent": true
+      },
+      {
+        "source": "/youtube",
+        "destination": "https://youtube.com/@calicastle",
+        "permanent": true
+      },
+      {
+        "source": "/tg",
+        "destination": "https://t.me/cali_so",
+        "permanent": true
+      },
+      {
+        "source": "/linkedin",
+        "destination": "https://www.linkedin.com/in/calicastle/",
+        "permanent": true
+      },
+      {
+        "source": "/github",
+        "destination": "https://github.com/CaliCastle",
+        "permanent": true
+      },
+      {
+        "source": "/bilibili",
+        "destination": "https://space.bilibili.com/8350251",
+        "permanent": true
+      }
+    ]
+  },
 
   rewrites() {
     return [
