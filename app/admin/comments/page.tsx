@@ -42,13 +42,12 @@ export default async function AdminCommentsPage() {
     .limit(15)
   // get unique post IDs from comments
   const postIds = [...new Set(latestComments.map((comment) => comment.postId))]
-  const posts = await clientFetch<
-    { _id: string; title: string; slug: string }[]
-  >(
-    `*[_type == "post" && (_id in [${postIds
-      .map((v) => `"${v}"`)
-      .join(',')}])]{ _id, title, "slug":slug.current }`
-  )
+  const posts: { _id: string; title: string; slug: string }[] =
+    await clientFetch(
+      `*[_type == "post" && (_id in [${postIds
+        .map((v) => `"${v}"`)
+        .join(',')}])]{ _id, title, "slug":slug.current }`
+    )
   // define a map with key of post IDs to posts
   const postMap = new Map(posts.map((post) => [post._id, post]))
 

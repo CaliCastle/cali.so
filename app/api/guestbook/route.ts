@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         ...guestbookData,
-        id: GuestbookHashids.encode(newGuestbook!.newId),
+        id: GuestbookHashids.encode(newGuestbook.newId),
         createdAt: new Date(),
       } satisfies GuestbookDto,
       {

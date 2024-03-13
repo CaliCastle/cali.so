@@ -164,7 +164,7 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     return NextResponse.json({
       ...commentData,
-      id: CommentHashids.encode(newComment!.newId),
+      id: CommentHashids.encode(newComment.newId),
       createdAt: new Date(),
       parentId: hashedParentId,
     } satisfies CommentDto)
