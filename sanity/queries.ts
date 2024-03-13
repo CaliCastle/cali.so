@@ -13,6 +13,8 @@ export const getAllLatestBlogPostSlugsQuery = () =>
   `
 
 export const getAllLatestBlogPostSlugs = () => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   return clientFetch<string[]>(getAllLatestBlogPostSlugsQuery())
 }
 
@@ -48,6 +50,8 @@ export const getLatestBlogPostsQuery = ({
     }
   }`
 export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   clientFetch<Post[] | null>(getLatestBlogPostsQuery(options))
 
 export const getBlogPostQuery = groq`
@@ -95,6 +99,8 @@ export const getBlogPostQuery = groq`
     }
   }`
 export const getBlogPost = (slug: string) =>
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   clientFetch<PostDetail | undefined>(getBlogPostQuery, { slug })
 
 export const getSettingsQuery = () =>
@@ -106,7 +112,28 @@ export const getSettingsQuery = () =>
       url,
       description,
       icon
+    },
+    "heroPhotos": heroPhotos[].asset->url,
+    "resume": resume[]{
+      company,
+      title,
+      start,
+      end,
+      "logo": logo.asset->{
+        url
+      }
     }
 }`
-export const getSettings = () =>
-  clientFetch<{ projects: Project[] | null }>(getSettingsQuery())
+export const getSettings = (): Promise<{
+  projects: Project[] | null
+  heroPhotos?: string[] | null
+  resume?:
+    | {
+        company: string
+        title: string
+        logo: string
+        start: string
+        end?: string
+      }[]
+    | null
+}> => clientFetch(getSettingsQuery())

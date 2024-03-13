@@ -37,19 +37,19 @@ export type PostDetail = Post & {
 
 export default defineType({
   name: 'post',
-  title: 'Post',
+  title: '文章',
   type: 'document',
   icon: PencilSwooshIcon,
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: '标题',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
-      title: 'Slug',
+      title: '链接标识符',
       type: 'slug',
       options: {
         source: 'title',
@@ -59,21 +59,19 @@ export default defineType({
     }),
     defineField({
       name: 'categories',
-      title: 'Categories',
+      title: '分类',
       type: 'array',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       of: [{ type: 'reference', to: { type: 'category' } }],
     }),
     defineField({
       name: 'publishedAt',
-      title: 'Published at',
+      title: '发布时间',
       type: 'datetime',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'mainImage',
-      title: 'Main image',
+      title: '主图',
       type: 'image',
       description: 'This image will be used for the preview (1200 x 675px)',
       options: {
@@ -83,20 +81,19 @@ export default defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Description',
+      title: '简介',
       type: 'text',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       rows: 3,
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'body',
-      title: 'Body',
+      title: '内容',
       type: 'blockContent',
     }),
     defineField({
       name: 'readingTime',
+      title: '阅读时长（分钟）',
       type: readingTimeType.name,
       validation: (Rule) => Rule.required(),
       options: {
@@ -105,7 +102,7 @@ export default defineType({
     }),
     defineField({
       name: 'mood',
-      title: 'Mood',
+      title: '文章情绪',
       type: 'string',
       options: {
         list: [

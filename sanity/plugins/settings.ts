@@ -34,6 +34,7 @@ export const settingsStructure = (
     // The `Settings` root list item
     const settingsListItem = // A singleton not using `documentListItem`, eg no built-in preview
       S.listItem()
+        .id(typeDef.name)
         .title(typeDef.title ?? 'Settings')
         .icon(typeDef.icon)
         .child(
@@ -49,7 +50,8 @@ export const settingsStructure = (
     )
 
     return S.list()
-      .title('Content')
+      .id('root')
+      .title('内容管理')
       .items([settingsListItem, S.divider(), ...defaultListItems])
   }
 }
