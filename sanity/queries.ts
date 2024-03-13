@@ -1,7 +1,7 @@
 import { groq } from 'next-sanity'
 
 import { getDate } from '~/lib/date'
-import { clientFetch } from '~/sanity/lib/client'
+import { client } from '~/sanity/lib/client'
 import { type Post, type PostDetail } from '~/sanity/schemas/post'
 import { type Project } from '~/sanity/schemas/project'
 
@@ -12,8 +12,8 @@ export const getAllLatestBlogPostSlugsQuery = () =>
   && defined(slug.current)] | order(publishedAt desc).slug.current
   `
 
-export const getAllLatestBlogPostSlugs = (): Promise<string[]> => {
-  return clientFetch(getAllLatestBlogPostSlugsQuery())
+export const getAllLatestBlogPostSlugs = () => {
+  return client.fetch<string[]>(getAllLatestBlogPostSlugsQuery())
 }
 
 type GetBlogPostsOptions = {
@@ -47,9 +47,8 @@ export const getLatestBlogPostsQuery = ({
       }
     }
   }`
-export const getLatestBlogPosts = (
-  options: GetBlogPostsOptions
-): Promise<Post[] | null> => clientFetch(getLatestBlogPostsQuery(options))
+export const getLatestBlogPosts = (options: GetBlogPostsOptions) =>
+  client.fetch<Post[] | null>(getLatestBlogPostsQuery(options))
 
 export const getBlogPostQuery = groq`
   *[_type == "post" && slug.current == $slug && !(_id in path("drafts.**"))][0] {
@@ -95,8 +94,10 @@ export const getBlogPostQuery = groq`
       },
     }
   }`
-export const getBlogPost = (slug: string): Promise<PostDetail | undefined> =>
-  clientFetch(getBlogPostQuery, { slug })
+export const getBlogPost = (slug: string) =>
+  client.fetch<PostDetail | undefined, { slug: string }>(getBlogPostQuery, {
+    slug,
+  })
 
 export const getSettingsQuery = () =>
   groq`
@@ -117,16 +118,17 @@ export const getSettingsQuery = () =>
       "logo": logo.asset->url
     }
 }`
-export const getSettings = (): Promise<{
-  projects: Project[] | null
-  heroPhotos?: string[] | null
-  resume?:
-    | {
-        company: string
-        title: string
-        logo: string
-        start: string
-        end?: string
-      }[]
-    | null
-}> => clientFetch(getSettingsQuery())
+export const getSettings = () =>
+  client.fetch<{
+    projects: Project[] | null
+    heroPhotos?: string[] | null
+    resume?:
+      | {
+          company: string
+          title: string
+          logo: string
+          start: string
+          end?: string
+        }[]
+      | null
+  }>(getSettingsQuery())
