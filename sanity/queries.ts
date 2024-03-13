@@ -119,9 +119,7 @@ export const getSettingsQuery = () =>
       title,
       start,
       end,
-      "logo": logo.asset->{
-        url
-      }
+      "logo": logo.asset->url
     }
 }`
 export const getSettings = (): Promise<{

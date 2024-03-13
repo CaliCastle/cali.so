@@ -1,66 +1,17 @@
-import Image, { type StaticImageData } from 'next/image'
+import Image from 'next/image'
 import React from 'react'
 
 import { BriefcaseIcon } from '~/assets'
-import eightNinthsLogo from '~/assets/company/8ninths.jpeg'
-import abletiveLogo from '~/assets/company/abletive.png'
-import vvsLogo from '~/assets/company/vvs.png'
-import zolplayLogo from '~/assets/company/zolplay.png'
 
 type Resume = {
   company: string
   title: string
-  start: string | { label: string; dateTime: number }
-  end: string | { label: string; dateTime: number }
-  logo: StaticImageData
-}
-const resume: Resume[] = [
-  {
-    company: '深圳市佐玩信息技术有限公司',
-    title: '创始人 CEO',
-    logo: zolplayLogo,
-    start: '2021',
-    end: {
-      label: '至今',
-      dateTime: new Date().getFullYear(),
-    },
-  },
-  {
-    company: 'very very spaceship',
-    title: '软件工程师',
-    logo: vvsLogo,
-    start: '2018',
-    end: '2020',
-  },
-  {
-    company: '8ninths Inc.',
-    title: 'AR & 全栈工程师',
-    logo: eightNinthsLogo,
-    start: '2017',
-    end: '2018',
-  },
-  {
-    company: 'Abletive',
-    title: '创始人',
-    logo: abletiveLogo,
-    start: '2014',
-    end: '2016',
-  },
-]
-
-function getRoleDate(date: Resume['start'] | Resume['end'], label = true) {
-  if (typeof date === 'string') {
-    return date
-  }
-
-  if (label) {
-    return date.label
-  } else {
-    return String(date.dateTime)
-  }
+  start: string
+  end?: string | null
+  logo: string
 }
 
-export function Resume() {
+export function Resume({ resume }: { resume: Resume[] }) {
   return (
     <div className="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
       <h2 className="flex items-center text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -75,6 +26,8 @@ export function Resume() {
                 src={role.logo}
                 alt={role.company}
                 className="h-8 w-8 rounded-full"
+                width={100}
+                height={100}
                 unoptimized
               />
             </div>
@@ -88,19 +41,9 @@ export function Resume() {
                 {role.title}
               </dd>
               <dt className="sr-only">日期</dt>
-              <dd
-                className="ml-auto text-xs text-zinc-500/80 dark:text-zinc-400/80"
-                aria-label={`${getRoleDate(role.start)} 到 ${getRoleDate(
-                  role.end
-                )}`}
-              >
-                <time dateTime={getRoleDate(role.start, false)}>
-                  {getRoleDate(role.start)}
-                </time>{' '}
-                <span aria-hidden="true">—</span>{' '}
-                <time dateTime={getRoleDate(role.end, false)}>
-                  {getRoleDate(role.end)}
-                </time>
+              <dd className="ml-auto text-xs text-zinc-500/80 dark:text-zinc-400/80">
+                {role.start}
+                <span aria-hidden="true">—</span> {role.end ?? '至今'}
               </dd>
             </dl>
           </li>

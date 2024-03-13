@@ -53,6 +53,7 @@ export default defineType({
               options: {
                 hotspot: true,
               },
+              validation: (Rule) => Rule.required(),
             }),
             defineField({
               name: 'start',
@@ -62,10 +63,24 @@ export default defineType({
             }),
             defineField({
               name: 'end',
-              title: '结束时间',
+              title: '结束时间（留空会显示“至今”）',
               type: 'string',
             }),
           ],
+          preview: {
+            select: {
+              company: 'company',
+              title: 'title',
+              logo: 'logo',
+              start: 'start',
+              end: 'end',
+            },
+            prepare: (selection) => ({
+              title: `${selection.company} - ${selection.title}`,
+              subtitle: `${selection.start} - ${selection.end ?? '至今'}`,
+              media: selection.logo,
+            }),
+          },
         },
       ],
     }),
