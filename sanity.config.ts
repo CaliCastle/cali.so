@@ -5,7 +5,7 @@
 import { codeInput } from '@sanity/code-input'
 import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
-import { deskTool } from 'sanity/desk'
+import { structureTool } from 'sanity/structure'
 import { media } from 'sanity-plugin-media'
 
 import { settingsPlugin, settingsStructure } from '~/sanity/plugins/settings'
@@ -22,9 +22,9 @@ export default defineConfig({
   // Add and edit the content schema in the './sanity/schema' folder
   schema,
   plugins: [
-    deskTool({
-      structure: settingsStructure(settingsType),
-    }),
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    structureTool({ structure: settingsStructure(settingsType) }),
     // Vision is a tool that lets you query your content with GROQ in the studio
     // https://www.sanity.io/docs/the-vision-plugin
     visionTool({ defaultApiVersion: apiVersion }),

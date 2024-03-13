@@ -8,6 +8,7 @@ export const client = createClient({
   dataset,
   projectId,
   useCdn,
+  perspective: 'published',
 })
 
 // Wrap the cache function in a way that reuses the TypeScript definitions
