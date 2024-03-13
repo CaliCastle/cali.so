@@ -33,7 +33,7 @@ function Designer() {
 
 function OCD() {
   return (
-    <span className="group">
+    <span className="group inline-flex items-center">
       <SparkleIcon className="mr-1 inline-flex transform-gpu transition-transform duration-500 group-hover:rotate-180" />
       <span>细节控</span>
     </span>
@@ -42,7 +42,7 @@ function OCD() {
 
 function Founder() {
   return (
-    <span className="group">
+    <span className="group inline-flex items-center">
       <UserSecurityIcon className="mr-1 inline-flex group-hover:fill-zinc-600/20 dark:group-hover:fill-zinc-200/20" />
       <span>创始人</span>
     </span>
@@ -64,7 +64,7 @@ export function Headline() {
         }}
       >
         <Developer />，<Designer />，
-        <br />
+        <span className="block h-2" />
         <OCD />，<Founder />
       </motion.h1>
       <motion.p
