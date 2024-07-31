@@ -1,7 +1,8 @@
 import { Card, Text, TextInput, Title } from '@tremor/react'
 import { extendDateTime, parseDateTime } from '@zolplay/utils'
-import { lte } from 'drizzle-orm'
+import { eq,lte } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
+import PQueue from 'p-queue'
 import { z } from 'zod'
 
 import { Button } from '~/components/ui/Button'
@@ -10,7 +11,9 @@ import { db } from '~/db'
 import { newsletters, subscribers } from '~/db/schema'
 import NewslettersTemplate from '~/emails/NewslettersTemplate'
 import { env } from '~/env.mjs'
+import { url } from '~/lib'
 import { resend } from '~/lib/mail'
+
 
 extendDateTime({
   timezone: true,
@@ -19,6 +22,13 @@ extendDateTime({
 const CreateNewsletterSchema = z.object({
   subject: z.string().min(1),
   body: z.string().min(1),
+})
+
+const queue = new PQueue({
+  concurrency: 10,
+  interval: 1000,
+  intervalCap: 2
+
 })
 export default function CreateNewsletterPage() {
   async function addNewsletter(formData: FormData) {
@@ -34,24 +44,50 @@ export default function CreateNewsletterPage() {
       })
       .from(subscribers)
       .where(lte(subscribers.subscribedAt, new Date()))
+    
     const subscriberEmails = new Set([
       ...subs
         .filter((sub) => typeof sub.email === 'string' && sub.email.length > 0)
         .map((sub) => sub.email),
     ])
 
-    await resend.emails.send({
-      subject: data.subject,
-      from: emailConfig.from,
-      to: env.SITE_NOTIFICATION_EMAIL_TO ?? [],
-      reply_to: emailConfig.from,
-      bcc: Array.from(subscriberEmails),
-      react: NewslettersTemplate({
-        subject: data.subject,
-        body: data.body,
-      }),
-    })
+          
+    // send notification if site_notification_email_to is set
+    if(env.SITE_NOTIFICATION_EMAIL_TO)
+      subscriberEmails.add(env.SITE_NOTIFICATION_EMAIL_TO)
+    
+    const sendEmail = async (email: string) => {
+      const token = crypto.randomUUID()
 
+      await resend.emails.send({
+        subject: data.subject,
+        from: emailConfig.from,
+        to: email,
+        reply_to: emailConfig.from,
+        react: NewslettersTemplate({
+          subject: data.subject,
+          body: data.body,
+          link: url(`unsubscribe/${token}`).href
+        })
+      });
+
+      await db
+      .update(subscribers)
+      .set({ unsub_token: token, updatedAt: new Date() })
+      .where(eq(subscribers.email, email))
+    };
+
+    //Resend api limit the rate of request to 2 per sec.
+    const addToQueue = async () => {
+        const Emails = Array.from(subscriberEmails)
+        for (const email of Emails) {
+          await queue.add(() => sendEmail(email));
+        }
+      
+    }
+
+    await addToQueue()
+    
     await db.insert(newsletters).values({
       ...data,
       sentAt: parseDateTime({

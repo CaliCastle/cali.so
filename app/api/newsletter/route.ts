@@ -37,29 +37,41 @@ export async function POST(req: NextRequest) {
     const [subscriber] = await db
       .select()
       .from(subscribers)
-      .where(eq(subscribers.email, parsed.email))
-
-    if (subscriber) {
-      return NextResponse.json({ status: 'success' })
+      .where(
+          eq(subscribers.email, parsed.email),
+      )
+    if (subscriber) {// if true, the user subscribed before.
+      if (!subscriber.unsubscribedAt) //if the user did not unsubscribed
+        return NextResponse.json({ status: 'success' }) // user still on the sub list, no need to proceed.
     }
 
     // generate a random one-time token
-    const token = crypto.randomUUID()
-
+    const sub_token = crypto.randomUUID()
+    const unsub_token = crypto.randomUUID() //generate an unsub token.
     if (env.NODE_ENV === 'production') {
       await resend.emails.send({
         from: emailConfig.from,
         to: parsed.email,
         subject: '来自 Cali 的订阅确认',
         react: ConfirmSubscriptionEmail({
-          link: url(`confirm/${token}`).href,
+          link: url(`confirm/${sub_token}`).href,
         }),
       })
 
-      await db.insert(subscribers).values({
-        email: parsed.email,
-        token,
-      })
+      if(subscriber) { // user resubscribed 
+        await db
+        .update(subscribers)
+        .set({ unsubscribedAt: null, sub_token: sub_token,unsub_token: unsub_token, updatedAt: new Date()})
+        .where(
+          eq(subscribers.email, parsed.email)
+        );
+      } else {
+          await db.insert(subscribers).values({
+            email: parsed.email,
+            sub_token,
+            unsub_token,
+          });
+        }
     }
 
     return NextResponse.json({ status: 'success' })
