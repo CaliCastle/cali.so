@@ -12,7 +12,8 @@ import {
 export const subscribers = pgTable('subscribers', {
   id: serial('id').primaryKey(),
   email: varchar('email', { length: 120 }),
-  token: varchar('token', { length: 50 }),
+  sub_token: varchar('sub_token', { length: 50 }),
+  unsub_token: varchar('unsub_token', { length: 50 }),
   subscribedAt: timestamp('subscribed_at'),
   unsubscribedAt: timestamp('unsubscribed_at'),
   updatedAt: timestamp('updated_at').defaultNow(),
