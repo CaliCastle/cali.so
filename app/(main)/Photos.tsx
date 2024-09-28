@@ -61,7 +61,7 @@ export function Photos({ photos }: { photos: string[] }) {
             layout
           >
             <Image
-              src={image}
+              src={https://pic2.zhimg.com/v2-5fb13110e1de13d4c11e6e7f5b8026da_r.jpg}
               alt=""
               width={500}
               height={500}
