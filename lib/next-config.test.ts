@@ -8,25 +8,21 @@ describe('server output tracing', () => {
       '/blog/**': expect.arrayContaining([
         './content/blog/**/*',
         './app/_fonts/*.woff2',
-        './node_modules/harfbuzzjs/**/*',
         './node_modules/subset-font/**/*',
       ]),
       '/en/blog/**': expect.arrayContaining([
         './content/blog/**/*',
         './app/_fonts/*.woff2',
-        './node_modules/harfbuzzjs/**/*',
         './node_modules/subset-font/**/*',
       ]),
       '/newsletters/**': expect.arrayContaining([
         './content/newsletters/**/*',
         './app/_fonts/*.woff2',
-        './node_modules/harfbuzzjs/**/*',
         './node_modules/subset-font/**/*',
       ]),
       '/en/newsletters/**': expect.arrayContaining([
         './content/newsletters/**/*',
         './app/_fonts/*.woff2',
-        './node_modules/harfbuzzjs/**/*',
         './node_modules/subset-font/**/*',
       ]),
       '/content/\\[\\.\\.\\.path\\]': [

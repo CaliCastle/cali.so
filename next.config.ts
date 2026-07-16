@@ -26,7 +26,6 @@ const exposeNavigationTestingApi =
 
 const ogRuntimeAssets = [
   './app/_fonts/*.woff2',
-  './node_modules/harfbuzzjs/**/*',
   './node_modules/subset-font/**/*',
 ]
 

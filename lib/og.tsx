@@ -1,14 +1,43 @@
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { cacheLife } from 'next/cache'
 
 // Loaded outside the build graph: Turbopack chokes on harfbuzz's wasm when
 // subset-font gets bundled or traced (NftJsonAsset error), and
-// serverExternalPackages doesn't take here. The cached OG helpers prerender
-// once per deployment, where node_modules is present.
+// serverExternalPackages doesn't take here. Vercel flattens the traced pnpm
+// symlink, so fall back to its real package path when the top-level alias is
+// unavailable inside a dynamic metadata function.
 async function loadSubsetFont() {
-  const mod = await import(/* turbopackIgnore: true */ 'subset-font')
-  return mod.default
+  try {
+    const mod = await import(/* turbopackIgnore: true */ 'subset-font')
+    return mod.default
+  } catch (error) {
+    if (
+      typeof error !== 'object' ||
+      error === null ||
+      !('code' in error) ||
+      error.code !== 'ERR_MODULE_NOT_FOUND'
+    ) {
+      throw error
+    }
+
+    const pnpmRoot = path.join(process.cwd(), 'node_modules/.pnpm')
+    const packageDirectory = (await readdir(pnpmRoot))
+      .sort()
+      .find((entry) => entry.startsWith('subset-font@'))
+    if (!packageDirectory) throw error
+
+    const packageUrl = pathToFileURL(
+      path.join(
+        pnpmRoot,
+        packageDirectory,
+        'node_modules/subset-font/index.js',
+      ),
+    ).href
+    const mod = await import(/* turbopackIgnore: true */ packageUrl)
+    return mod.default
+  }
 }
 
 // Design-language tokens resolved to sRGB for satori (no oklch support).
