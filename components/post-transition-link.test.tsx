@@ -111,32 +111,41 @@ describe('PostTransitionLink', () => {
     ).toBe('')
   })
 
-  it('leaves the current page unchanged when Next does not navigate', () => {
-    render(
-      <PostTransitionLink
-        href="/blog/a-post"
-        coverTransitionName="cover-p01"
-        titleTransitionName="title-p01"
-      >
-        Open post elsewhere
-      </PostTransitionLink>,
-    )
+  it.each([
+    ['Command-click', { metaKey: true }],
+    ['Control-click', { ctrlKey: true }],
+    ['Shift-click', { shiftKey: true }],
+    ['Alt-click', { altKey: true }],
+    ['middle-click', { button: 1 }],
+  ] satisfies Array<[string, MouseEventInit]>)(
+    'leaves %s native when Next does not navigate',
+    (_label, eventInit) => {
+      render(
+        <PostTransitionLink
+          href="/blog/a-post"
+          coverTransitionName="cover-p01"
+          titleTransitionName="title-p01"
+        >
+          Open post elsewhere
+        </PostTransitionLink>,
+      )
 
-    const handled = fireEvent.click(
-      screen.getByRole('link', { name: 'Open post elsewhere' }),
-      { metaKey: true },
-    )
+      const handled = fireEvent.click(
+        screen.getByRole('link', { name: 'Open post elsewhere' }),
+        eventInit,
+      )
 
-    expect(
-      document.documentElement.style.getPropertyValue(
-        '--post-cover-transition-name',
-      ),
-    ).toBe('')
-    expect(
-      document.documentElement.style.getPropertyValue(
-        '--post-title-transition-name',
-      ),
-    ).toBe('')
-    expect(handled).toBe(true)
-  })
+      expect(
+        document.documentElement.style.getPropertyValue(
+          '--post-cover-transition-name',
+        ),
+      ).toBe('')
+      expect(
+        document.documentElement.style.getPropertyValue(
+          '--post-title-transition-name',
+        ),
+      ).toBe('')
+      expect(handled).toBe(true)
+    },
+  )
 })
