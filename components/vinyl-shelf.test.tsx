@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 
-import { cleanup, fireEvent, render } from '@testing-library/react'
+import { act, cleanup, fireEvent, render } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { records } from '~/lib/personal'
@@ -146,6 +146,56 @@ describe('VinylShelf', () => {
     const annotation = container.querySelector<HTMLAnchorElement>('.vinyl-annotation')
     expect(annotation?.getAttribute('href')).toBe(records[nextIndex].url)
     expect(annotation?.textContent).toContain(records[nextIndex].album)
+  })
+
+  it('keeps the centered sleeve on top during a held mouse drag', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }) as MediaQueryList),
+    )
+    const { container } = render(<VinylShelf />)
+    const viewport = container.querySelector<HTMLElement>('.vinyl-viewport')
+    const shelf = container.querySelector<HTMLElement>('.vinyl-shelf')
+    const sleeves = [...container.querySelectorAll<HTMLElement>('.vinyl')]
+    const annotation = container.querySelector<HTMLAnchorElement>('.vinyl-annotation')
+    const initialIndex = Math.floor(records.length / 2)
+    const centeredIndex = Math.min(records.length - 1, initialIndex + 2)
+    const stackOrder = (index: number) =>
+      Number(sleeves[index].style.getPropertyValue('--vinyl-stack-order'))
+
+    fireEvent.pointerDown(viewport!, {
+      button: 0,
+      clientX: 300,
+      clientY: 100,
+      isPrimary: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+    })
+    fireEvent.pointerMove(viewport!, {
+      clientX: 172,
+      clientY: 100,
+      isPrimary: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+    })
+
+    await act(
+      () => new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve())),
+    )
+
+    expect(shelf?.dataset.activeIndex).toBe(String(initialIndex))
+    expect(annotation?.textContent).toContain(records[initialIndex].album)
+    expect(stackOrder(centeredIndex)).toBeGreaterThan(stackOrder(initialIndex))
+
+    fireEvent.pointerUp(viewport!, {
+      clientX: 172,
+      clientY: 100,
+      isPrimary: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+    })
+
+    expect(shelf?.dataset.activeIndex).toBe(String(centeredIndex))
   })
 
   it('keeps a mobile horizontal swipe and snaps to the next sleeve', () => {

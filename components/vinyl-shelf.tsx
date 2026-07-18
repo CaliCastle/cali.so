@@ -125,6 +125,7 @@ export function VinylShelf() {
   const pointerFocusWasInsideRef = useRef(false)
 
   const activeRecord = records[activeIndex]
+  const visualFrontIndex = Math.round(selectionPosition)
 
   function clampPosition(position: number) {
     return Math.min(records.length - 1, Math.max(0, position))
@@ -540,6 +541,7 @@ export function VinylShelf() {
             const offset = index - selectionPosition
             const distance = Math.abs(offset)
             const isActive = index === activeIndex
+            const isVisualFront = index === visualFrontIndex
             const inwardAngle = Math.min(68, 16 * Math.min(distance, 1) + distance * 13)
             const accessibleName = `${record.artist}, ${record.album} (${record.year})`
             const finish = sleeveFinishes[index]
@@ -583,9 +585,11 @@ export function VinylShelf() {
                     '--vinyl-wear-opacity': finish.wearOpacity,
                     '--vinyl-wear-x': `${finish.wearX}%`,
                     '--vinyl-wear-y': `${finish.wearY}%`,
-                    '--vinyl-stack-order': isActive
-                      ? records.length * 100 + 100
-                      : Math.max(1, Math.round((records.length - distance) * 100)),
+                    '--vinyl-stack-order': Math.max(
+                      1,
+                      Math.round((records.length - distance) * 100) +
+                        (isVisualFront ? 1 : 0),
+                    ),
                   } as React.CSSProperties
                 }
               >
