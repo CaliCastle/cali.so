@@ -137,7 +137,11 @@ function processingLabel(asset: MediaAssetReviewRecord) {
   return labels[asset.processingState]
 }
 
-/** Amber while work is pending, red when the pipeline needs a hand. */
+/**
+ * Amber while a photo is not yet publishable (processing, or Alt Text
+ * still missing — e.g. the auto-approval could not run), red when the
+ * pipeline needs a hand.
+ */
 function statusTone(asset: MediaAssetReviewRecord): 'busy' | 'attention' | null {
   if (asset.catalogState === 'purging') return 'attention'
   if (
@@ -147,6 +151,9 @@ function statusTone(asset: MediaAssetReviewRecord): 'busy' | 'attention' | null 
     return 'attention'
   }
   if (asset.processingState !== 'ready') return 'busy'
+  if (asset.catalogState === 'active' && !isMediaAssetEligible(asset)) {
+    return 'busy'
+  }
   return null
 }
 
@@ -1193,8 +1200,8 @@ export function MediaLibrary({
       {view === 'active' && active.some((asset) => !isMediaAssetEligible(asset)) && (
         <p className="mt-4 text-sm leading-5 text-muted-foreground">
           <T
-            zh="带黄点的素材仍在处理中；红点表示需要打开检查一下。"
-            en="Amber dots are still processing; red dots want a look inside."
+            zh="带黄点的素材还不能发布——处理中，或缺少替代文本（打开后保存即可）；红点表示需要打开检查一下。"
+            en="Amber dots are not publishable yet — still processing, or missing Alt Text (open and save to fix); red dots want a look inside."
           />
         </p>
       )}

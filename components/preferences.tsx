@@ -51,7 +51,7 @@ export function Preferences({
   const [mounted, setMounted] = useState(false)
   const [locale, setLocale] = useState<'zh' | 'en'>('zh')
   const [sound, setSound] = useState(false)
-  const probedRef = useRef(false)
+  const probingRef = useRef(false)
 
   useEffect(() => {
     setMounted(true)
@@ -59,14 +59,14 @@ export function Preferences({
     setSound(soundEnabled())
   }, [])
 
-  // The owner probe runs once per mount, the first time the panel opens —
-  // public pages stay static and ordinary visitors never trigger it on
-  // page load. A confirmed answer is remembered so the row (and the G D
-  // chord) is armed instantly on later visits; a stale hint self-corrects
-  // on the next open.
+  // The owner probe runs on each panel open (never on page load, so public
+  // pages stay static and ordinary visitors never trigger it in passing).
+  // A confirmed answer is remembered so the row and the G D chord are
+  // armed instantly on later visits, and a stale hint self-corrects the
+  // next time the panel opens.
   function probeOwner(open: boolean) {
-    if (!open || probedRef.current) return
-    probedRef.current = true
+    if (!open || probingRef.current) return
+    probingRef.current = true
     void fetch('/api/admin/session')
       .then((response) => (response.ok ? response.json() : null))
       .then((data: { owner?: boolean } | null) => {
@@ -81,6 +81,9 @@ export function Preferences({
       })
       .catch(() => {
         /* offline — leave the current hint alone */
+      })
+      .finally(() => {
+        probingRef.current = false
       })
   }
 

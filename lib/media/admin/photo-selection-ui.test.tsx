@@ -230,6 +230,46 @@ describe('Photo curation UI contract', () => {
     expect(publish.body.expectedDraftRevision).toBe(9)
   })
 
+  it('blocks publishing while the draft has an unsaved failed autosave', async () => {
+    document.documentElement.dataset.locale = 'en'
+    let attempts = 0
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+        attempts += 1
+        if (attempts === 1) {
+          return Response.json({ error: 'dependency_unavailable' }, { status: 503 })
+        }
+        const body = JSON.parse(String(init?.body)) as { mediaAssetIds: string[] }
+        return Response.json({ draft: draft(body.mediaAssetIds, 4) })
+      }),
+    )
+    const { getByRole, findByRole } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id])}
+        assets={allAssets}
+        publishedIds={[]}
+      />,
+    )
+
+    fireEvent.click(getByRole('button', { name: /Position 2: Chinatown/ }))
+    fireEvent.click(getByRole('button', { name: /Move earlier/ }))
+
+    // The failed autosave leaves the server behind the screen — Publish
+    // must not ship the stale arrangement.
+    const retry = await findByRole('button', { name: /Save failed/ })
+    expect(
+      (getByRole('button', { name: /Publish/ }) as HTMLButtonElement).disabled,
+    ).toBe(true)
+
+    fireEvent.click(retry)
+    await waitFor(() =>
+      expect(
+        (getByRole('button', { name: /Publish/ }) as HTMLButtonElement).disabled,
+      ).toBe(false),
+    )
+  })
+
   it('recovers from a revision conflict by reloading the draft in place', async () => {
     document.documentElement.dataset.locale = 'en'
     vi.stubGlobal(

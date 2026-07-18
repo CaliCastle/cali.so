@@ -121,6 +121,7 @@ export function PhotoCuration({
   const savePromiseRef = useRef<Promise<void> | null>(null)
   const queuedRef = useRef(false)
   const conflictRef = useRef(false)
+  const saveFailedRef = useRef(false)
   const publishKeyRef = useRef<string | null>(null)
   const noticeRef = useRef<HTMLParagraphElement>(null)
 
@@ -166,11 +167,13 @@ export function PhotoCuration({
         const draft = body.draft as DraftPhotoSelection
         revisionRef.current = draft.revision
         publishKeyRef.current = null
+        saveFailedRef.current = false
         setSaveState('saved')
       } catch (error) {
         const conflicted =
           error instanceof Error && error.message === 'revision_conflict'
         conflictRef.current = conflicted
+        saveFailedRef.current = true
         setSaveState(conflicted ? 'conflict' : 'error')
       } finally {
         savePromiseRef.current = null
@@ -234,7 +237,10 @@ export function PhotoCuration({
     setNotice(null)
     try {
       await flushSave()
-      if (conflictRef.current) {
+      // Never publish over an unsaved order: a failed autosave leaves the
+      // server's Draft (and its revision) behind the screen, and publishing
+      // would silently ship the stale arrangement.
+      if (conflictRef.current || saveFailedRef.current) {
         setConfirming(false)
         return
       }
@@ -329,7 +335,9 @@ export function PhotoCuration({
           </span>
           <button
             type="button"
-            disabled={busy || conflict || ineligibleIds.length > 0}
+            disabled={
+              busy || conflict || saveState === 'error' || ineligibleIds.length > 0
+            }
             onClick={() => setConfirming((current) => !current)}
             className="min-h-11 rounded-full bg-foreground px-5 text-sm font-medium text-background outline-none transition-transform duration-100 active:scale-[0.97] disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-reduce:transform-none"
           >

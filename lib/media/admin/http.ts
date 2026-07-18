@@ -377,6 +377,7 @@ export function createMediaAltTextHandler(
       // approved text is never overwritten — regenerating only updates the
       // suggestion, and edits go through approve_alt_text as before.
       let asset: unknown = null
+      let autoApprovalFailed = false
       try {
         const common = { ownerUserId: access.principal.id, mediaAssetId }
         const current = await dependencies.review.getAsset(common)
@@ -396,11 +397,16 @@ export function createMediaAltTextHandler(
           asset = current
         }
       } catch {
-        // The suggestion still stands on its own; approval can happen from
-        // the inspector if this follow-up write did not go through.
+        // The suggestion still stands on its own; the flag lets the UI say
+        // the photo needs a save in the inspector before it can publish.
+        autoApprovalFailed = true
       }
 
-      return json(200, { suggestion, asset })
+      return json(200, {
+        suggestion,
+        asset,
+        ...(autoApprovalFailed ? { autoApprovalFailed: true } : {}),
+      })
     } catch (error) {
       return errorResponse(error)
     }

@@ -557,6 +557,47 @@ describe('Media admin HTTP contract', () => {
     }
   })
 
+  it('flags a failed auto-approval instead of failing the suggestion', async () => {
+    const f = fixture()
+    const handler = createMediaAltTextHandler({
+      authenticator: f.authenticator,
+      security: f.security,
+      altText: {
+        async generateSuggestion() {
+          return { zhHans: '一张照片', en: 'A photo' }
+        },
+      },
+      review: {
+        async getAsset() {
+          return { altTextApprovedAt: null }
+        },
+        async approveAltText() {
+          throw new Error('dependency_unavailable')
+        },
+      },
+    })
+
+    const response = await handler(
+      request(`/api/admin/media/assets/${mediaAssetId}/alt-text`, {
+        method: 'POST',
+      }),
+      mediaAssetId,
+    )
+    const body = (await response.json()) as {
+      asset: unknown
+      autoApprovalFailed?: boolean
+      suggestion: unknown
+    }
+
+    expect(response.status).toBe(200)
+    expect(body.suggestion).toEqual({ zhHans: '一张照片', en: 'A photo' })
+    expect(body.asset).toBeNull()
+    expect(body.autoApprovalFailed).toBe(true)
+    expect(f.auditEvents.map(({ event }) => event)).toEqual([
+      'media_alt_text.requested',
+    ])
+  })
+
   it('forbids non-owner publish attempts before service work', async () => {
     const f = fixture()
     const handler = createPhotoSelectionPublishHandler({
