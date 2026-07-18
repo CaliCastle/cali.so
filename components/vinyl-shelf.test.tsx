@@ -58,7 +58,17 @@ describe('VinylShelf', () => {
     const finishSeeds = records.map(
       (record) => `${record.artist}, ${record.album} (${record.year})`,
     )
-    expect(finishSeeds.map(sleeveFinish)).toEqual(finishSeeds.map(sleeveFinish))
+    const finishes = finishSeeds.map(sleeveFinish)
+    const creaseImages = finishes.map(
+      (finish) =>
+        (finish.creaseStyle as unknown as Record<string, string>)[
+          '--vinyl-crease-image'
+        ],
+    )
+
+    expect(finishes).toEqual(finishSeeds.map(sleeveFinish))
+    expect(creaseImages).toContain('none')
+    expect(creaseImages.some((image) => image !== 'none')).toBe(true)
 
     const { container, rerender } = render(<VinylShelf />)
     const room = container.querySelector<HTMLElement>('.vinyl-room')

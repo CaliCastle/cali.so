@@ -50,6 +50,8 @@ function hashOf(s: string): number {
 // full-cover stripes, while the other channels offset the shared paper grain.
 export function sleeveFinish(seed: string): SleeveFinish {
   const h = hashOf(seed) >>> 0
+  // Some jackets intentionally stay crease-free so the wear does not become
+  // a repeated visual requirement across the whole collection.
   const creaseCount = (h >>> 3) % 3
   const creaseImages: string[] = []
   const creasePositions: string[] = []
@@ -57,11 +59,13 @@ export function sleeveFinish(seed: string): SleeveFinish {
 
   for (let index = 0; index < creaseCount; index++) {
     const creaseSeed = hashOf(`${seed}:${index}`) >>> 0
+    const xSeed = hashOf(`horizontal:${index}:${seed}`) >>> 0
+    const ySeed = hashOf(`${seed}:vertical:${index}`) >>> 0
     const angle = 22 + (creaseSeed % 137)
     const width = 34 + ((creaseSeed >>> 5) % 31)
     const height = 22 + ((creaseSeed >>> 11) % 23)
-    const x = 6 + ((creaseSeed >>> 17) % 85)
-    const y = 6 + ((creaseSeed >>> 23) % 85)
+    const x = 6 + (xSeed % 85)
+    const y = 6 + (ySeed % 85)
 
     creaseImages.push(
       `linear-gradient(${angle}deg, transparent 47%, rgb(0 0 0 / 0.08) 49%, rgb(255 255 255 / 0.14) 50%, transparent 52%)`,
