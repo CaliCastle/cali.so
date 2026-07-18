@@ -17,6 +17,18 @@ type Point = { x: number; y: number }
 type InteractionPhase = 'idle' | 'instant' | 'panning' | 'settling'
 type PointerIntent = 'pending' | 'horizontal' | 'vertical'
 
+interface SleeveFinish {
+  creaseStyle: React.CSSProperties
+  paperSize: number
+  paperX: number
+  paperY: number
+  restOffset: number
+  restTilt: number
+  wearOpacity: number
+  wearX: number
+  wearY: number
+}
+
 interface PointerSession {
   pointerId: number
   startX: number
@@ -33,22 +45,51 @@ function hashOf(s: string): number {
   return Math.abs(h)
 }
 
-// 2–3 seeded crease streaks per sleeve — worn paper, unique per album
-function creases(seed: string): string {
-  const h = hashOf(seed)
-  const layers: string[] = []
-  for (let i = 0; i < 3; i++) {
-    const angle = 15 + ((h >> (i * 7)) % 150)
-    const pos = 18 + ((h >> (i * 5)) % 64)
-    const ink = i % 2 === 0
-    layers.push(
-      `linear-gradient(${angle}deg, transparent ${pos - 1.4}%, ${
-        ink ? 'rgb(0 0 0 / 0.09)' : 'rgb(255 255 255 / 0.18)'
-      } ${pos}%, transparent ${pos + 1.6}%)`,
+// A deterministic finish keeps the jackets imperfect without introducing
+// hydration drift. Creases stay local to an edge or corner instead of drawing
+// full-cover stripes, while the other channels offset the shared paper grain.
+export function sleeveFinish(seed: string): SleeveFinish {
+  const h = hashOf(seed) >>> 0
+  const creaseCount = (h >>> 3) % 3
+  const creaseImages: string[] = []
+  const creasePositions: string[] = []
+  const creaseSizes: string[] = []
+
+  for (let index = 0; index < creaseCount; index++) {
+    const creaseSeed = hashOf(`${seed}:${index}`) >>> 0
+    const angle = 22 + (creaseSeed % 137)
+    const width = 34 + ((creaseSeed >>> 5) % 31)
+    const height = 22 + ((creaseSeed >>> 11) % 23)
+    const x = 6 + ((creaseSeed >>> 17) % 85)
+    const y = 6 + ((creaseSeed >>> 23) % 85)
+
+    creaseImages.push(
+      `linear-gradient(${angle}deg, transparent 47%, rgb(0 0 0 / 0.08) 49%, rgb(255 255 255 / 0.14) 50%, transparent 52%)`,
     )
+    creaseSizes.push(`${width}% ${height}%`)
+    creasePositions.push(`${x}% ${y}%`)
   }
-  return layers.join(', ')
+
+  return {
+    creaseStyle: {
+      '--vinyl-crease-image': creaseImages.length > 0 ? creaseImages.join(', ') : 'none',
+      '--vinyl-crease-position': creasePositions.length > 0 ? creasePositions.join(', ') : '0 0',
+      '--vinyl-crease-size': creaseSizes.length > 0 ? creaseSizes.join(', ') : '0 0',
+    } as React.CSSProperties,
+    paperSize: 84 + ((h >>> 20) % 3) * 12,
+    paperX: (h >>> 8) % 108,
+    paperY: (h >>> 16) % 192,
+    restOffset: ((h >>> 5) % 3) * 0.55,
+    restTilt: ((h % 9) - 4) * 0.085,
+    wearOpacity: 0.13 + ((h >>> 10) % 5) * 0.01,
+    wearX: (h & 1) === 0 ? 8 : 92,
+    wearY: (h & 2) === 0 ? 10 : 90,
+  }
 }
+
+const sleeveFinishes = records.map((record) =>
+  sleeveFinish(`${record.artist}, ${record.album} (${record.year})`),
+)
 
 // Favorite records as an overlapping horizontal stack of worn-paper
 // sleeves. Every interaction selects a sleeve; the separate annotation is
@@ -56,6 +97,7 @@ function creases(seed: string): string {
 export function VinylShelf() {
   const locale = useLocale()
   const initialIndex = Math.floor(records.length / 2)
+  const [activeIndex, setActiveIndex] = useState(initialIndex)
   const [selectionPosition, setSelectionPosition] = useState(initialIndex)
   const [interactionPhase, setInteractionPhaseState] = useState<InteractionPhase>('idle')
   const [pointerOwnerIndex, setPointerOwnerIndex] = useState<number | null>(null)
@@ -78,7 +120,6 @@ export function VinylShelf() {
   const wheelSelectionStepRef = useRef(64)
   const pointerFocusWasInsideRef = useRef(false)
 
-  const activeIndex = Math.round(selectionPosition)
   const activeRecord = records[activeIndex]
 
   function clampPosition(position: number) {
@@ -186,6 +227,7 @@ export function VinylShelf() {
 
     clearSettleTimer()
     clearInstantFrame()
+    setActiveIndex(nextIndex)
 
     if (mode === 'instant' && !prefersReducedMotion) {
       setInteractionPhase('instant')
@@ -495,8 +537,15 @@ export function VinylShelf() {
             const distance = Math.abs(offset)
             const isActive = index === activeIndex
             const inwardAngle = Math.min(68, 16 * Math.min(distance, 1) + distance * 13)
-            const scale = 1 - distance * 0.025 + Math.max(0, 1 - distance) * 0.08
             const accessibleName = `${record.artist}, ${record.album} (${record.year})`
+            const finish = sleeveFinishes[index]
+            const activeAmount = Math.max(0, 1 - distance)
+            const restingAmount = Math.min(distance, 1)
+            const scale = Math.max(0.92, 1 - distance * 0.012 + activeAmount * 0.04)
+            const contactScale = Math.max(0.38, Math.cos(inwardAngle * Math.PI / 180))
+            const projectedContactScale = Number(
+              (contactScale * (0.96 + activeAmount * 0.04)).toFixed(4),
+            )
             const spineTone = hashOf(accessibleName) % 5
 
             return (
@@ -505,20 +554,31 @@ export function VinylShelf() {
                 className="vinyl"
                 data-active={isActive ? '' : undefined}
                 data-index={index}
-                data-position={isActive ? 'active' : offset < 0 ? 'before' : 'after'}
+                data-position={Math.abs(offset) < 0.001 ? 'active' : offset < 0 ? 'before' : 'after'}
                 style={
                   {
                     '--vinyl-index': index,
                     '--vinyl-offset': offset,
                     '--vinyl-distance': distance,
                     '--vinyl-direction': Math.sign(offset),
+                    '--vinyl-contact-opacity': Math.max(0.16, 0.34 - distance * 0.035),
+                    '--vinyl-contact-scale': projectedContactScale,
+                    '--vinyl-forward': activeAmount * 4,
                     '--vinyl-inward-angle': inwardAngle,
+                    '--vinyl-paper-size': `${finish.paperSize}px`,
+                    '--vinyl-paper-x': `${finish.paperX}px`,
+                    '--vinyl-paper-y': `${finish.paperY}px`,
+                    '--vinyl-rest-offset': finish.restOffset * restingAmount,
+                    '--vinyl-rest-tilt': finish.restTilt * restingAmount,
                     '--vinyl-scale': scale,
                     '--vinyl-spine-tone': spineTone,
                     '--vinyl-spine-color':
                       record.spineColor ??
                       'color-mix(in oklab, var(--paper) calc(94% - var(--vinyl-spine-tone) * 5%), var(--paper-ink))',
                     '--vinyl-spine-ink': record.spineInk ?? 'oklch(0.28 0.012 95)',
+                    '--vinyl-wear-opacity': finish.wearOpacity,
+                    '--vinyl-wear-x': `${finish.wearX}%`,
+                    '--vinyl-wear-y': `${finish.wearY}%`,
                     '--vinyl-stack-order': isActive
                       ? records.length * 100 + 100
                       : Math.max(1, Math.round((records.length - distance) * 100)),
@@ -557,6 +617,7 @@ export function VinylShelf() {
                       aria-hidden
                     />
                   ))}
+                  <span className="vinyl-contact-shadow" aria-hidden />
                   <span className="vinyl-object">
                     <span className="vinyl-sleeve" aria-hidden>
                       {record.art ? (
@@ -579,7 +640,7 @@ export function VinylShelf() {
                       )}
                       <span
                         className="vinyl-creases"
-                        style={{ backgroundImage: creases(record.album + record.artist) }}
+                        style={finish.creaseStyle}
                       />
                       <span className="vinyl-paper" />
                     </span>

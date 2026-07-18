@@ -2374,8 +2374,7 @@ a:focus-visible .external-label .external-mark {
     0 2px 3px rgb(0 0 0 / 0.3);
 }
 
-/* contact shadows where things meet the wood */
-.room-shelf .vinyl::after,
+/* bookshelf contact shadows stay on their translated book elements */
 .room-shelf .book3::after {
   content: '';
   position: absolute;
@@ -2474,13 +2473,97 @@ a:focus-visible .external-label .external-mark {
 /* ── Vinyl shelf (components/vinyl-shelf.tsx) ─────────────────────── */
 
 .vinyl-room {
+  --vinyl-depth: 3px;
+  --vinyl-motion-duration: 330ms;
+  --vinyl-shadow-rgb: 27 22 17;
+  --vinyl-wood-front-bottom: oklch(0.61 0.065 64);
+  --vinyl-wood-front-top: oklch(0.79 0.05 74);
+  --vinyl-wood-grain: rgb(71 42 17 / 0.08);
+  --vinyl-wood-top-back: oklch(0.77 0.045 75);
+  --vinyl-wood-top-front: oklch(0.84 0.04 78);
+
   left: 50%;
   width: min(37.5rem, calc(100vw - 2rem));
+  isolation: isolate;
   transform: translateX(-50%);
+}
+
+.vinyl-room > .room-shelf-plank {
+  z-index: 1;
+  border-radius: 1px 1px 2px 2px;
+  background:
+    radial-gradient(ellipse 22% 38% at 12% 22%, transparent 0 92%, var(--vinyl-wood-grain) 93% 95%, transparent 96%),
+    radial-gradient(ellipse 32% 42% at 67% 70%, transparent 0 93%, var(--vinyl-wood-grain) 94% 96%, transparent 97%),
+    linear-gradient(92deg, transparent 0 8%, var(--vinyl-wood-grain) 14%, transparent 22% 54%, var(--vinyl-wood-grain) 61%, transparent 72%),
+    linear-gradient(180deg, var(--vinyl-wood-front-top), var(--vinyl-wood-front-bottom));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -1px 0 rgb(51 28 10 / 0.2),
+    1px 3px 3px -2px rgb(var(--vinyl-shadow-rgb) / 0.24),
+    3px 10px 16px -8px rgb(var(--vinyl-shadow-rgb) / 0.34),
+    6px 24px 34px -18px rgb(var(--vinyl-shadow-rgb) / 0.28);
+}
+
+.vinyl-room > .room-shelf-plank::before,
+.vinyl-room > .room-shelf-plank::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.vinyl-room > .room-shelf-plank::before {
+  top: -6px;
+  height: 6px;
+  clip-path: polygon(0.8% 0, 99.2% 0, 100% 100%, 0 100%);
+  background:
+    radial-gradient(ellipse 28% 70% at 23% 45%, transparent 0 90%, var(--vinyl-wood-grain) 91% 93%, transparent 94%),
+    linear-gradient(91deg, transparent 0 16%, var(--vinyl-wood-grain) 25%, transparent 34% 67%, var(--vinyl-wood-grain) 75%, transparent 83%),
+    linear-gradient(180deg, var(--vinyl-wood-top-front), var(--vinyl-wood-top-back));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 -1px 0 rgb(52 29 11 / 0.18);
+}
+
+.vinyl-room > .room-shelf-plank::after {
+  bottom: -2px;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(180deg, rgb(var(--vinyl-shadow-rgb) / 0.24), rgb(var(--vinyl-shadow-rgb) / 0.08));
+}
+
+.vinyl-annotation {
+  z-index: 2;
+}
+
+.dark .vinyl-room {
+  --vinyl-shadow-rgb: 0 0 0;
+  --vinyl-wood-front-bottom: oklch(0.29 0.035 49);
+  --vinyl-wood-front-top: oklch(0.43 0.04 59);
+  --vinyl-wood-grain: rgb(0 0 0 / 0.15);
+  --vinyl-wood-top-back: oklch(0.38 0.035 56);
+  --vinyl-wood-top-front: oklch(0.47 0.035 62);
+}
+
+.dark .vinyl-room > .room-shelf-plank {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 -1px 0 rgb(0 0 0 / 0.48),
+    1px 3px 3px -2px rgb(var(--vinyl-shadow-rgb) / 0.45),
+    3px 10px 16px -8px rgb(var(--vinyl-shadow-rgb) / 0.62),
+    6px 24px 34px -18px rgb(var(--vinyl-shadow-rgb) / 0.5);
+}
+
+.dark .vinyl-room > .room-shelf-plank::before {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 -1px 0 rgb(0 0 0 / 0.4);
 }
 
 .vinyl-viewport {
   position: relative;
+  z-index: 2;
   overflow: clip;
   cursor: grab;
 }
@@ -2495,7 +2578,7 @@ a:focus-visible .external-label .external-mark {
   display: grid;
   place-items: end center;
   margin: 0;
-  padding: 2.5rem 0 0;
+  padding: 2.5rem 0 4px;
   list-style: none;
   overflow: visible;
   isolation: isolate;
@@ -2525,11 +2608,14 @@ a:focus-visible .external-label .external-mark {
   pointer-events: none;
   touch-action: manipulation;
   transform: translateX(calc(var(--vinyl-offset) * var(--vinyl-spread)))
+    translateY(calc(var(--vinyl-rest-offset) * 1px))
+    translateZ(calc(var(--vinyl-forward) * 1px))
+    rotateZ(calc(var(--vinyl-rest-tilt) * 1deg))
     rotateY(calc(var(--vinyl-direction) * var(--vinyl-inward-angle) * -1deg))
     scale(var(--vinyl-scale));
   transform-origin: bottom center;
   transform-style: preserve-3d;
-  transition: transform 330ms var(--ease-spring);
+  transition: transform var(--vinyl-motion-duration) var(--ease-spring);
   will-change: transform;
 }
 
@@ -2575,23 +2661,60 @@ a:focus-visible .external-label .external-mark {
 
 .vinyl-object {
   position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   transform: translate(0, 0);
   transform-style: preserve-3d;
-  transition: transform 300ms var(--ease-spring);
+  transition: transform var(--vinyl-motion-duration) var(--ease-spring);
+}
+
+.vinyl-contact-shadow {
+  position: absolute;
+  z-index: 0;
+  top: calc(100% - 5px);
+  right: 8%;
+  left: 8%;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(var(--vinyl-shadow-rgb) / 0.4) 0%,
+    rgb(var(--vinyl-shadow-rgb) / 0.18) 46%,
+    transparent 84%
+  );
+  opacity: var(--vinyl-contact-opacity);
+  pointer-events: none;
+  transform: translateZ(-1px)
+    rotateY(calc(var(--vinyl-direction) * var(--vinyl-inward-angle) * 1deg))
+    rotateX(62deg)
+    scaleX(var(--vinyl-contact-scale));
+  transform-origin: center;
+  transition:
+    transform var(--vinyl-motion-duration) var(--ease-spring),
+    opacity var(--vinyl-motion-duration) var(--ease-spring);
 }
 
 .vinyl-room[data-vinyl-interaction='panning'] .vinyl-trigger,
 .vinyl-room[data-vinyl-interaction='panning'] .vinyl-object,
+.vinyl-room[data-vinyl-interaction='panning'] .vinyl-contact-shadow,
 .vinyl-room[data-vinyl-interaction='instant'] .vinyl-trigger,
-.vinyl-room[data-vinyl-interaction='instant'] .vinyl-object {
+.vinyl-room[data-vinyl-interaction='instant'] .vinyl-object,
+.vinyl-room[data-vinyl-interaction='instant'] .vinyl-contact-shadow {
   transition: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .vinyl-trigger:not([data-active])[data-pointer-owned] .vinyl-object {
-    transform: translateX(calc(var(--vinyl-direction) * 2px)) translateY(-5px);
+    transform: translateX(calc(var(--vinyl-direction) * 2px)) translateY(-4px);
+  }
+
+  .vinyl-trigger:not([data-active])[data-pointer-owned] .vinyl-contact-shadow {
+    opacity: calc(var(--vinyl-contact-opacity) * 0.55);
+    transform: translateZ(-1px)
+      rotateY(calc(var(--vinyl-direction) * var(--vinyl-inward-angle) * 1deg))
+      rotateX(62deg)
+      scaleX(calc(var(--vinyl-contact-scale) * 1.08));
   }
 }
 
@@ -2608,15 +2731,24 @@ a:focus-visible .external-label .external-mark {
   aspect-ratio: 1;
   background: var(--paper);
   box-shadow:
-    0 0 0 1px rgb(0 0 0 / 0.08),
-    0 2px 4px -1px rgb(0 0 0 / 0.16),
-    0 9px 16px -9px rgb(0 0 0 / 0.28);
+    0 0 0 var(--border-hairline) rgb(0 0 0 / 0.09),
+    1px 2px 3px -1px rgb(var(--vinyl-shadow-rgb) / 0.2),
+    4px 9px 16px -9px rgb(var(--vinyl-shadow-rgb) / 0.3);
   overflow: hidden;
   backface-visibility: hidden;
-  transform: translateZ(7px);
+  transform: translateZ(var(--vinyl-depth));
 }
 
-/* Real 3D side faces: the cover sits 7px forward and these planes bridge
+.vinyl-sleeve::after {
+  content: '';
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  background: linear-gradient(118deg, rgb(255 255 255 / 0.12), transparent 28% 70%, rgb(25 16 9 / 0.11));
+  pointer-events: none;
+}
+
+/* Real 3D side faces: the cover sits forward and these planes bridge
    the depth. The face revealed by each inward turn becomes the sleeve spine. */
 .vinyl-spine {
   position: absolute;
@@ -2624,15 +2756,13 @@ a:focus-visible .external-label .external-mark {
   top: 0;
   bottom: 0;
   left: 0;
-  width: 7px;
+  width: var(--vinyl-depth);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   color: var(--vinyl-spine-ink, oklch(0.28 0.012 95));
-  background:
-    linear-gradient(to right, rgb(0 0 0 / 0.18), transparent 35%, rgb(255 255 255 / 0.14) 70%, rgb(0 0 0 / 0.12)),
-    var(--vinyl-spine-color, var(--paper));
+  background: var(--vinyl-spine-color, var(--paper));
   box-shadow:
     inset 1px 0 rgb(255 255 255 / 0.16),
     inset -1px 0 rgb(0 0 0 / 0.18);
@@ -2644,7 +2774,7 @@ a:focus-visible .external-label .external-mark {
   max-height: calc(100% - 10px);
   overflow: hidden;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
-  font-size: 5px;
+  font-size: 4px;
   line-height: 1;
   letter-spacing: 0.04em;
   text-overflow: ellipsis;
@@ -2653,6 +2783,9 @@ a:focus-visible .external-label .external-mark {
 }
 
 .vinyl-spine-left {
+  background:
+    linear-gradient(to right, rgb(255 255 255 / 0.16), transparent 45%, rgb(0 0 0 / 0.16)),
+    var(--vinyl-spine-color, var(--paper));
   transform: rotateY(-90deg);
   transform-origin: left center;
 }
@@ -2660,6 +2793,9 @@ a:focus-visible .external-label .external-mark {
 .vinyl-spine-right {
   right: 0;
   left: auto;
+  background:
+    linear-gradient(to right, rgb(0 0 0 / 0.24), transparent 55%, rgb(255 255 255 / 0.08)),
+    var(--vinyl-spine-color, var(--paper));
   transform: rotateY(90deg);
   transform-origin: right center;
 }
@@ -2678,16 +2814,39 @@ a:focus-visible .external-label .external-mark {
 /* seeded crease streaks (inline background) + paper grain overlay */
 .vinyl-creases {
   position: absolute;
+  z-index: 2;
   inset: 0;
+  background-image: var(--vinyl-crease-image);
+  background-position: var(--vinyl-crease-position);
+  background-repeat: no-repeat;
+  background-size: var(--vinyl-crease-size);
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .vinyl-paper {
   position: absolute;
+  z-index: 3;
   inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 96px 96px;
-  mix-blend-mode: overlay;
-  opacity: 0.55;
+  background-image:
+    radial-gradient(circle at var(--vinyl-wear-x) var(--vinyl-wear-y), rgb(70 42 20 / 0.24) 0 0.5px, rgb(70 42 20 / 0.08) 1px 4%, transparent 9%),
+    linear-gradient(118deg, rgb(255 255 255 / 0.15), transparent 24% 72%, rgb(30 18 10 / 0.12)),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='108' height='108'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.52 0 0 0 0 0.46 0.06 0.06 0.06 0 -0.03'/%3E%3C/filter%3E%3Crect width='108' height='108' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-position:
+    center,
+    center,
+    var(--vinyl-paper-x) var(--vinyl-paper-y);
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size:
+    100% 100%,
+    100% 100%,
+    var(--vinyl-paper-size) var(--vinyl-paper-size);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.22),
+    inset -1px -1px 0 rgb(45 27 13 / 0.14);
+  mix-blend-mode: soft-light;
+  opacity: var(--vinyl-wear-opacity);
+  pointer-events: none;
 }
 
 .vinyl-sleeve-raster {
@@ -2733,12 +2892,21 @@ a:focus-visible .external-label .external-mark {
 @media (prefers-reduced-motion: reduce) {
   .vinyl-trigger,
   .vinyl-sleeve,
-  .vinyl-object {
+  .vinyl-object,
+  .vinyl-contact-shadow {
     transition: none;
   }
 
   .vinyl-trigger:not([data-active])[data-pointer-owned] .vinyl-object {
     transform: none;
+  }
+
+  .vinyl-trigger:not([data-active])[data-pointer-owned] .vinyl-contact-shadow {
+    opacity: var(--vinyl-contact-opacity);
+    transform: translateZ(-1px)
+      rotateY(calc(var(--vinyl-direction) * var(--vinyl-inward-angle) * 1deg))
+      rotateX(62deg)
+      scaleX(var(--vinyl-contact-scale));
   }
 }
 

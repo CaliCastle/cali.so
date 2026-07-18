@@ -326,9 +326,11 @@ typewriter/ascii textures, measuring ticks, registration marks. Rules:
   never a control. Email's card is a little paper ENVELOPE (folded flap,
   perforated avatar stamp, mono address); the trigger opens mailto:.
 - **Room shelves** (`.room-shelf-plank`): records and books rest on an
-  actual wooden plank — edge grain drawn with layered CSS streaks over an
-  oak tone (walnut in dark), top highlight, wall shadow beneath, and
-  per-item contact shadows where things meet the wood. The plank runs the
+  actual wooden plank. The record shelf has a 6px top plane above its 12px
+  front face, low-contrast irregular longitudinal grain over an oak tone
+  (walnut in dark), and a layered wall shadow beneath. One upper-left light
+  source governs its top highlight, underside, sleeve edges, side faces, and
+  the per-item contact shadows where things meet the wood. The plank runs the
   full framed width even when half empty — that's the point. A persistent
   muted plain-text annotation directly below it names the selected object and
   is the shelf's only external link. Covers always select; they never navigate.
@@ -339,19 +341,28 @@ typewriter/ascii textures, measuring ticks, registration marks. Rules:
   sleeves form a horizontal cover stack with one active album enlarged in
   front. Sleeves on either side turn inward in 3D; rotation increases with
   distance so nearby albums retain more cover while distant albums read
-  increasingly as a spine. Each sleeve is a shallow 3D object with two rendered
-  side faces carrying its album and artist, not a shaded strip painted over the
-  cover. The middle item is selected by default so the first composition is
-  balanced on both sides. The records themselves are not rendered; the visual
-  system is entirely about paper sleeves, cover art, and their spines. One tap
+  increasingly as a spine. Each sleeve is a shallow 3D object with two thin
+  rendered side faces carrying its album and artist, not a shaded strip painted
+  over the cover. The face sits 3px forward, with the selected sleeve moving a
+  further 4px toward the viewer and scaling only to about 1.04. The middle item
+  is selected by default so the first composition is balanced on both sides.
+  The records themselves are not rendered; the visual system is entirely about
+  paper sleeves, cover art, and their spines. One tap
   brings a sleeve forward; tapping the active sleeve leaves it selected. The
-  sleeves carry a quiet layered drop shadow so their paper edges separate from
-  one another without floating away from the plank. Covers keep the default
-  cursor and only inactive sleeves lift slightly on a
+  sleeves carry a quiet directional drop shadow so their paper edges separate
+  from one another without floating away from the plank. Every sleeve also owns
+  a transformed shelf-plane contact shadow, which follows drag and selection
+  while staying on the wood when its jacket lifts on hover. Paper finish values
+  are derived deterministically from the record: texture position and scale,
+  corner wear, at most two short localized creases, and no more than 0.34° lean
+  or 1.1px settling variation. There is no runtime randomness. Covers keep the
+  default cursor and only inactive sleeves lift slightly on a
   fine-pointer hover. The shelf is clipped to a centered 37.5rem frame. Pointer
   drag and horizontal trackpad wheel input pan the stack continuously; vertical
   wheel input remains native page scrolling. Releasing the pointer or ending a
-  horizontal wheel gesture snaps to the nearest sleeve. The frame is tuned for
+  horizontal wheel gesture commits the new front sleeve and annotation, then
+  snaps to it. Selection ownership stays stable during the continuous gesture,
+  so covers do not swap paint order halfway through a drag. The frame is tuned for
   nine albums: one centered selection and four progressively turned sleeves on
   either side. Sleeves without art retain the word-raster fallback.
 - **Bookshelf** (`components/bookshelf.tsx`): one book opens at a time while

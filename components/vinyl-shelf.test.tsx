@@ -3,7 +3,9 @@
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { VinylShelf } from './vinyl-shelf'
+import { records } from '~/lib/personal'
+
+import { sleeveFinish, VinylShelf } from './vinyl-shelf'
 
 vi.mock('next/image', () => ({
   default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
@@ -52,6 +54,90 @@ afterAll(() => {
 })
 
 describe('VinylShelf', () => {
+  it('keeps every physical finish deterministic and decorative', () => {
+    const finishSeeds = records.map(
+      (record) => `${record.artist}, ${record.album} (${record.year})`,
+    )
+    expect(finishSeeds.map(sleeveFinish)).toEqual(finishSeeds.map(sleeveFinish))
+
+    const { container, rerender } = render(<VinylShelf />)
+    const room = container.querySelector<HTMLElement>('.vinyl-room')
+    const viewport = container.querySelector<HTMLElement>('.vinyl-viewport')
+    const plank = container.querySelector<HTMLElement>('.room-shelf-plank')
+    const sleeves = [...container.querySelectorAll<HTMLElement>('.vinyl')]
+    const shadows = [...container.querySelectorAll<HTMLElement>('.vinyl-contact-shadow')]
+
+    expect(sleeves).toHaveLength(records.length)
+    expect(shadows).toHaveLength(records.length)
+    expect(room?.contains(viewport)).toBe(true)
+    expect(room?.contains(plank)).toBe(true)
+    expect(viewport?.parentElement).toBe(room)
+    expect(plank?.parentElement).toBe(room)
+    expect(shadows.every((shadow) => shadow.getAttribute('aria-hidden') === 'true')).toBe(true)
+    expect(shadows.every((shadow) => !shadow.matches('a, button, [tabindex]'))).toBe(true)
+    expect(shadows.every((shadow) => shadow.querySelector('a, button, [tabindex]') === null)).toBe(true)
+    expect(shadows.every((shadow) => shadow.tabIndex === -1)).toBe(true)
+
+    const finishTuple = (sleeve: HTMLElement) => {
+      const crease = sleeve.querySelector<HTMLElement>('.vinyl-creases')
+      const fields = [
+        sleeve.style.getPropertyValue('--vinyl-contact-scale'),
+        sleeve.style.getPropertyValue('--vinyl-paper-size'),
+        sleeve.style.getPropertyValue('--vinyl-paper-x'),
+        sleeve.style.getPropertyValue('--vinyl-paper-y'),
+        sleeve.style.getPropertyValue('--vinyl-rest-offset'),
+        sleeve.style.getPropertyValue('--vinyl-rest-tilt'),
+        sleeve.style.getPropertyValue('--vinyl-wear-opacity'),
+        sleeve.style.getPropertyValue('--vinyl-wear-x'),
+        sleeve.style.getPropertyValue('--vinyl-wear-y'),
+        crease?.style.getPropertyValue('--vinyl-crease-image') ?? '',
+        crease?.style.getPropertyValue('--vinyl-crease-position') ?? '',
+        crease?.style.getPropertyValue('--vinyl-crease-size') ?? '',
+      ]
+
+      expect(fields.every((field) => field !== '')).toBe(true)
+      return fields.join('|')
+    }
+    const initialFinishes = sleeves.map(finishTuple)
+
+    expect(new Set(initialFinishes).size).toBeGreaterThan(1)
+
+    rerender(<VinylShelf />)
+
+    expect([...container.querySelectorAll<HTMLElement>('.vinyl')].map(finishTuple)).toEqual(initialFinishes)
+  })
+
+  it('preserves roving keyboard selection through the decorative layers', () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }) as MediaQueryList),
+    )
+    const { container } = render(<VinylShelf />)
+    const shelf = container.querySelector<HTMLElement>('.vinyl-shelf')
+    const triggers = [...container.querySelectorAll<HTMLButtonElement>('.vinyl-trigger')]
+    const initialIndex = Math.floor(records.length / 2)
+    const nextIndex = (initialIndex + 1) % records.length
+
+    expect(shelf?.dataset.activeIndex).toBe(String(initialIndex))
+    expect(triggers[initialIndex].ariaPressed).toBe('true')
+    expect(triggers[initialIndex].tabIndex).toBe(0)
+
+    fireEvent.keyDown(triggers[initialIndex], { key: 'ArrowRight' })
+
+    expect(shelf?.dataset.activeIndex).toBe(String(nextIndex))
+    expect(triggers[initialIndex].ariaPressed).toBe('false')
+    expect(triggers[initialIndex].hasAttribute('aria-current')).toBe(false)
+    expect(triggers[initialIndex].tabIndex).toBe(-1)
+    expect(triggers[nextIndex].ariaPressed).toBe('true')
+    expect(triggers[nextIndex].getAttribute('aria-current')).toBe('true')
+    expect(triggers[nextIndex].tabIndex).toBe(0)
+    expect(document.activeElement).toBe(triggers[nextIndex])
+
+    const annotation = container.querySelector<HTMLAnchorElement>('.vinyl-annotation')
+    expect(annotation?.getAttribute('href')).toBe(records[nextIndex].url)
+    expect(annotation?.textContent).toContain(records[nextIndex].album)
+  })
+
   it('keeps a mobile horizontal swipe and snaps to the next sleeve', () => {
     vi.stubGlobal(
       'matchMedia',
@@ -60,10 +146,18 @@ describe('VinylShelf', () => {
     const { container } = render(<VinylShelf />)
     const viewport = container.querySelector<HTMLElement>('.vinyl-viewport')
     const shelf = container.querySelector<HTMLElement>('.vinyl-shelf')
+    const initialIndex = Math.floor(records.length / 2)
+    const nextIndex = Math.min(records.length - 1, initialIndex + 1)
+    const triggers = [...container.querySelectorAll<HTMLButtonElement>('.vinyl-trigger')]
+    const annotation = container.querySelector<HTMLAnchorElement>('.vinyl-annotation')
 
     expect(viewport).not.toBeNull()
-    expect(shelf?.dataset.activeIndex).toBe('4')
+    expect(shelf?.dataset.activeIndex).toBe(String(initialIndex))
     expect(viewport?.style.touchAction).toBe('pan-y')
+    expect(annotation?.getAttribute('href')).toBe(records[initialIndex].url)
+
+    triggers[initialIndex].focus()
+    expect(document.activeElement).toBe(triggers[initialIndex])
 
     fireEvent.pointerDown(viewport!, {
       button: 0,
@@ -83,6 +177,18 @@ describe('VinylShelf', () => {
       pointerId: 1,
       pointerType: 'touch',
     })
+
+    expect(shelf?.dataset.activeIndex).toBe(String(initialIndex))
+    expect(triggers[initialIndex].ariaPressed).toBe('true')
+    expect(triggers[initialIndex].getAttribute('aria-current')).toBe('true')
+    expect(triggers[initialIndex].tabIndex).toBe(0)
+    expect(triggers[nextIndex].ariaPressed).toBe('false')
+    expect(triggers[nextIndex].hasAttribute('aria-current')).toBe(false)
+    expect(triggers[nextIndex].tabIndex).toBe(-1)
+    expect(annotation?.getAttribute('href')).toBe(records[initialIndex].url)
+    expect(annotation?.textContent).toContain(records[initialIndex].album)
+    expect(document.activeElement).toBe(triggers[initialIndex])
+
     fireEvent.pointerUp(viewport!, {
       clientX: 236,
       clientY: 100,
@@ -91,6 +197,15 @@ describe('VinylShelf', () => {
       pointerType: 'touch',
     })
 
-    expect(shelf?.dataset.activeIndex).toBe('5')
+    expect(shelf?.dataset.activeIndex).toBe(String(nextIndex))
+    expect(triggers[initialIndex].ariaPressed).toBe('false')
+    expect(triggers[initialIndex].hasAttribute('aria-current')).toBe(false)
+    expect(triggers[initialIndex].tabIndex).toBe(-1)
+    expect(triggers[nextIndex].ariaPressed).toBe('true')
+    expect(triggers[nextIndex].getAttribute('aria-current')).toBe('true')
+    expect(triggers[nextIndex].tabIndex).toBe(0)
+    expect(annotation?.getAttribute('href')).toBe(records[nextIndex].url)
+    expect(annotation?.textContent).toContain(records[nextIndex].album)
+    expect(document.activeElement).toBe(triggers[nextIndex])
   })
 })
