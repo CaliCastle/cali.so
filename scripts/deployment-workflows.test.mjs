@@ -49,10 +49,27 @@ test('feature pushes branch from Staging, migrate, then deploy Preview', async (
   assert.equal(config.concurrency.group, 'preview-${{ github.ref_name }}')
 
   const deploy = job.steps.find((step) => step.name === 'Deploy Preview')
+  assert.equal(config.permissions['pull-requests'], 'write')
+  assert.equal(deploy.id, 'deployment')
   assert.equal(deploy.uses, './.github/actions/deploy-neon-vercel')
   assert.equal(deploy.with['parent-branch'], 'staging')
   assert.match(deploy.with['branch-name'], /^preview\//)
   assert.equal(deploy.with.target, 'preview')
+  const comment = job.steps.find(
+    (step) => step.name === 'Comment Preview URL on pull request',
+  )
+  assert.equal(
+    comment.env.DEPLOYMENT_URL,
+    '${{ steps.deployment.outputs.deployment-url }}',
+  )
+  assert.equal(comment.env.GIT_BRANCH, '${{ github.ref_name }}')
+  assert.equal(comment.env.COMMIT_SHA, '${{ github.sha }}')
+  assert.match(comment.run, /comment-preview-deployment\.mjs/)
+  assertOrdered(
+    job.steps,
+    'Deploy Preview',
+    'Comment Preview URL on pull request',
+  )
 })
 
 test('dev continuously migrates and deploys the persistent Staging environment', async () => {
@@ -194,11 +211,28 @@ test('manual refresh resets a feature database from Staging before redeploying',
   const resolve = job.steps.find((step) => step.name === 'Resolve target commit')
   assert.equal(resolve['working-directory'], 'target')
   const reset = job.steps.find((step) => step.name === 'Refresh Preview')
+  assert.equal(config.permissions['pull-requests'], 'write')
+  assert.equal(reset.id, 'deployment')
   assert.equal(reset.uses, './.github/actions/deploy-neon-vercel')
   assert.equal(reset.with.reset, true)
   assert.equal(reset.with['working-directory'], 'target')
   assert.match(reset.with['branch-name'], /^preview\//)
   assert.equal(reset.with.target, 'preview')
+  const comment = job.steps.find(
+    (step) => step.name === 'Comment Preview URL on pull request',
+  )
+  assert.equal(
+    comment.env.DEPLOYMENT_URL,
+    '${{ steps.deployment.outputs.deployment-url }}',
+  )
+  assert.equal(comment.env.GIT_BRANCH, '${{ inputs.git_branch }}')
+  assert.equal(comment.env.COMMIT_SHA, '${{ steps.target.outputs.sha }}')
+  assert.match(comment.run, /comment-preview-deployment\.mjs/)
+  assertOrdered(
+    job.steps,
+    'Refresh Preview',
+    'Comment Preview URL on pull request',
+  )
 })
 
 test('shared non-production action keeps migration credentials out of Vercel', async () => {

@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: preview-${{ github.ref_name }}
@@ -27,6 +28,7 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Deploy Preview
+        id: deployment
         uses: ./.github/actions/deploy-neon-vercel
         with:
           branch-name: preview/${{ github.ref_name }}
@@ -42,3 +44,11 @@ jobs:
           vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
           vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Comment Preview URL on pull request
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GIT_BRANCH: ${{ github.ref_name }}
+        run: node scripts/comment-preview-deployment.mjs

@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write
 
 concurrency:
   group: preview-${{ inputs.git_branch }}
@@ -46,6 +47,7 @@ jobs:
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Refresh Preview
+        id: deployment
         uses: ./.github/actions/deploy-neon-vercel
         with:
           branch-name: preview/${{ inputs.git_branch }}
@@ -62,3 +64,11 @@ jobs:
           vercel-org-id: ${{ vars.VERCEL_ORG_ID }}
           vercel-project-id: ${{ vars.VERCEL_PROJECT_ID }}
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Comment Preview URL on pull request
+        env:
+          COMMIT_SHA: ${{ steps.target.outputs.sha }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GIT_BRANCH: ${{ inputs.git_branch }}
+        run: node scripts/comment-preview-deployment.mjs

@@ -12,7 +12,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:validate": "node --test scripts/ama-migrations.test.mjs",
-    "test:deployment": "node --test scripts/check-production-migrations.test.mjs scripts/delete-vercel-branch-deployments.test.mjs scripts/deployment-workflows.test.mjs",
+    "test:deployment": "node --test scripts/check-production-migrations.test.mjs scripts/comment-preview-deployment.test.mjs scripts/delete-vercel-branch-deployments.test.mjs scripts/deployment-workflows.test.mjs",
     "start": "next start",
     "test:ama": "vitest run lib/ama && pnpm db:validate",
     "test:security": "vitest run lib/security",
