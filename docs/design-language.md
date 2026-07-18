@@ -288,7 +288,14 @@ typewriter/ascii textures, measuring ticks, registration marks. Rules:
   reveals it instantly, while no-JS leaves the reserved square empty. Its
   wrapper is 149.6px wide on mobile (15% below the original 176px
   presentation) and returns to the fixed 240px size from the 40rem breakpoint
-  onward.
+  onward. The portrait also hides one bounded **topographic stage**: deliberate
+  hover, keyboard focus, or touch develops low-contrast contour lines behind
+  the print. Fine-pointer hover and touch use Shaders `ContourLines` over slowly
+  evolving `PerlinNoise`; it is never mounted at rest, unmounts after the field
+  recedes, and disables vendor telemetry. Keyboard focus, reduced motion, or
+  missing WebGPU reveals only the static hand-drawn contour plate, without a
+  transition. The portrait itself never moves and its reserved square never
+  changes size.
 - **Rulers**: measuring ticks (48px major / 12px minor) ride top and
   bottom as arcs of an enormous circle (fixed 40px rise at the viewport
   edge, so R = w²/8s at any width) — a bent steel rule whose ends bow away

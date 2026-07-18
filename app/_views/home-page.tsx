@@ -7,6 +7,7 @@ import { HalftonePortrait } from '~/components/halftone-portrait'
 import { HomeIntroduction } from '~/components/home-introduction'
 import { NavCards, PhotoNavCard } from '~/components/nav-cards'
 import { PostRow } from '~/components/post-row'
+import { PortraitHiddenStage } from '~/components/portrait-hidden-stage'
 import { VinylShelf } from '~/components/vinyl-shelf'
 import { getAllPosts } from '~/lib/content'
 import { T } from '~/lib/i18n'
@@ -44,12 +45,20 @@ export async function HomePageView({ locale }: { locale: Locale }) {
           </div>
         </div>
         <div className="w-[9.35rem] shrink-0 sm:w-60">
-          <HalftonePortrait
-            srcLight="/images/headshot.jpg"
-            srcDark="/images/portrait-square.jpg"
-            alt="Cali 的半调网点肖像"
-            altEn="Cali's halftone portrait"
-          />
+          <PortraitHiddenStage
+            label={
+              locale === 'en'
+                ? "Cali's halftone portrait. Reveal the hidden topographic field"
+                : 'Cali 的半调网点肖像。显现隐藏的等高线场'
+            }
+          >
+            <HalftonePortrait
+              srcLight="/images/headshot.jpg"
+              srcDark="/images/portrait-square.jpg"
+              alt="Cali 的半调网点肖像"
+              altEn="Cali's halftone portrait"
+            />
+          </PortraitHiddenStage>
         </div>
       </div>
 
