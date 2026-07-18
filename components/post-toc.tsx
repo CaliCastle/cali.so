@@ -13,14 +13,17 @@ const DESKTOP_QUERY = '(min-width: 64rem)'
 const DESKTOP_EXIT_DURATION = 0.2
 const DESKTOP_EXIT_STAGGER_WINDOW = 0.06
 const EASE_SWIFT = [0.2, 0.8, 0.2, 1] as const
-const PHONE_ENTER_DURATION = 0.2
-const PHONE_ENTER_STAGGER_WINDOW = 0.06
-const PHONE_EXIT_DURATION = 0.16
-const PHONE_EXIT_STAGGER_WINDOW = 0.04
+const PHONE_ENTER_STAGGER_WINDOW = 0.1
+const PHONE_EXIT_STAGGER_WINDOW = 0.1
 const PHONE_ISLAND_ENTER_DURATION = 0.28
 const PHONE_ISLAND_EXIT_DURATION = 0.26
 const PHONE_ISLAND_HIDDEN_TRANSFORM = 'translate(-50%, -16px) scale(0.96)'
 const PHONE_ISLAND_VISIBLE_TRANSFORM = 'translate(-50%, 0px) scale(1)'
+const PHONE_NODE_ENTER_DURATION = 0.18
+const PHONE_NODE_EXIT_DURATION = 0.16
+const PHONE_NODE_HIDDEN_FILTER = 'blur(2px)'
+const PHONE_PANEL_ENTER_DURATION = 0.28
+const PHONE_PANEL_EXIT_DURATION = 0.26
 const PHONE_PANEL_HIDDEN_TRANSFORM = 'translateY(-12px) scale(0.96)'
 const PHONE_PANEL_VISIBLE_TRANSFORM = 'translateY(0px) scale(1)'
 const PHONE_QUERY = '(max-width: 39.99rem)'
@@ -132,6 +135,7 @@ export function PostToc({ nodes, nodesEn }: { nodes: PostRailNode[]; nodesEn: Po
       panelAnimationRef.current?.cancel()
       panelAnimationRef.current = null
       for (const item of items ?? []) {
+        item.style.removeProperty('filter')
         item.style.removeProperty('opacity')
         item.style.removeProperty('transform')
       }
@@ -160,16 +164,16 @@ export function PostToc({ nodes, nodesEn }: { nodes: PostRailNode[]; nodesEn: Po
     const phoneStaggerWindow = nextOpen
       ? PHONE_ENTER_STAGGER_WINDOW
       : PHONE_EXIT_STAGGER_WINDOW
+    const phoneFurthestIndex = items.length - 1
     const phoneStagger =
-      furthestCenterIndex > 0
-        ? Math.min(0.01, phoneStaggerWindow / furthestCenterIndex)
-        : 0
+      phoneFurthestIndex > 0 ? phoneStaggerWindow / phoneFurthestIndex : 0
 
     // Motion otherwise resolves the first open against the incoming React
     // state, so phone items jump directly to their final styles. Pinning the
     // rendered frame also keeps rapid direction changes interruptible.
     for (const item of items) {
       const style = window.getComputedStyle(item)
+      if (phone) item.style.filter = style.filter
       item.style.opacity = style.opacity
       item.style.transform = style.transform
     }
@@ -190,7 +194,7 @@ export function PostToc({ nodes, nodesEn }: { nodes: PostRailNode[]; nodesEn: Po
           transform: nextOpen ? PHONE_PANEL_VISIBLE_TRANSFORM : PHONE_PANEL_HIDDEN_TRANSFORM,
         },
         {
-          duration: nextOpen ? PHONE_ENTER_DURATION : PHONE_EXIT_DURATION,
+          duration: nextOpen ? PHONE_PANEL_ENTER_DURATION : PHONE_PANEL_EXIT_DURATION,
           ease: EASE_SWIFT,
         },
       )
@@ -207,27 +211,35 @@ export function PostToc({ nodes, nodesEn }: { nodes: PostRailNode[]; nodesEn: Po
         .catch(() => undefined)
     }
 
+    const itemTransform = nextOpen
+      ? 'translateY(0) rotate(0deg)'
+      : 'translateY(-8px) rotate(2deg)'
+    const itemKeyframes = phone
+      ? {
+          filter: nextOpen ? 'blur(0px)' : PHONE_NODE_HIDDEN_FILTER,
+          opacity: nextOpen ? 1 : 0,
+          transform: itemTransform,
+        }
+      : {
+          opacity: nextOpen ? 1 : 0,
+          transform: itemTransform,
+        }
     const animation = animate(
       items,
-      {
-        opacity: nextOpen ? 1 : 0,
-        transform: nextOpen
-          ? 'translateY(0) rotate(0deg)'
-          : 'translateY(-8px) rotate(2deg)',
-      },
+      itemKeyframes,
       {
         duration: closingDesktop
           ? DESKTOP_EXIT_DURATION
           : phone
             ? nextOpen
-              ? PHONE_ENTER_DURATION
-              : PHONE_EXIT_DURATION
+              ? PHONE_NODE_ENTER_DURATION
+              : PHONE_NODE_EXIT_DURATION
             : nextOpen
               ? 0.26
               : 0.2,
         delay: stagger(
           closingDesktop ? desktopExitStagger : phone ? phoneStagger : nextOpen ? 0.012 : 0.01,
-          { from: 'center' },
+          { from: phone ? (nextOpen ? 'first' : 'last') : 'center' },
         ),
         ease: EASE_SWIFT,
       },
@@ -240,6 +252,7 @@ export function PostToc({ nodes, nodesEn }: { nodes: PostRailNode[]; nodesEn: Po
         animation.cancel()
         nodeAnimationRef.current = null
         for (const item of items) {
+          item.style.removeProperty('filter')
           item.style.removeProperty('opacity')
           item.style.removeProperty('transform')
         }
