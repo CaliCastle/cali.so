@@ -206,9 +206,14 @@ export function PhotoCuration({
       window.clearTimeout(saveTimerRef.current)
       saveTimerRef.current = null
       await runSave()
-      return
     }
-    if (savePromiseRef.current) await savePromiseRef.current
+    // A settling save can launch a queued follow-up from its finally (the
+    // new promise is assigned synchronously there), so drain until nothing
+    // is in flight — publishing must never race a newer order to the
+    // server.
+    while (savePromiseRef.current) {
+      await savePromiseRef.current
+    }
   }
 
   function moveTo(id: string, destination: number) {

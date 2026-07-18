@@ -230,6 +230,70 @@ describe('Photo curation UI contract', () => {
     expect(publish.body.expectedDraftRevision).toBe(9)
   })
 
+  it('drains a queued follow-up save before publishing', async () => {
+    document.documentElement.dataset.locale = 'en'
+    const sequence: string[] = []
+    const putOrders: string[][] = []
+    const releases: Array<() => void> = []
+    let revision = 3
+    let publishRevision: number | null = null
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        if (url.endsWith('/publish')) {
+          sequence.push('publish')
+          publishRevision = (
+            JSON.parse(String(init?.body)) as { expectedDraftRevision: number }
+          ).expectedDraftRevision
+          return Promise.resolve(
+            Response.json({ result: { status: 'published' } }),
+          )
+        }
+        const ids = (JSON.parse(String(init?.body)) as { mediaAssetIds: string[] })
+          .mediaAssetIds
+        sequence.push('save')
+        putOrders.push(ids)
+        return new Promise<Response>((resolve) => {
+          releases.push(() => {
+            revision += 1
+            resolve(Response.json({ draft: draft(ids, revision) }))
+          })
+        })
+      }),
+    )
+    const { getByRole } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id, three.id])}
+        assets={allAssets}
+        publishedIds={[]}
+      />,
+    )
+
+    // First reorder debounces into an in-flight save that we hold open…
+    fireEvent.click(getByRole('button', { name: /Position 3: Twin Peaks/ }))
+    fireEvent.click(getByRole('button', { name: /Move earlier/ }))
+    await waitFor(() => expect(putOrders).toHaveLength(1))
+
+    // …then a second reorder lands while it is in flight and gets queued.
+    fireEvent.click(getByRole('button', { name: /Move earlier/ }))
+    await new Promise((resolve) => setTimeout(resolve, 700))
+
+    fireEvent.click(getByRole('button', { name: /Publish/ }))
+    fireEvent.click(getByRole('button', { name: /Confirm publish/ }))
+
+    releases[0]!()
+    await waitFor(() => expect(releases).toHaveLength(2))
+    releases[1]!()
+
+    await waitFor(() => expect(sequence.includes('publish')).toBe(true))
+    // Both saves settle before publish, which carries the final revision
+    // and the final order.
+    expect(sequence).toEqual(['save', 'save', 'publish'])
+    expect(putOrders[1]).toEqual([three.id, one.id, two.id])
+    expect(publishRevision).toBe(5)
+  })
+
   it('blocks publishing while the draft has an unsaved failed autosave', async () => {
     document.documentElement.dataset.locale = 'en'
     let attempts = 0
