@@ -53,13 +53,16 @@ a presentation surface. It does not alter the Original.
 _Avoid_: Crop, hotspot
 
 **Alt Text Suggestion**:
-An AI-generated Chinese or English candidate description that the owner may
-accept, edit, or regenerate. It is never published directly.
+An AI-generated bilingual candidate description. Since July 2026 a fresh
+suggestion auto-applies as the approved Alt Text when none exists yet, so an
+upload becomes publishable without a review step; the owner may edit or
+regenerate at any time, and regeneration never overwrites approved text.
 _Avoid_: Generated alt text, automatic alt text
 
 **Alt Text**:
-The owner-approved Chinese and English visual descriptions required before a
-Media Asset may join a Published Photo Selection.
+The approved Chinese and English visual descriptions required before a
+Media Asset may join a Published Photo Selection. Approval is automatic on
+first suggestion and explicit on any owner edit.
 _Avoid_: Caption, Alt Text Suggestion
 
 **Catalog State**:

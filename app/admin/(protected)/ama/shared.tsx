@@ -27,6 +27,10 @@ export type BookingRowViewModel = {
   startsAt: string
   endsAt: string
   refundStatus: RefundStatus
+  /** Prep-at-a-glance: the meeting link already exists. */
+  hasMeetingLink: boolean
+  /** Prep-at-a-glance: the Guest submitted a Booking Brief (not yet purged). */
+  hasBrief: boolean
 }
 
 export type OperationViewModel = {

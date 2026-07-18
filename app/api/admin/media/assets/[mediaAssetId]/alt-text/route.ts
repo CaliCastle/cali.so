@@ -9,9 +9,10 @@ export async function POST(
   { params }: { params: Promise<{ mediaAssetId: string }> },
 ) {
   const { mediaAssetId } = await params
-  const { altText, security } = getMediaAdminServices()
+  const { altText, review, security } = getMediaAdminServices()
   return createMediaAltTextHandler({
     altText,
+    review,
     authenticator: ownerRequestAuthenticator,
     security,
   })(request, mediaAssetId)

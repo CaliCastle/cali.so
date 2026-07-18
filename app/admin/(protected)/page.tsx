@@ -2,113 +2,66 @@ import type { Metadata } from 'next'
 
 import { requireOwnerPage } from '~/lib/admin/server'
 import { getAmaAdminServices } from '~/lib/ama/admin/server'
+import { getMediaAdminPageServices } from '~/lib/media/admin/server'
+import { getPublishedPhotoSelection } from '~/lib/media/photo-selection/server'
 import { nonPublicRobots } from '~/lib/non-public-metadata'
 
-import {
-  AdminDashboard,
-  type AdminQueryNotices,
-  type GoogleConnectionStatus,
-} from './AdminDashboard'
+import { AdminOverview } from './AdminOverview'
 
 export const metadata: Metadata = {
-  title: 'AMA Admin',
+  title: 'Admin',
   robots: nonPublicRobots,
 }
 
 // Admin account data intentionally renders per request.
 export const instant = false
 
-const availabilityNotices = new Set(['saved', 'invalid', 'failed'] as const)
-const calendarNotices = new Set([
-  'disconnected',
-  'connected',
-  'expired',
-  'revoked',
-  'denied-scope',
-  'unavailable',
-] as const)
-
-function first(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value
-}
-
-function queryNotices(input: {
-  availability?: string | string[]
-  calendar?: string | string[]
-}): AdminQueryNotices {
-  const availability = first(input.availability)
-  const calendar = first(input.calendar)
-  return {
-    availability: availabilityNotices.has(
-      availability as AdminQueryNotices['availability'] & string,
-    )
-      ? (availability as AdminQueryNotices['availability'])
-      : undefined,
-    calendar: calendarNotices.has(calendar as GoogleConnectionStatus)
-      ? (calendar as GoogleConnectionStatus)
-      : undefined,
-  }
-}
-
-function connectionStatus(status: string | undefined): GoogleConnectionStatus {
-  if (status === 'connected' || status === 'expired' || status === 'revoked') {
-    return status
-  }
-  if (status === 'denied_scope') return 'denied-scope'
-  if (status === 'error') return 'unavailable'
-  return 'disconnected'
-}
-
-export default async function AdminPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    availability?: string | string[]
-    calendar?: string | string[]
-  }>
-}) {
-  await requireOwnerPage('/admin')
-  const { availability, google } = getAmaAdminServices()
-  const windowsPromise = availability.list()
-  const connectionPromise = google.getConnection()
-  const previewPromise = availability.preview()
-  const [windows, connection, preview, params] = await Promise.all([
-    windowsPromise,
-    connectionPromise,
-    previewPromise,
-    searchParams,
+export default async function AdminPage() {
+  const owner = await requireOwnerPage('/admin')
+  const { bookingAdmin } = getAmaAdminServices()
+  const { getDraft, listAssets } = getMediaAdminPageServices()
+  const [
+    attention,
+    operations,
+    upcoming,
+    timeRequests,
+    activeAssets,
+    archivedAssets,
+    draft,
+    published,
+  ] = await Promise.all([
+    bookingAdmin.listBookings('attention'),
+    bookingAdmin.listUnresolvedOperations(),
+    bookingAdmin.listBookings('upcoming'),
+    bookingAdmin.listAlternateTimeRequests('new'),
+    listAssets({ ownerUserId: owner.id, view: 'active' }),
+    listAssets({ ownerUserId: owner.id, view: 'archived' }),
+    getDraft(owner.id),
+    getPublishedPhotoSelection(),
   ])
 
-  const persistedStatus = connectionStatus(connection?.status)
-  const status =
-    persistedStatus === 'connected' && preview.status !== 'connected'
-      ? preview.status
-      : persistedStatus
+  const failedOperationCount = operations.filter(
+    (operation) => operation.status === 'failed',
+  ).length
+  const next = upcoming.find((booking) => booking.status !== 'cancelled')
 
   return (
-    <AdminDashboard
-      windows={windows.map(({ id, isoWeekday, startMinute, endMinute }) => ({
-        id,
-        isoWeekday,
-        startMinute,
-        endMinute,
-      }))}
-      googleConnection={{
-        status,
-        identity:
-          connection?.calendarId && connection.status !== 'disconnected'
-            ? {
-                calendarId: connection.calendarId,
-                summary: connection.calendarSummary,
-                email: connection.calendarEmail,
-              }
-            : null,
-      }}
-      previewSlots={preview.slots.map((slot) => ({
-        startsAt: slot.startsAt.toISOString(),
-        endsAt: slot.endsAt.toISOString(),
-      }))}
-      notices={queryNotices(params)}
+    <AdminOverview
+      attentionCount={attention.length + failedOperationCount}
+      nextBooking={
+        next
+          ? {
+              id: next.id,
+              guestName: next.guestName,
+              startsAt: next.startsAt.toISOString(),
+            }
+          : null
+      }
+      newTimeRequestCount={timeRequests.length}
+      mediaActiveCount={activeAssets.length}
+      mediaArchivedCount={archivedAssets.length}
+      photosPublishedCount={published?.items.length ?? 0}
+      photosDraftCount={draft.mediaAssetIds.length}
     />
   )
 }

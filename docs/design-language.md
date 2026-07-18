@@ -97,11 +97,12 @@ Hard rules:
 ## Color, borders, dark mode
 
 - Grays are a numbered scale (`--gray-1` … `--gray-12`) that flips wholesale
-  in dark mode. The public scale carries a slight warm-paper hue; admin keeps
-  its neutral product palette. Headings use the strongest ink, body copy steps
-  down two levels, and metadata steps down again. Components reference scale
-  variables, never Tailwind `dark:` overrides — if a component needs a
-  `dark:` modifier, the token is wrong.
+  in dark mode. The warm-paper scale is shared by the public site and the
+  owner admin (maintainer decision, July 2026); the neutral base ramp remains
+  only as the pre-hydration fallback. Headings use the strongest ink, body
+  copy steps down two levels, and metadata steps down again. Components
+  reference scale variables, never Tailwind `dark:` overrides — if a
+  component needs a `dark:` modifier, the token is wrong.
 - Text selection uses a translucent yellow-green highlighter token and never
   changes the selected text color. The dark token lowers opacity so it reads
   as marker on dark paper rather than a luminous block.
@@ -500,6 +501,42 @@ selection resolves, six quiet, nonanimated tiles reserve the two-column mobile
 or three-column desktop masonry. The placeholder uses the final card radius,
 gutter, and neutral edge treatment so navigation responds immediately without
 introducing a second visual language or shifting the page header.
+
+## Owner admin
+
+The admin is a desk in the same studio: it shares the warm paper, grain,
+dashed column guides, and the 37.5rem center column, while staying outside
+public analytics, social reads, and route view transitions. Its contract:
+
+- **Owner dock** (`components/admin-dock.tsx`): the public dock's grammar —
+  glass pill, sliding marker, tooltips with chord hints — carrying the admin
+  surfaces. Avatar = Overview (`/admin`), then AMA / Media / Photos, a
+  divider, a return arrow to the public site, and Preferences. The admin
+  Preferences variant keeps language (in-place), theme, and sound, and adds
+  Sign out (a form POST; server-side session revocation).
+- **Chords**: inside the admin, G then O / A / M / P jumps between surfaces
+  and G then S returns to the site. On the public dock, G then D opens the
+  admin — armed only after the owner probe (`GET /api/admin/session`, called
+  when the Preferences panel opens; a remembered confirmation arms it
+  instantly on later visits). Visitors never see owner chrome and public
+  pages stay fully static.
+- **Quiet headers.** Admin pages open like public views: an h1 at 14px
+  medium muted ink with a tabular count line. Structure comes from
+  `hairline-top` separators and spacing, not from heavier type.
+- **Surfaces.** Inspectors and pickers are dialogs on the surface ladder
+  (`Elevated` offset 4); popovers stay at offset 2. Never a native
+  `confirm()`/`prompt()`.
+- **Confirmation grammar.** Reversible-but-notable actions (archive,
+  disconnect) use a two-step armed button that relaxes after ~4s.
+  Irreversible actions (Purge) require the typed confirmation word inside
+  the dialog; the server validates the same literal. Publishing shows an
+  inline summary of what changes before one confirm.
+- **No entrance animations** — the admin is daily-use chrome (frequency
+  principle). Status is a quiet dot: amber for in-flight, red only for
+  broken or destructive. Numbers are always `tabular-nums`.
+- There is no step-up verification anywhere in the admin (July 2026
+  decision); owner authorization is the server-side Clerk `siteOwner`
+  check plus origin guards, rate limits, and audit events.
 
 ## Liquid glass dock
 

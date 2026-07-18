@@ -2,7 +2,6 @@ import type {
   OwnerAccess,
   OwnerPrincipal,
 } from '~/lib/admin/authorization'
-import type { OwnerReverifier } from '~/lib/admin/reverification'
 
 import { securityDenialHeaders } from '../security/request-policy'
 import type { AmaFeature, AmaSecurity } from '../security/service'
@@ -47,10 +46,6 @@ type HandlerDependencies<T> = {
   baseUrl: URL
 }
 
-type HighImpactHandlerDependencies<T> = HandlerDependencies<T> & {
-  reverifier: OwnerReverifier
-}
-
 type AdminRequestMode = 'browser-mutation' | 'provider-callback'
 
 function redirect(baseUrl: URL, pathOrUrl: string | URL) {
@@ -70,7 +65,6 @@ async function enforceAdminRequestPolicy(
   request: Request,
   mode: AdminRequestMode,
   requiredFeatures?: readonly AmaFeature[],
-  reverifier?: OwnerReverifier,
 ) {
   const { authenticator, security } = dependencies
   const blocked = mode === 'browser-mutation'
@@ -102,17 +96,6 @@ async function enforceAdminRequestPolicy(
     access.principal.actorId,
   )
   if (limited) return limited
-  if (reverifier) {
-    try {
-      const required = await reverifier.verify(request)
-      if (required) return required
-    } catch {
-      return new Response(null, {
-        status: 503,
-        headers: securityDenialHeaders(),
-      })
-    }
-  }
   return access.principal
 }
 
@@ -204,11 +187,11 @@ export function createAvailabilityMutationHandler(
       } else {
         const input = availabilityWindowFrom(formData)
         if (!input || (intent === 'update' && id === null)) {
-          return redirect(baseUrl, '/admin?availability=invalid')
+          return redirect(baseUrl, '/admin/ama?availability=invalid')
         }
         if (intent === 'create') await service.create(input)
         else if (intent === 'update') await service.update(id!, input)
-        else return redirect(baseUrl, '/admin?availability=invalid')
+        else return redirect(baseUrl, '/admin/ama?availability=invalid')
       }
 
       dependencies.security.recordPrivilegedAction(
@@ -216,15 +199,15 @@ export function createAvailabilityMutationHandler(
         'availability_mutation.succeeded',
         access.actorId,
       )
-      return redirect(baseUrl, '/admin?availability=saved')
+      return redirect(baseUrl, '/admin/ama?availability=saved')
     } catch {
-      return redirect(baseUrl, '/admin?availability=failed')
+      return redirect(baseUrl, '/admin/ama?availability=failed')
     }
   }
 }
 
 export function createGoogleConnectHandler(
-  dependencies: HighImpactHandlerDependencies<AdminGoogleService>,
+  dependencies: HandlerDependencies<AdminGoogleService>,
 ) {
   const { service, baseUrl } = dependencies
   return async function POST(request: Request) {
@@ -233,7 +216,6 @@ export function createGoogleConnectHandler(
       request,
       'browser-mutation',
       ['google'],
-      dependencies.reverifier,
     )
     if (denied(access)) return access
     try {
@@ -245,13 +227,13 @@ export function createGoogleConnectHandler(
       )
       return redirect(baseUrl, providerUrl)
     } catch {
-      return redirect(baseUrl, '/admin?calendar=unavailable')
+      return redirect(baseUrl, '/admin/ama?calendar=unavailable')
     }
   }
 }
 
 export function createGoogleCallbackHandler(
-  dependencies: HighImpactHandlerDependencies<AdminGoogleService>,
+  dependencies: HandlerDependencies<AdminGoogleService>,
 ) {
   const { service, baseUrl } = dependencies
   return async function GET(request: Request) {
@@ -260,7 +242,6 @@ export function createGoogleCallbackHandler(
       request,
       'provider-callback',
       ['google'],
-      dependencies.reverifier,
     )
     if (denied(access)) return access
     const params = new URL(request.url).searchParams
@@ -275,15 +256,15 @@ export function createGoogleCallbackHandler(
         'google_callback.completed',
         access.actorId,
       )
-      return redirect(baseUrl, `/admin?calendar=${result}`)
+      return redirect(baseUrl, `/admin/ama?calendar=${result}`)
     } catch {
-      return redirect(baseUrl, '/admin?calendar=unavailable')
+      return redirect(baseUrl, '/admin/ama?calendar=unavailable')
     }
   }
 }
 
 export function createGoogleDisconnectHandler(
-  dependencies: HighImpactHandlerDependencies<AdminGoogleService>,
+  dependencies: HandlerDependencies<AdminGoogleService>,
 ) {
   const { service, baseUrl } = dependencies
   return async function POST(request: Request) {
@@ -292,7 +273,6 @@ export function createGoogleDisconnectHandler(
       request,
       'browser-mutation',
       ['google'],
-      dependencies.reverifier,
     )
     if (denied(access)) return access
     try {
@@ -302,9 +282,9 @@ export function createGoogleDisconnectHandler(
         'google_disconnect.succeeded',
         access.actorId,
       )
-      return redirect(baseUrl, '/admin?calendar=disconnected')
+      return redirect(baseUrl, '/admin/ama?calendar=disconnected')
     } catch {
-      return redirect(baseUrl, '/admin?calendar=unavailable')
+      return redirect(baseUrl, '/admin/ama?calendar=unavailable')
     }
   }
 }

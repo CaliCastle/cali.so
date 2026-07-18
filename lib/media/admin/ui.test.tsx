@@ -1,20 +1,8 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-
-const clerk = vi.hoisted(() => ({
-  verifyWithPasskey: vi.fn(),
-}))
-
-vi.mock('@clerk/nextjs', () => ({
-  useSession: () => ({
-    isLoaded: true,
-    session: { id: 'sess_owner', verifyWithPasskey: clerk.verifyWithPasskey },
-  }),
-  useReverification: (fetcher: unknown) => fetcher,
-}))
 
 import { MediaLibrary } from '../../../app/admin/(protected)/media/MediaLibrary'
 import type { MediaAssetReviewRecord } from '../asset-review/service'
@@ -55,14 +43,7 @@ const activeAsset: MediaAssetReviewRecord = {
   },
 }
 
-const emptyDraft = {
-  revision: 0,
-  mediaAssetIds: [],
-  updatedAt: null,
-}
-
 beforeEach(() => {
-  clerk.verifyWithPasskey.mockResolvedValue({ status: 'complete' })
   const entries = new Map<string, string>()
   vi.stubGlobal('localStorage', {
     get length() {
@@ -89,54 +70,50 @@ afterEach(() => {
   localStorage.clear()
   vi.unstubAllGlobals()
   delete document.documentElement.dataset.locale
-  clerk.verifyWithPasskey.mockReset()
 })
 
-describe('Media Library UI contract', () => {
-  it('renders the batch, review, accessibility, and destructive controls', () => {
+describe('Media archive UI contract', () => {
+  it('renders the drop tray, contact sheet, and search without leaking private data', () => {
     const html = renderToStaticMarkup(
       <MediaLibrary
         initialActive={[activeAsset]}
         initialArchived={[]}
-        initialDraft={emptyDraft}
+        selectionIds={[activeAsset.id]}
       />,
     )
 
-    expect(html).toContain('Drop JPEG, PNG, or HEIC files here')
+    expect(html).toContain('Drop or choose photos')
     expect(html).toContain('multiple=""')
     expect(html).toContain('image/heic')
     expect(html).toContain('role="tablist"')
-    expect(html).toContain('aria-pressed="true"')
-    expect(html).toContain('aria-label="设置焦点"')
-    expect(html).toContain('use the arrow keys to adjust it')
-    expect(html).toContain('Location Label (English)')
-    expect(html).toContain('Alt Text Suggestion')
-    expect(html).toContain('Approve Alt Text')
+    expect(html).toContain('aria-haspopup="dialog"')
+    // The selection mark shows what the photos page is using.
+    expect(html).toContain('In use')
     expect(html).toContain('min-h-11')
     expect(html).not.toMatch(/latitude|longitude|originals\//i)
   })
 
-  it('supports keyboard adjustment of the Focal Point', () => {
-    const { container, getByRole } = render(
+  it('opens the inspector and supports keyboard Focal Point adjustment', async () => {
+    document.documentElement.dataset.locale = 'en'
+    const { getByRole } = render(
       <MediaLibrary
         initialActive={[activeAsset]}
         initialArchived={[]}
-        initialDraft={emptyDraft}
+        selectionIds={[]}
       />,
     )
 
-    fireEvent.keyDown(getByRole('button', { name: '设置焦点' }), {
-      key: 'ArrowRight',
-    })
+    fireEvent.click(getByRole('button', { name: /San Francisco/ }))
+    const focal = await screen.findByRole('button', { name: /Set Focal Point/ })
+    fireEvent.keyDown(focal, { key: 'ArrowRight' })
 
-    expect(
-      container.querySelector<HTMLSpanElement>(
-        'button[aria-label="设置焦点"] span[style]',
-      )?.style.left,
-    ).toBe('45%')
+    await waitFor(() => {
+      const marker = focal.querySelector<HTMLSpanElement>('span[style]')
+      expect(marker?.style.left).toBe('45%')
+    })
   })
 
-  it('explains missing GPS metadata and keeps manual Location Labels available', () => {
+  it('keeps manual Location entry available when a file has no GPS metadata', async () => {
     document.documentElement.dataset.locale = 'en'
     const withoutCaptureLocation = {
       ...activeAsset,
@@ -144,108 +121,116 @@ describe('Media Library UI contract', () => {
       locationLabelEn: null,
       locationLabelZhHans: null,
     }
-    const { getByRole, getByText } = render(
+    const { getByRole } = render(
       <MediaLibrary
         initialActive={[withoutCaptureLocation]}
         initialArchived={[]}
-        initialDraft={emptyDraft}
+        selectionIds={[]}
       />,
     )
 
+    fireEvent.click(
+      getByRole('button', { name: /11111111/ }),
+    )
+    await screen.findByRole('dialog')
+
+    expect(
+      screen.queryByRole('button', { name: /Fill from Capture Location/ }),
+    ).toBeNull()
     expect(
       (
-        getByRole('button', {
-          name: /Suggest from Capture Location/,
-        }) as HTMLButtonElement
-      ).disabled,
-    ).toBe(true)
-    expect(
-      getByText(
-        'This file has no GPS Capture Location. Enter the label manually.',
-      ),
-    ).toBeTruthy()
-    expect(
-      (
-        getByRole('textbox', {
-          name: /Location Label \(English\)/,
+        screen.getByRole('textbox', {
+          name: /Location \(English\)/,
         }) as HTMLInputElement
       ).disabled,
     ).toBe(false)
   })
 
-  it('adds a reviewed asset to the Draft from the same workspace', async () => {
+  it('saves location and alt text edits with one Save action', async () => {
     document.documentElement.dataset.locale = 'en'
-    const eligibleAsset = {
-      ...activeAsset,
-      altTextZhHans: '一辆缆车沿着街道行驶。',
-      altTextEn: 'A cable car travels along a city street.',
-      altTextApprovedAt: new Date('2026-07-15T12:30:00.000Z'),
-    }
-    const fetchMock = vi.fn(
-      async (_input: RequestInfo | URL, init?: RequestInit) => {
-        const request = JSON.parse(String(init?.body)) as {
-          mediaAssetIds: string[]
-        }
-        return Response.json({
-          draft: {
-            revision: 1,
-            mediaAssetIds: request.mediaAssetIds,
-            updatedAt: '2026-07-15T12:31:00.000Z',
-          },
-        })
-      },
-    )
+    const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as { intent: string }
+      return Response.json({
+        asset: {
+          ...activeAsset,
+          ...(body.intent === 'approve_alt_text'
+            ? {
+                altTextZhHans: '一辆缆车沿着街道行驶。',
+                altTextEn: 'A cable car travels along a city street.',
+                altTextApprovedAt: new Date().toISOString(),
+              }
+            : {}),
+        },
+      })
+    })
     vi.stubGlobal('fetch', fetchMock)
     const { getByRole } = render(
       <MediaLibrary
-        initialActive={[eligibleAsset]}
+        initialActive={[activeAsset]}
         initialArchived={[]}
-        initialDraft={emptyDraft}
+        selectionIds={[]}
       />,
     )
 
-    fireEvent.click(getByRole('button', { name: /Add to Draft/ }))
-
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/admin/media/photo-selection',
-      expect.objectContaining({ method: 'PUT' }),
-    )
-    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
-      expectedRevision: 0,
-      mediaAssetIds: [eligibleAsset.id],
+    fireEvent.click(getByRole('button', { name: /San Francisco/ }))
+    await screen.findByRole('dialog')
+    fireEvent.change(screen.getByRole('textbox', { name: /Location \(English\)/ }), {
+      target: { value: 'San Francisco, CA' },
     })
-    await waitFor(() =>
-      expect(getByRole('link', { name: /In Draft/ })).toBeTruthy(),
+    fireEvent.click(screen.getByRole('button', { name: /Save/ }))
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
+    const intents = fetchMock.mock.calls.map(
+      ([, init]) => (JSON.parse(String(init?.body)) as { intent: string }).intent,
     )
+    // Both halves changed (location edited; alt text prefilled from the
+    // suggestion but not yet approved), one Save sends both.
+    expect(intents).toEqual(['update_display_metadata', 'approve_alt_text'])
   })
 
-  it('does not purge when passkey verification is cancelled', async () => {
+  it('purges only through the typed in-dialog confirmation', async () => {
     document.documentElement.dataset.locale = 'en'
     const archivedAsset: MediaAssetReviewRecord = {
       ...activeAsset,
       catalogState: 'archived',
       archivedAt: new Date('2026-07-15T13:00:00.000Z'),
     }
-    vi.stubGlobal('prompt', vi.fn(() => 'PURGE'))
-    clerk.verifyWithPasskey.mockRejectedValueOnce(
-      new Error('passkey cancelled'),
-    )
-    const fetchMock = vi.fn()
+    const fetchMock = vi.fn(async () => Response.json({ result: { purged: true } }))
     vi.stubGlobal('fetch', fetchMock)
     const { getByRole } = render(
       <MediaLibrary
         initialActive={[]}
         initialArchived={[archivedAsset]}
-        initialDraft={emptyDraft}
+        selectionIds={[]}
       />,
     )
 
     fireEvent.click(getByRole('tab', { name: /Archived/ }))
-    fireEvent.click(getByRole('button', { name: /Purge permanently/ }))
+    fireEvent.click(getByRole('button', { name: /San Francisco/ }))
+    await screen.findByRole('dialog')
+    fireEvent.click(screen.getByRole('button', { name: /Purge$/ }))
 
-    await waitFor(() => expect(clerk.verifyWithPasskey).toHaveBeenCalledOnce())
+    const confirmButton = screen.getByRole('button', {
+      name: /Confirm purge/,
+    }) as HTMLButtonElement
+    const input = screen.getByRole('textbox', { name: /Type PURGE to confirm/ })
+
+    fireEvent.change(input, { target: { value: 'purge' } })
+    expect(confirmButton.disabled).toBe(true)
     expect(fetchMock).not.toHaveBeenCalled()
+
+    fireEvent.change(input, { target: { value: 'PURGE' } })
+    expect(confirmButton.disabled).toBe(false)
+    fireEvent.click(confirmButton)
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/admin/media/assets/${activeAsset.id}/purge`,
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ confirmation: 'PURGE' }),
+      }),
+    )
   })
 
   it('retries a failed Original transfer before attempting completion', async () => {
@@ -284,7 +269,7 @@ describe('Media Library UI contract', () => {
           })
         }
         if (url.endsWith('/alt-text')) {
-          return Response.json({ suggestion: null })
+          return Response.json({ suggestion: null, asset: null })
         }
         if (url.endsWith('?view=active')) {
           return Response.json({ assets: [activeAsset] })
@@ -298,11 +283,7 @@ describe('Media Library UI contract', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     const { container, getByRole } = render(
-      <MediaLibrary
-        initialActive={[]}
-        initialArchived={[]}
-        initialDraft={emptyDraft}
-      />,
+      <MediaLibrary initialActive={[]} initialArchived={[]} selectionIds={[]} />,
     )
     const file = new File([new Uint8Array([1, 2, 3])], 'photo.jpg', {
       type: 'image/jpeg',
@@ -320,21 +301,25 @@ describe('Media Library UI contract', () => {
     fireEvent.click(getByRole('button', { name: /Retry/ }))
     await waitFor(() => {
       expect(originalAttempts).toBe(2)
-      expect(fetchMock.mock.calls.some(([input]) => String(input).endsWith('/complete'))).toBe(true)
+      expect(
+        fetchMock.mock.calls.some(([input]) => String(input).endsWith('/complete')),
+      ).toBe(true)
     })
 
     const urls = fetchMock.mock.calls.map(([input]) => String(input))
     expect(urls.filter((url) => url === '/api/admin/media/upload-intents')).toHaveLength(1)
     expect(urls.filter((url) => url.endsWith('/original'))).toHaveLength(2)
     expect(urls.filter((url) => url.endsWith('/complete'))).toHaveLength(1)
+    // The auto-approve request follows completion without user action.
+    expect(urls.some((url) => url.endsWith('/alt-text'))).toBe(true)
     const intentBody = JSON.parse(
-      String(fetchMock.mock.calls.find(([input]) =>
-        String(input).endsWith('/upload-intents'),
-      )?.[1]?.body),
+      String(
+        fetchMock.mock.calls.find(([input]) =>
+          String(input).endsWith('/upload-intents'),
+        )?.[1]?.body,
+      ),
     ) as { idempotencyKey: string }
-    expect(intentBody.idempotencyKey).toBe(
-      'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
-    )
+    expect(intentBody.idempotencyKey).toBe('bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb')
     expect(localStorage.length).toBe(0)
   })
 
@@ -366,11 +351,7 @@ describe('Media Library UI contract', () => {
     }
 
     const first = render(
-      <MediaLibrary
-        initialActive={[]}
-        initialArchived={[]}
-        initialDraft={emptyDraft}
-      />,
+      <MediaLibrary initialActive={[]} initialArchived={[]} selectionIds={[]} />,
     )
     fireEvent.change(first.container.querySelector('input[type="file"]')!, {
       target: { files: [file] },
@@ -379,11 +360,7 @@ describe('Media Library UI contract', () => {
     first.unmount()
 
     const second = render(
-      <MediaLibrary
-        initialActive={[]}
-        initialArchived={[]}
-        initialDraft={emptyDraft}
-      />,
+      <MediaLibrary initialActive={[]} initialArchived={[]} selectionIds={[]} />,
     )
     fireEvent.change(second.container.querySelector('input[type="file"]')!, {
       target: { files: [file] },
@@ -395,7 +372,8 @@ describe('Media Library UI contract', () => {
     ])
   })
 
-  it('keeps a completed upload ready when the library refresh fails', async () => {
+  it('keeps a completed upload archived when the library refresh fails', async () => {
+    document.documentElement.dataset.locale = 'en'
     const digest = new Uint8Array(32).buffer
     vi.stubGlobal('crypto', {
       randomUUID: vi
@@ -418,7 +396,9 @@ describe('Media Library UI contract', () => {
           mediaAsset: { id: activeAsset.id, processingState: 'ready' },
         })
       }
-      if (url.endsWith('/alt-text')) return Response.json({ suggestion: null })
+      if (url.endsWith('/alt-text')) {
+        return Response.json({ suggestion: null, asset: null })
+      }
       if (url.includes('/api/admin/media/assets?view=')) {
         return Response.json({ error: 'dependency_unavailable' }, { status: 503 })
       }
@@ -427,11 +407,7 @@ describe('Media Library UI contract', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     const { container, getByText, queryByRole } = render(
-      <MediaLibrary
-        initialActive={[]}
-        initialArchived={[]}
-        initialDraft={emptyDraft}
-      />,
+      <MediaLibrary initialActive={[]} initialArchived={[]} selectionIds={[]} />,
     )
     const file = new File([new Uint8Array([1, 2, 3])], 'photo.jpg', {
       type: 'image/jpeg',
@@ -445,7 +421,7 @@ describe('Media Library UI contract', () => {
       target: { files: [file] },
     })
 
-    await waitFor(() => expect(getByText('Ready for review')).toBeTruthy())
+    await waitFor(() => expect(getByText('In the archive')).toBeTruthy())
     expect(queryByRole('button', { name: /Retry/ })).toBeNull()
     expect(
       fetchMock.mock.calls.filter(([input]) => String(input).endsWith('/complete')),

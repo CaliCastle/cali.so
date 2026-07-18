@@ -1,51 +1,22 @@
-import { Children, isValidElement, type ReactElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('next/navigation', () => ({
-  usePathname: () => '/admin/media',
+vi.mock('~/components/admin-dock', () => ({
+  AdminDock: () => <span data-admin-dock="" />,
 }))
 
 import { AdminShell } from './AdminShell'
 
 describe('AdminShell', () => {
-  it('uses compact grid chrome with a responsive sidebar', () => {
-    const shell = AdminShell({
-      children: <section>Media content</section>,
-    })
-    const sections = Children.toArray(shell.props.children).filter(
-      isValidElement,
-    ) as ReactElement<{
-      className: string
-      children?: React.ReactNode
-      style?: React.CSSProperties
-    }>[]
-    const nav = sections.find((section) => section.type === 'nav')
-    const main = sections.find((section) => section.type === 'main')
-    const links = Children.toArray(nav?.props.children).filter(
-      isValidElement,
-    ) as ReactElement<{
-      href: string
-      prefetch: boolean
-      'aria-current'?: string
-    }>[]
-
-    expect(shell.props.className).toContain('grid')
-    expect(shell.props.className).toContain('lg:grid-cols-[11rem_minmax(0,1fr)]')
-    expect(nav?.props.className).toContain('grid')
-    expect(nav?.props.className).toContain(
-      'grid-cols-[repeat(var(--admin-nav-columns),minmax(0,1fr))]',
+  it('centers content in the site column with the owner dock', () => {
+    const html = renderToStaticMarkup(
+      <AdminShell>
+        <section>Media content</section>
+      </AdminShell>,
     )
-    expect(nav?.props.className).toContain('lg:grid-cols-1')
-    expect(nav?.props.style).toMatchObject({ '--admin-nav-columns': 3 })
-    expect(main?.props.className).toContain('min-w-0')
-    expect(main?.props.children).toEqual(<section>Media content</section>)
-    expect(links).toHaveLength(3)
-    expect(links.some((link) => link.props.href === '/admin/photos')).toBe(false)
-    expect(links.every((link) => link.props.prefetch === false)).toBe(true)
-    expect(
-      links
-        .find((link) => link.props.href === '/admin/media')
-        ?.props['aria-current'],
-    ).toBe('page')
+
+    expect(html).toContain('max-w-[37.5rem]')
+    expect(html).toContain('Media content')
+    expect(html).toContain('data-admin-dock')
   })
 })

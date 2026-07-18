@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLayoutEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 
 import {
   AmaIcon,
@@ -14,6 +14,7 @@ import {
 } from '~/components/dock-icons'
 import { LiquidGlass } from '~/components/liquid-glass'
 import { Preferences } from '~/components/preferences'
+import { useDockActiveIndicator } from '~/hooks/use-dock-active-indicator'
 import { dockGoKeyFor, useDockGoShortcuts } from '~/hooks/use-dock-go-shortcuts'
 import { T } from '~/lib/i18n'
 import { localize, useLocale } from '~/lib/locale-client'
@@ -31,7 +32,7 @@ const ITEMS = [
   { href: '/ama', zh: '咨询', en: 'AMA', icon: AmaIcon },
 ] as const
 
-function DockTip({
+export function DockTip({
   zh,
   en,
   goKey,
@@ -55,13 +56,14 @@ function DockTip({
   )
 }
 
-function DockItem({
+export function DockItem({
   href,
   locale,
   zh,
   en,
   goKey,
   active = false,
+  prefetch,
   itemRef,
   onNavigate,
   children,
@@ -72,6 +74,7 @@ function DockItem({
   en: string
   goKey?: string
   active?: boolean
+  prefetch?: false
   itemRef?: (element: HTMLAnchorElement | null) => void
   onNavigate?: (href: string, keyboardInitiated: boolean) => void
   children: React.ReactNode
@@ -85,6 +88,7 @@ function DockItem({
     <Link
       ref={itemRef}
       href={href}
+      prefetch={prefetch}
       className="dock-item"
       data-active={active || undefined}
       aria-label={ariaLabel}
@@ -160,85 +164,27 @@ export function Dock() {
   const pathname = usePathname()
   const routePathname = unlocalizedPathname(pathname)
   const activeHref = routePathname === '/' ? '/' : ITEMS.find(({ href }) => routePathname.startsWith(href))?.href
-  const dockRef = useRef<HTMLElement | null>(null)
-  const indicatorRef = useRef<HTMLSpanElement | null>(null)
-  const itemRefs = useRef(new Map<string, HTMLAnchorElement>())
-  const activeHrefRef = useRef(activeHref)
-  const keyboardNavigationRef = useRef(false)
-  const indicatorFrameRef = useRef<number | null>(null)
-
-  function registerItem(href: string, element: HTMLAnchorElement | null) {
-    if (element) itemRefs.current.set(href, element)
-    else itemRefs.current.delete(href)
-  }
-
-  function clearIndicatorFrame() {
-    if (indicatorFrameRef.current === null) return
-    window.cancelAnimationFrame(indicatorFrameRef.current)
-    indicatorFrameRef.current = null
-  }
-
-  function positionIndicator(instant: boolean) {
-    const dock = dockRef.current
-    const indicator = indicatorRef.current
-    const href = activeHrefRef.current
-    const activeItem = href ? itemRefs.current.get(href) : undefined
-
-    if (!dock || !indicator || !activeItem) {
-      indicator?.removeAttribute('data-ready')
-      return
-    }
-
-    const dockRect = dock.getBoundingClientRect()
-    const itemRect = activeItem.getBoundingClientRect()
-    const center = itemRect.left - dockRect.left + itemRect.width / 2
-    const shouldSnap = instant || !indicator.hasAttribute('data-ready')
-
-    clearIndicatorFrame()
-    if (shouldSnap) indicator.setAttribute('data-instant', '')
-
-    indicator.style.setProperty('--dock-indicator-x', `${center}px`)
-    indicator.setAttribute('data-ready', '')
-
-    if (shouldSnap) {
-      // Keep transitions disabled for one painted frame. Keyboard navigation
-      // and dock resizing should reposition the marker without movement.
-      indicatorFrameRef.current = window.requestAnimationFrame(() => {
-        indicatorFrameRef.current = window.requestAnimationFrame(() => {
-          indicatorFrameRef.current = null
-          indicator.removeAttribute('data-instant')
-        })
-      })
-    }
-  }
-
-  function handleNavigate(href: string, keyboardInitiated: boolean) {
-    keyboardNavigationRef.current = href !== activeHref && keyboardInitiated
-  }
+  // Owner chrome is invisible until known: the hint remembers a confirmed
+  // probe so the Admin row and its chord are armed instantly on later
+  // visits; the probe itself runs when the Preferences panel opens.
+  const [ownerAdmin, setOwnerAdmin] = useState(false)
+  const { dockRef, indicatorRef, registerItem, handleNavigate } =
+    useDockActiveIndicator(activeHref)
 
   useDockGoShortcuts({
     locale,
     activeHref,
     onNavigate: handleNavigate,
+    ownerAdmin,
   })
 
-  useLayoutEffect(() => {
-    activeHrefRef.current = activeHref
-    positionIndicator(keyboardNavigationRef.current)
-    keyboardNavigationRef.current = false
-  }, [activeHref])
-
-  useLayoutEffect(() => {
-    const dock = dockRef.current
-    if (!dock || typeof ResizeObserver === 'undefined') return
-
-    const observer = new ResizeObserver(() => positionIndicator(true))
-    observer.observe(dock)
-
-    return () => observer.disconnect()
+  useEffect(() => {
+    try {
+      if (localStorage.owner === '1') setOwnerAdmin(true)
+    } catch {
+      /* private mode */
+    }
   }, [])
-
-  useLayoutEffect(() => () => clearIndicatorFrame(), [])
 
   return (
     <nav ref={dockRef} className="dock" aria-label={localize(locale, '主导航', 'Main navigation')}>
@@ -275,7 +221,7 @@ export function Dock() {
         </DockItem>
       ))}
       <span className="dock-rule" aria-hidden />
-      <Preferences />
+      <Preferences ownerAdmin={ownerAdmin} onOwnerAdminChange={setOwnerAdmin} />
     </nav>
   )
 }

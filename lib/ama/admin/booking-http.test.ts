@@ -4,7 +4,6 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => ({}))
 
-import { createOwnerReverifier } from '../../admin/reverification'
 import type { AdminActionResult, BookingAdminService } from '../booking/admin'
 import { createAmaSecurity, type SecurityAuditEvent } from '../security/service'
 import type { OwnerRequestAuthenticator } from './http'
@@ -37,9 +36,7 @@ function jsonRequest(
   })
 }
 
-function fixture(
-  options: { rateLimitAllows?: boolean; hasFreshFirstFactor?: boolean } = {},
-) {
+function fixture(options: { rateLimitAllows?: boolean } = {}) {
   const calls: unknown[] = []
   let result: AdminActionResult = { outcome: 'done' }
   const service = {
@@ -112,9 +109,6 @@ function fixture(
     service,
     security,
     baseUrl: new URL('https://cali.so'),
-    reverifier: createOwnerReverifier({
-      hasFreshFirstFactor: async () => options.hasFreshFirstFactor ?? true,
-    }),
   }
 
   return {
@@ -329,27 +323,6 @@ describe('admin booking action handler', () => {
       f.securityEvents.some((event) => event.event === 'ama_booking.cancelled'),
     ).toBe(false)
   })
-
-  it('requires a fresh first factor before any booking action runs', async () => {
-    const f = fixture({ hasFreshFirstFactor: false })
-    const handler = createAdminBookingActionHandler(f.dependencies)
-
-    const response = await handler(
-      jsonRequest('/api/admin/ama/bookings/bk_1', { action: 'cancel' }),
-      'bk_1',
-    )
-
-    expect(response.status).toBe(403)
-    await expect(response.json()).resolves.toMatchObject({
-      clerk_error: {
-        reason: 'reverification-error',
-        metadata: {
-          reverification: { level: 'first_factor', afterMinutes: 10 },
-        },
-      },
-    })
-    expect(f.calls).toEqual([])
-  })
 })
 
 describe('admin operation action handler', () => {
@@ -393,19 +366,6 @@ describe('admin operation action handler', () => {
 
     expect(response.status).toBe(400)
     expect(f.calls).toEqual([])
-  })
-
-  it('does not require reverification for operation recovery', async () => {
-    const f = fixture({ hasFreshFirstFactor: false })
-    const handler = createAdminOperationActionHandler(f.dependencies)
-
-    const response = await handler(
-      jsonRequest('/api/admin/ama/operations/op_1', { action: 'retry' }),
-      'op_1',
-    )
-
-    expect(response.status).toBe(200)
-    expect(f.calls).toEqual([['retry', 'op_1']])
   })
 
   it('maps not_applicable operation outcomes to 409', async () => {

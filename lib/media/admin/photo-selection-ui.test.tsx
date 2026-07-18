@@ -1,22 +1,16 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const clerk = vi.hoisted(() => ({
-  verifyWithPasskey: vi.fn(),
+const refresh = vi.fn()
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh }),
+  usePathname: () => '/admin/photos',
 }))
 
-vi.mock('@clerk/nextjs', () => ({
-  useSession: () => ({
-    isLoaded: true,
-    session: { id: 'sess_owner', verifyWithPasskey: clerk.verifyWithPasskey },
-  }),
-  useReverification: (fetcher: unknown) => fetcher,
-}))
-
-import { PhotoSelectionEditor } from '../../../app/admin/(protected)/photos/PhotoSelectionEditor'
+import { PhotoCuration } from '../../../app/admin/(protected)/photos/PhotoCuration'
 import type { MediaAssetReviewRecord } from '../asset-review/service'
 
 function asset(id: string, name: string): MediaAssetReviewRecord {
@@ -42,233 +36,262 @@ function asset(id: string, name: string): MediaAssetReviewRecord {
     altTextSuggestion: null,
     altTextZhHans: `${name} 的照片`,
     altTextEn: `A photo of ${name}`,
-    altTextApprovedAt: new Date('2026-07-15T12:00:00.000Z'),
+    altTextApprovedAt: new Date('2026-07-15T12:30:00.000Z'),
     archivedAt: null,
     previewRendition: {
-      src: `https://media.example.com/${id}.jpg`,
+      src: `https://media.example.com/renditions/${id}-640.jpg`,
       width: 640,
       height: 480,
     },
   }
 }
 
-const first = asset('11111111-1111-4111-8111-111111111111', 'First')
-const second = asset('22222222-2222-4222-8222-222222222222', 'Second')
-const third = asset('33333333-3333-4333-8333-333333333333', 'Third')
-const fourth = asset('44444444-4444-4444-8444-444444444444', 'Fourth')
+const one = asset('11111111-1111-4111-8111-111111111111', 'Pier 7')
+const two = asset('22222222-2222-4222-8222-222222222222', 'Chinatown')
+const three = asset('33333333-3333-4333-8333-333333333333', 'Twin Peaks')
+const four = asset('44444444-4444-4444-8444-444444444444', 'Ocean Beach')
+const processing: MediaAssetReviewRecord = {
+  ...asset('55555555-5555-4555-8555-555555555555', 'Presidio'),
+  processingState: 'processing',
+  previewRendition: null,
+  altTextApprovedAt: null,
+}
 
-beforeEach(() => {
-  clerk.verifyWithPasskey.mockResolvedValue({ status: 'complete' })
-})
+const allAssets = [one, two, three, four, processing]
+
+function draft(ids: string[], revision = 3) {
+  return { revision, mediaAssetIds: ids, updatedAt: new Date('2026-07-15T13:00:00.000Z') }
+}
 
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
+  refresh.mockClear()
   delete document.documentElement.dataset.locale
-  clerk.verifyWithPasskey.mockReset()
 })
 
-describe('Photo Selection admin UI contract', () => {
-  it('renders autosaved curation, direct reorder, preview, and publish controls', () => {
-    document.documentElement.dataset.locale = 'en'
+describe('Photo curation UI contract', () => {
+  it('renders the selection as ordered prints with the homepage trio marked', () => {
     const html = renderToStaticMarkup(
-      <PhotoSelectionEditor
-        initialDraft={{
-          revision: 2,
-          mediaAssetIds: [first.id, second.id, third.id],
-          updatedAt: new Date('2026-07-15T12:00:00.000Z'),
-        }}
-        initialAssets={[first, second, third, fourth]}
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id, three.id, four.id])}
+        assets={allAssets}
+        publishedIds={[one.id, two.id, three.id, four.id]}
       />,
     )
 
-    expect(html).toContain('Changes autosave to the Draft')
-    expect(html).toContain('Homepage preview order')
-    expect(html).toContain('draggable="true"')
-    expect(html).toContain('aria-label="向前移动"')
-    expect(html).toContain('aria-label="向后移动"')
-    expect(html).toContain('Add to Draft')
+    expect(html).toContain('01')
+    expect(html).toContain('04')
+    // Exactly the first three prints carry the homepage mark.
+    expect(html.match(/HOME/g)).toHaveLength(3)
+    expect(html).toContain('polaroid')
     expect(html).toContain('Publish')
-    expect(html).toContain('min-h-11')
+    expect(html).toContain('Add photos from the archive')
     expect(html).not.toMatch(/latitude|longitude|originals\//i)
   })
 
-  it('autosaves keyboard reorder with the current Draft revision', async () => {
+  it('reorders through the toolbar and coalesces changes into one autosave', async () => {
     document.documentElement.dataset.locale = 'en'
-    const onDraftChange = vi.fn()
     const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
-      const request = JSON.parse(String(init?.body)) as {
-        mediaAssetIds: string[]
-      }
-      return Response.json({
-        draft: {
-          revision: 3,
-          mediaAssetIds: request.mediaAssetIds,
-          updatedAt: '2026-07-15T12:01:00.000Z',
-        },
-      })
+      const body = JSON.parse(String(init?.body)) as { mediaAssetIds: string[] }
+      return Response.json({ draft: draft(body.mediaAssetIds, 4) })
     })
     vi.stubGlobal('fetch', fetchMock)
-    const { getAllByRole } = render(
-      <PhotoSelectionEditor
-        initialDraft={{
-          revision: 2,
-          mediaAssetIds: [first.id, second.id],
-          updatedAt: null,
-        }}
-        initialAssets={[first, second]}
-        onDraftChange={onDraftChange}
+    const { getByRole } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id, three.id])}
+        assets={allAssets}
+        publishedIds={[]}
       />,
     )
 
-    expect(onDraftChange).not.toHaveBeenCalled()
-    fireEvent.click(getAllByRole('button', { name: 'Move later' })[0]!)
+    fireEvent.click(getByRole('button', { name: /Position 3: Twin Peaks/ }))
+    const earlier = getByRole('button', { name: /Move earlier/ })
+    fireEvent.click(earlier)
+    fireEvent.click(earlier)
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/admin/media/photo-selection',
       expect.objectContaining({ method: 'PUT' }),
     )
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
-      expectedRevision: 2,
-      mediaAssetIds: [second.id, first.id],
+      expectedRevision: 3,
+      mediaAssetIds: [three.id, one.id, two.id],
     })
-    expect(onDraftChange).toHaveBeenCalledOnce()
-    expect(onDraftChange).toHaveBeenCalledWith([second.id, first.id])
   })
 
-  it('ignores text dragged from outside the Photo Selection', () => {
+  it('appends eligible archive photos from the picker and blocks unready ones', async () => {
     document.documentElement.dataset.locale = 'en'
-    const fetchMock = vi.fn()
+    const fetchMock = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      const body = JSON.parse(String(init?.body)) as { mediaAssetIds: string[] }
+      return Response.json({ draft: draft(body.mediaAssetIds, 4) })
+    })
     vi.stubGlobal('fetch', fetchMock)
-    const { container } = render(
-      <PhotoSelectionEditor
-        initialDraft={{
-          revision: 2,
-          mediaAssetIds: [first.id, second.id],
-          updatedAt: null,
-        }}
-        initialAssets={[first, second]}
+    const { getByRole } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id])}
+        assets={allAssets}
+        publishedIds={[one.id]}
       />,
     )
 
-    fireEvent.drop(container.querySelector('[draggable="true"]')!, {
-      dataTransfer: { getData: () => 'https://example.com' },
-    })
+    fireEvent.click(getByRole('button', { name: /Add photos from the archive/ }))
+    await screen.findByRole('dialog')
 
-    expect(fetchMock).not.toHaveBeenCalled()
+    const unready = screen.getByRole('button', {
+      name: /Presidio/,
+    }) as HTMLButtonElement
+    expect(unready.disabled).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: /Ocean Beach/ }))
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      expectedRevision: 3,
+      mediaAssetIds: [one.id, four.id],
+    })
   })
 
-  it('clears the dragged item when a drag is cancelled', () => {
+  it('publishes after an inline confirmation that summarizes the change', async () => {
     document.documentElement.dataset.locale = 'en'
-    const fetchMock = vi.fn()
-    vi.stubGlobal('fetch', fetchMock)
-    const { getAllByRole } = render(
-      <PhotoSelectionEditor
-        initialDraft={{
-          revision: 2,
-          mediaAssetIds: [first.id, second.id],
-          updatedAt: null,
-        }}
-        initialAssets={[first, second]}
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = []
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        calls.push({ url, body: JSON.parse(String(init?.body)) })
+        if (url.endsWith('/publish')) {
+          return Response.json({
+            result: { status: 'published', itemCount: 2 },
+          })
+        }
+        return Response.json({ draft: draft([], 4) })
+      }),
+    )
+    const { getByRole, getByText } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id])}
+        assets={allAssets}
+        publishedIds={[one.id]}
       />,
     )
-    const dragButtons = getAllByRole('button', { name: /Drag/ })
-    const dataTransfer = {
-      effectAllowed: 'none',
-      getData: () => first.id,
-      setData: vi.fn(),
-    }
 
-    fireEvent.dragStart(dragButtons[0]!, { dataTransfer })
-    fireEvent.dragEnd(dragButtons[0]!, { dataTransfer })
-    fireEvent.drop(dragButtons[1]!.closest('li')!, { dataTransfer })
+    fireEvent.click(getByRole('button', { name: /Publish/ }))
+    expect(getByText(/1 added/)).toBeTruthy()
 
-    expect(fetchMock).not.toHaveBeenCalled()
+    fireEvent.click(getByRole('button', { name: /Confirm publish/ }))
+    await waitFor(() =>
+      expect(calls.some((call) => call.url.endsWith('/publish'))).toBe(true),
+    )
+    const publish = calls.find((call) => call.url.endsWith('/publish'))!
+    expect(publish.body.expectedDraftRevision).toBe(3)
+    expect(typeof publish.body.idempotencyKey).toBe('string')
+    await waitFor(() => expect(getByText(/photos published/)).toBeTruthy())
+    expect(refresh).toHaveBeenCalled()
   })
 
-  it('explains failed publication without claiming the Draft was published', async () => {
+  it('flushes a pending reorder before publishing with the new revision', async () => {
     document.documentElement.dataset.locale = 'en'
-    vi.stubGlobal('confirm', vi.fn(() => true))
-    vi.stubGlobal('crypto', { randomUUID: () => 'publish_01' })
+    const calls: Array<{ url: string; body: Record<string, unknown> }> = []
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        const body = JSON.parse(String(init?.body)) as Record<string, unknown>
+        calls.push({ url, body })
+        if (url.endsWith('/publish')) {
+          return Response.json({ result: { status: 'published' } })
+        }
+        return Response.json({
+          draft: draft(body.mediaAssetIds as string[], 9),
+        })
+      }),
+    )
+    const { getByRole } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id])}
+        assets={allAssets}
+        publishedIds={[]}
+      />,
+    )
+
+    fireEvent.click(getByRole('button', { name: /Position 2: Chinatown/ }))
+    fireEvent.click(getByRole('button', { name: /Move earlier/ }))
+    fireEvent.click(getByRole('button', { name: /Publish/ }))
+    fireEvent.click(getByRole('button', { name: /Confirm publish/ }))
+
+    await waitFor(() =>
+      expect(calls.some((call) => call.url.endsWith('/publish'))).toBe(true),
+    )
+    expect(calls[0]!.url).toBe('/api/admin/media/photo-selection')
+    expect(calls[0]!.body.mediaAssetIds).toEqual([two.id, one.id])
+    const publish = calls.find((call) => call.url.endsWith('/publish'))!
+    expect(publish.body.expectedDraftRevision).toBe(9)
+  })
+
+  it('recovers from a revision conflict by reloading the draft in place', async () => {
+    document.documentElement.dataset.locale = 'en'
     vi.stubGlobal(
       'fetch',
       vi.fn(async () =>
-        Response.json({ error: 'ineligible_assets' }, { status: 409 }),
+        Response.json({ error: 'revision_conflict' }, { status: 409 }),
       ),
     )
+    const { getByRole, findByRole } = render(
+      <PhotoCuration
+        initialDraft={draft([one.id, two.id])}
+        assets={allAssets}
+        publishedIds={[]}
+      />,
+    )
+
+    fireEvent.click(getByRole('button', { name: /Position 2: Chinatown/ }))
+    fireEvent.click(getByRole('button', { name: /Move earlier/ }))
+
+    const reload = await findByRole('button', { name: /Reload draft/ })
+    expect(
+      (getByRole('button', { name: /Publish/ }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true)
+    fireEvent.click(reload)
+    expect(refresh).toHaveBeenCalledOnce()
+  })
+
+  it('keeps the publish idempotency key across a failed retry', async () => {
+    document.documentElement.dataset.locale = 'en'
+    const publishBodies: Array<{ idempotencyKey: string }> = []
+    let attempts = 0
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input)
+        if (url.endsWith('/publish')) {
+          publishBodies.push(JSON.parse(String(init?.body)))
+          attempts += 1
+          if (attempts === 1) {
+            return Response.json({ error: 'dependency_unavailable' }, { status: 503 })
+          }
+          return Response.json({ result: { status: 'published' } })
+        }
+        throw new Error(`Unexpected request: ${url}`)
+      }),
+    )
     const { getByRole, findByText } = render(
-      <PhotoSelectionEditor
-        initialDraft={{ revision: 2, mediaAssetIds: [first.id], updatedAt: null }}
-        initialAssets={[first]}
+      <PhotoCuration
+        initialDraft={draft([one.id])}
+        assets={allAssets}
+        publishedIds={[one.id]}
       />,
     )
 
     fireEvent.click(getByRole('button', { name: /Publish/ }))
+    fireEvent.click(getByRole('button', { name: /Confirm publish/ }))
+    await findByText(/safe to retry/)
 
-    expect(
-      await findByText(/The Draft contains Media Assets that are no longer eligible/),
-    ).toBeTruthy()
-  })
-
-  it('does not publish when passkey verification is cancelled', async () => {
-    document.documentElement.dataset.locale = 'en'
-    vi.stubGlobal('confirm', vi.fn(() => true))
-    vi.stubGlobal('crypto', { randomUUID: vi.fn(() => 'publish_01') })
-    clerk.verifyWithPasskey.mockRejectedValueOnce(
-      new Error('passkey cancelled'),
-    )
-    const fetchMock = vi.fn()
-    vi.stubGlobal('fetch', fetchMock)
-    const { getByRole } = render(
-      <PhotoSelectionEditor
-        initialDraft={{ revision: 2, mediaAssetIds: [first.id], updatedAt: null }}
-        initialAssets={[first]}
-      />,
-    )
-
-    fireEvent.click(getByRole('button', { name: /Publish/ }))
-
-    await waitFor(() => expect(clerk.verifyWithPasskey).toHaveBeenCalledOnce())
-    expect(fetchMock).not.toHaveBeenCalled()
-  })
-
-  it('reuses the publish key when cache refresh needs a safe retry', async () => {
-    document.documentElement.dataset.locale = 'en'
-    vi.stubGlobal('confirm', vi.fn(() => true))
-    vi.stubGlobal('crypto', { randomUUID: vi.fn(() => 'publish_01') })
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(
-        Response.json(
-          { error: 'cache_invalidation_failed' },
-          { status: 503 },
-        ),
-      )
-      .mockResolvedValueOnce(Response.json({ publication: { status: 'published' } }))
-    vi.stubGlobal('fetch', fetchMock)
-    const { getByRole, findByText } = render(
-      <PhotoSelectionEditor
-        initialDraft={{ revision: 2, mediaAssetIds: [first.id], updatedAt: null }}
-        initialAssets={[first]}
-      />,
-    )
-    const publish = getByRole('button', { name: /Publish/ })
-
-    fireEvent.click(publish)
-    expect(
-      await findByText(/was published, but its public cache was not refreshed/),
-    ).toBeTruthy()
-    fireEvent.click(publish)
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2))
-
-    const requests = fetchMock.mock.calls.map(([, init]) =>
-      JSON.parse(String(init?.body)),
-    )
-    expect(requests).toEqual([
-      { expectedDraftRevision: 2, idempotencyKey: 'publish_01' },
-      { expectedDraftRevision: 2, idempotencyKey: 'publish_01' },
-    ])
+    // The confirmation panel stays open after a failure — retry directly.
+    fireEvent.click(getByRole('button', { name: /Confirm publish/ }))
+    await waitFor(() => expect(publishBodies).toHaveLength(2))
+    expect(publishBodies[0]!.idempotencyKey).toBe(publishBodies[1]!.idempotencyKey)
   })
 })

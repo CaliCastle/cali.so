@@ -2,12 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
-import {
-  PasskeyVerificationError,
-  usePasskeyVerification,
-} from '~/lib/admin/passkey-client'
 import { T } from '~/lib/i18n'
-import { localize, useLocale } from '~/lib/locale-client'
 
 import {
   AvailabilityWindowForm,
@@ -40,16 +35,16 @@ export type PreviewSlotViewModel = {
   endsAt: string
 }
 
-export type AdminQueryNotices = {
+export type AmaSettingsNotices = {
   availability?: 'saved' | 'invalid' | 'failed'
   calendar?: GoogleConnectionStatus
 }
 
-export type AdminDashboardProps = {
+export type AmaSettingsProps = {
   windows: readonly AvailabilityWindowViewModel[]
   googleConnection: GoogleConnectionViewModel
   previewSlots: readonly PreviewSlotViewModel[]
-  notices?: AdminQueryNotices
+  notices?: AmaSettingsNotices
 }
 
 const ownerTimeZone = 'Asia/Taipei'
@@ -79,7 +74,7 @@ function QueryNotices({
   notices,
   restoreFocus = false,
 }: {
-  notices: AdminQueryNotices | undefined
+  notices: AmaSettingsNotices | undefined
   restoreFocus?: boolean
 }) {
   const noticeRef = useRef<HTMLDivElement>(null)
@@ -138,7 +133,7 @@ function QueryNotices({
       id={availability ? 'availability-notice' : 'calendar-notice'}
       role={isAlert ? 'alert' : 'status'}
       tabIndex={restoreFocus ? -1 : undefined}
-      className="mt-4 rounded-md bg-surface-1 px-4 py-3 text-sm leading-6"
+      className="mt-4 rounded-md bg-surface-1 px-4 py-3 text-sm leading-6 outline-none"
     >
       {availability && <T zh={availability.zh} en={availability.en} />}
       {availability && calendar && ' '}
@@ -156,49 +151,50 @@ function GoogleCalendarSection({
   notice?: GoogleConnectionStatus
   restoreNoticeFocus: boolean
 }) {
-  const locale = useLocale()
   const [pending, setPending] = useState<'connect' | 'disconnect' | null>(null)
-  const [passkeyCancelled, setPasskeyCancelled] = useState(false)
-  const verifyWithPasskey = usePasskeyVerification()
+  const [disconnectArmed, setDisconnectArmed] = useState(false)
+  const disconnectTimerRef = useRef<number | null>(null)
 
-  async function verifyAndSubmit(
-    form: HTMLFormElement,
-    action: 'connect' | 'disconnect',
-  ) {
-    if (pending !== null) return
-    setPasskeyCancelled(false)
-    setPending(action)
-    try {
-      await verifyWithPasskey()
-      form.submit()
-    } catch (error) {
-      setPending(null)
-      if (error instanceof PasskeyVerificationError) {
-        setPasskeyCancelled(true)
+  useEffect(
+    () => () => {
+      if (disconnectTimerRef.current !== null) {
+        window.clearTimeout(disconnectTimerRef.current)
       }
-    }
-  }
+    },
+    [],
+  )
 
   function connect(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    void verifyAndSubmit(event.currentTarget, 'connect')
-  }
-
-  function disconnect(event: FormEvent<HTMLFormElement>) {
-    if (
-      !globalThis.confirm(
-        localize(
-          locale,
-          '断开 Google 日历？可预约时段会保留，但在重新连接前无法检查日历冲突。',
-          'Disconnect Google Calendar? Availability Windows stay saved, but calendar conflicts cannot be checked until you reconnect.',
-        ),
-      )
-    ) {
+    if (pending !== null) {
       event.preventDefault()
       return
     }
-    event.preventDefault()
-    void verifyAndSubmit(event.currentTarget, 'disconnect')
+    setPending('connect')
+  }
+
+  // Disconnecting is a two-step armed action: the first press asks for
+  // confirmation on the button itself and disarms after 4 seconds.
+  function disconnect(event: FormEvent<HTMLFormElement>) {
+    if (pending !== null) {
+      event.preventDefault()
+      return
+    }
+    if (!disconnectArmed) {
+      event.preventDefault()
+      setDisconnectArmed(true)
+      if (disconnectTimerRef.current !== null) {
+        window.clearTimeout(disconnectTimerRef.current)
+      }
+      disconnectTimerRef.current = window.setTimeout(
+        () => setDisconnectArmed(false),
+        4000,
+      )
+      return
+    }
+    if (disconnectTimerRef.current !== null) {
+      window.clearTimeout(disconnectTimerRef.current)
+    }
+    setPending('disconnect')
   }
 
   const stateCopy = {
@@ -235,14 +231,14 @@ function GoogleCalendarSection({
 
   return (
     <section
-      className="border-t border-dashed border-border pt-6"
+      className="mt-8 hairline-top pt-6"
       aria-labelledby="google-heading"
     >
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="max-w-md">
-          <h2 id="google-heading" className="text-sm font-medium">
+          <h3 id="google-heading" className="text-sm font-medium">
             <T zh="Google 日历" en="Google Calendar" />
-          </h2>
+          </h3>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             <T zh={copy.zh} en={copy.en} />
           </p>
@@ -258,7 +254,7 @@ function GoogleCalendarSection({
               <button
                 type="submit"
                 disabled={pending !== null}
-                className="min-h-11 min-w-[10rem] touch-manipulation rounded-md bg-foreground px-4 text-sm font-medium text-background outline-none transition-transform duration-100 ease-[ease] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none"
+                className="min-h-11 touch-manipulation rounded-full bg-foreground px-4 text-sm font-medium text-background outline-none transition-transform duration-100 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none"
               >
                 {pending === 'connect' ? (
                   <T zh="正在连接…" en="Connecting…" />
@@ -277,10 +273,16 @@ function GoogleCalendarSection({
               <button
                 type="submit"
                 disabled={pending !== null}
-                className="min-h-11 min-w-[7.5rem] touch-manipulation rounded-md px-3 text-sm text-muted-foreground outline-none transition-transform duration-100 ease-[ease] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 focus-visible:ring-foreground motion-reduce:transform-none motion-reduce:transition-none"
+                className={`min-h-11 touch-manipulation rounded-full px-3 text-sm outline-none transition-transform duration-100 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 motion-reduce:transform-none motion-reduce:transition-none ${
+                  disconnectArmed
+                    ? 'text-destructive focus-visible:ring-destructive'
+                    : 'text-muted-foreground focus-visible:ring-foreground'
+                }`}
               >
                 {pending === 'disconnect' ? (
                   <T zh="正在断开…" en="Disconnecting…" />
+                ) : disconnectArmed ? (
+                  <T zh="确认断开？" en="Confirm disconnect?" />
                 ) : (
                   <T zh="断开" en="Disconnect" />
                 )}
@@ -290,22 +292,19 @@ function GoogleCalendarSection({
         </div>
       </div>
 
+      {disconnectArmed && pending === null && (
+        <p className="mt-3 text-sm leading-5 text-muted-foreground">
+          <T
+            zh="可预约时段会保留，但在重新连接前无法检查日历冲突。"
+            en="Availability Windows stay saved, but calendar conflicts cannot be checked until you reconnect."
+          />
+        </p>
+      )}
+
       <QueryNotices
         notices={notice ? { calendar: notice } : undefined}
         restoreFocus={restoreNoticeFocus}
       />
-
-      {passkeyCancelled && (
-        <p
-          role="status"
-          className="mt-4 text-sm leading-6 text-muted-foreground"
-        >
-          <T
-            zh="未完成通行密钥验证，Google 日历没有变化。"
-            en="Passkey verification was not completed. Google Calendar was not changed."
-          />
-        </p>
-      )}
 
       {connection.identity && (
         <dl className="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[7rem_minmax(0,1fr)]">
@@ -333,14 +332,11 @@ function SlotPreview({ slots }: { slots: readonly PreviewSlotViewModel[] }) {
   const visibleSlots = slots.slice(0, previewLimit)
 
   return (
-    <section
-      className="border-t border-dashed border-border pt-6"
-      aria-labelledby="preview-heading"
-    >
+    <section className="mt-8 hairline-top pt-6" aria-labelledby="preview-heading">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id="preview-heading" className="text-sm font-medium">
+        <h3 id="preview-heading" className="text-sm font-medium">
           <T zh="开放时间预览" en="Open-time preview" />
-        </h2>
+        </h3>
         <span className="text-sm text-muted-foreground tabular-nums">
           Asia/Taipei · UTC+8
         </span>
@@ -394,41 +390,32 @@ function SlotPreview({ slots }: { slots: readonly PreviewSlotViewModel[] }) {
   )
 }
 
-export function AdminDashboard({
+// The scheduling settings live at the bottom of the AMA page: Availability
+// Windows and the Google Calendar connection keep their native form-POST
+// contract (303 back to /admin/ama with ?availability= / ?calendar= notices).
+export function AmaSettings({
   windows,
   googleConnection,
   previewSlots,
   notices,
-}: AdminDashboardProps) {
+}: AmaSettingsProps) {
   return (
-    <div className="w-full max-w-[37.5rem]">
-      <h1 className="text-sm font-semibold">
-        <T zh="控制台" en="Dashboard" />
-      </h1>
+    <section aria-labelledby="settings-heading" className="mt-10 hairline-top pt-6">
+      <h2 id="settings-heading" className="text-sm font-medium text-muted-foreground">
+        <T zh="设置" en="Settings" />
+      </h2>
+      <p className="mt-1 text-sm leading-6 text-muted-foreground">
+        <T
+          zh="每次 60 分钟 · 至少提前 24 小时 · 开放未来 30 天 · 前后各留 15 分钟"
+          en="60 minutes · 24-hour notice · 30-day horizon · 15-minute buffers"
+        />
+      </p>
 
-      <section
-        className="mt-10 border-t border-dashed border-border pt-6"
-        aria-labelledby="policy-heading"
-      >
-        <h2 id="policy-heading" className="text-sm font-medium">
-          <T zh="规则" en="Policy" />
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          <T
-            zh="每次 60 分钟 · 至少提前 24 小时 · 开放未来 30 天 · 前后各留 15 分钟"
-            en="60 minutes · 24-hour notice · 30-day horizon · 15-minute buffers"
-          />
-        </p>
-      </section>
-
-      <section
-        className="mt-8 border-t border-dashed border-border pt-6"
-        aria-labelledby="availability-heading"
-      >
+      <section className="mt-6" aria-labelledby="availability-heading">
         <div className="max-w-md">
-          <h2 id="availability-heading" className="text-sm font-medium">
+          <h3 id="availability-heading" className="text-sm font-medium">
             <T zh="每周可预约时段" en="Weekly Availability Windows" />
-          </h2>
+          </h3>
           <p className="mt-2 text-sm leading-6 text-muted-foreground">
             <T
               zh="所有时间都按 Asia/Taipei 解释。可以在同一天添加多个时段。"
@@ -462,7 +449,7 @@ export function AdminDashboard({
           </div>
         )}
 
-        <div className="mt-6 border-t border-dotted border-border pt-5">
+        <div className="mt-6 hairline-top pt-5">
           <p className="mb-3 text-sm text-muted-foreground">
             <T zh="添加时段" en="Add a window" />
           </p>
@@ -476,16 +463,14 @@ export function AdminDashboard({
         </div>
       </section>
 
-      <div className="mt-8 grid gap-8">
-        <GoogleCalendarSection
-          connection={googleConnection}
-          notice={notices?.calendar}
-          restoreNoticeFocus={
-            notices?.calendar !== undefined && notices.availability === undefined
-          }
-        />
-        <SlotPreview slots={previewSlots} />
-      </div>
-    </div>
+      <GoogleCalendarSection
+        connection={googleConnection}
+        notice={notices?.calendar}
+        restoreNoticeFocus={
+          notices?.calendar !== undefined && notices.availability === undefined
+        }
+      />
+      <SlotPreview slots={previewSlots} />
+    </section>
   )
 }

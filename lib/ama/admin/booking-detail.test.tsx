@@ -3,19 +3,8 @@
 import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const clerk = vi.hoisted(() => ({
-  verifyWithPasskey: vi.fn(),
-}))
-
 const router = vi.hoisted(() => ({
   refresh: vi.fn(),
-}))
-
-vi.mock('@clerk/nextjs', () => ({
-  useSession: () => ({
-    isLoaded: true,
-    session: { id: 'sess_owner', verifyWithPasskey: clerk.verifyWithPasskey },
-  }),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -33,7 +22,6 @@ const fetchMock = vi.fn<typeof fetch>()
 vi.stubGlobal('fetch', fetchMock)
 
 beforeEach(() => {
-  clerk.verifyWithPasskey.mockResolvedValue({ status: 'complete' })
   // Notices from localize() follow the admin locale preference.
   document.documentElement.dataset.locale = 'en'
 })
@@ -41,23 +29,12 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
   fetchMock.mockReset()
-  clerk.verifyWithPasskey.mockReset()
   router.refresh.mockReset()
   delete document.documentElement.dataset.locale
 })
 
 function jsonResponse(body: unknown, status = 200) {
   return Response.json(body, { status })
-}
-
-const reverificationDenial = {
-  clerk_error: {
-    type: 'forbidden',
-    reason: 'reverification-error',
-    metadata: {
-      reverification: { level: 'first_factor', afterMinutes: 10 },
-    },
-  },
 }
 
 function buttonWithText(container: HTMLElement, text: string) {
@@ -119,6 +96,13 @@ const events = [
     occurredAt: '2026-07-02T02:00:00.000Z',
     detail: { kind: 'issue_refund' },
   },
+  {
+    id: 'evt_3',
+    event: 'artifacts_updated',
+    actor: 'system' as const,
+    occurredAt: '2026-07-03T02:00:00.000Z',
+    detail: { calendar: { eventId: 'gcal_evt_1' } },
+  },
 ]
 
 const operations = [
@@ -157,7 +141,13 @@ describe('AMA booking detail', () => {
     expect(text).toContain('gcal_evt_1')
     expect(text).toContain('booking_confirmed')
     expect(text).toContain('operation_retried')
-    expect(text).toContain('{"kind":"issue_refund"}')
+    // A flat event detail renders as definition rows, not raw JSON.
+    const detailTerms = Array.from(container.querySelectorAll('ol dl dt'))
+    expect(detailTerms.some((term) => term.textContent === 'kind')).toBe(true)
+    expect(text).toContain('issue_refund')
+    expect(text).not.toContain('{"kind":"issue_refund"}')
+    // A nested detail keeps the JSON fallback.
+    expect(text).toContain('{"calendar":{"eventId":"gcal_evt_1"}}')
     expect(text).toContain('(Asia/Taipei)')
     expect(text).toContain('(America/New_York)')
     // Operations for this Booking render with the shared rows.
@@ -202,14 +192,13 @@ describe('AMA booking detail', () => {
         }),
       ),
     )
-    expect(clerk.verifyWithPasskey).toHaveBeenCalledOnce()
     await waitFor(() => expect(container.textContent).toContain('was cancelled'))
     expect(router.refresh).toHaveBeenCalled()
   })
 
-  it('surfaces a server reverification denial and succeeds on the owner retry', async () => {
+  it('keeps the Booking unchanged on a failed cancel and succeeds on retry', async () => {
     fetchMock
-      .mockResolvedValueOnce(jsonResponse(reverificationDenial, 403))
+      .mockResolvedValueOnce(jsonResponse({ error: 'dependency_unavailable' }, 503))
       .mockResolvedValueOnce(jsonResponse({ result: 'done' }))
     const { container } = renderDetail()
 
@@ -218,7 +207,7 @@ describe('AMA booking detail', () => {
 
     await waitFor(() =>
       expect(container.textContent).toContain(
-        'Passkey verification could not be confirmed.',
+        'The cancellation did not complete and the Booking is unchanged.',
       ),
     )
     expect(fetchMock).toHaveBeenCalledTimes(1)
@@ -228,7 +217,6 @@ describe('AMA booking detail', () => {
 
     await waitFor(() => expect(container.textContent).toContain('was cancelled'))
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(clerk.verifyWithPasskey).toHaveBeenCalledTimes(2)
   })
 
   it('reschedules through the slot picker', async () => {

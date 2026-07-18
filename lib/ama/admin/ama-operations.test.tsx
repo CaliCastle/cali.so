@@ -34,8 +34,13 @@ function buttonWithText(container: HTMLElement, text: string) {
   return button
 }
 
+const settings: AmaOperationsProps['settings'] = {
+  windows: [{ id: 1, isoWeekday: 1, startMinute: 540, endMinute: 720 }],
+  googleConnection: { status: 'disconnected', identity: null },
+  previewSlots: [],
+}
+
 const fixtures: AmaOperationsProps = {
-  counts: { pending: 1, failed: 2, succeeded: 5 },
   upcoming: [
     {
       id: 'bk_upcoming',
@@ -47,6 +52,8 @@ const fixtures: AmaOperationsProps = {
       startsAt: '2026-08-01T02:00:00.000Z',
       endsAt: '2026-08-01T03:00:00.000Z',
       refundStatus: 'none',
+      hasMeetingLink: true,
+      hasBrief: false,
     },
   ],
   past: [
@@ -60,6 +67,8 @@ const fixtures: AmaOperationsProps = {
       startsAt: '2026-06-01T02:00:00.000Z',
       endsAt: '2026-06-01T03:00:00.000Z',
       refundStatus: 'none',
+      hasMeetingLink: true,
+      hasBrief: true,
     },
   ],
   attention: [
@@ -73,6 +82,8 @@ const fixtures: AmaOperationsProps = {
       startsAt: '2026-08-02T02:00:00.000Z',
       endsAt: '2026-08-02T03:00:00.000Z',
       refundStatus: 'failed',
+      hasMeetingLink: false,
+      hasBrief: true,
     },
   ],
   timeRequests: [
@@ -86,7 +97,7 @@ const fixtures: AmaOperationsProps = {
       createdAt: '2026-07-10T09:00:00.000Z',
     },
   ],
-  operations: [
+  failedOperations: [
     {
       id: 'op_failed',
       kind: 'issue_refund',
@@ -97,85 +108,84 @@ const fixtures: AmaOperationsProps = {
       nextAttemptAt: '2026-07-16T00:00:00.000Z',
       lastErrorCode: 'stripe_unavailable',
     },
-    {
-      id: 'op_pending',
-      kind: 'send_reminder',
-      bookingId: 'bk_upcoming',
-      status: 'pending',
-      attemptCount: 0,
-      maxAttempts: 8,
-      nextAttemptAt: '2026-07-20T00:00:00.000Z',
-      lastErrorCode: null,
-    },
   ],
+  settings,
 }
 
 const emptyFixtures: AmaOperationsProps = {
-  counts: {},
   upcoming: [],
   past: [],
   attention: [],
   timeRequests: [],
-  operations: [],
+  failedOperations: [],
+  settings,
 }
 
-describe('AMA operations dashboard', () => {
-  it('renders the status strip, bookings, requests, and operations', () => {
+describe('AMA admin page', () => {
+  it('leads with attention, then upcoming prep, and retires the status strip', () => {
     const { container } = render(<AmaOperations {...fixtures} />)
     const text = container.textContent!
 
-    // Status strip highlights failures and keeps counts tabular.
-    expect(text).toContain('Failed')
-    expect(container.querySelector('dl .text-destructive')).not.toBeNull()
+    // Header counts: upcoming and everything needing a hand.
+    const countLine = container.querySelector('h1 + p')!
+    expect(countLine.textContent).toContain('1 ')
+    expect(countLine.textContent).toContain('3 ')
+    expect(countLine.className).toContain('tabular-nums')
 
-    // Upcoming booking row with owner and guest zone labels.
-    expect(text).toContain('Ada Lovelace')
-    expect(text).toContain('(Asia/Taipei)')
-    expect(text).toContain('(America/New_York)')
+    // Attention comes first: the broken booking, the failed operation, and
+    // the new Alternate Time Request.
+    const sections = Array.from(container.querySelectorAll('section'))
+    expect(sections[0]?.textContent).toContain('Alan Turing')
+    expect(sections[0]?.textContent).toContain('stripe_unavailable')
+    expect(sections[0]?.textContent).toContain('katherine@example.com')
+    expect(sections[0]?.textContent).toContain('Weekday evenings after 19:00')
+    expect(sections[0]?.textContent).toContain('Any Friday works best.')
+    expect(sections[0]?.querySelector('.text-destructive')).not.toBeNull()
+
+    // Upcoming rows link to the Booking detail with both time zones and
+    // prep-at-a-glance indicators.
     expect(
       container.querySelector('a[href="/admin/ama/bookings/bk_upcoming"]'),
     ).not.toBeNull()
+    expect(text).toContain('(Asia/Taipei)')
+    expect(text).toContain('(America/New_York)')
+    expect(text).toContain('Meeting link ready')
+    expect(text).toContain('No Booking Brief')
 
-    // Alternate Time Request content.
-    expect(text).toContain('katherine@example.com')
-    expect(text).toContain('Weekday evenings after 19:00')
-    expect(text).toContain('Any Friday works best.')
+    // The operation-status count strip is gone.
+    expect(text).not.toContain('Succeeded')
+    expect(text).not.toContain('Running')
 
-    // Operation rows: kind, attempts, error code, booking link.
-    expect(text).toContain('Issue refund')
-    expect(text).toContain('8/8')
-    expect(text).toContain('stripe_unavailable')
-    expect(text).toContain('View Booking')
+    // Settings render at the bottom with the native form contract.
+    expect(text).toContain('Weekly Availability Windows')
+    expect(
+      container.querySelector('form[action="/api/admin/ama/availability"]'),
+    ).not.toBeNull()
+    expect(
+      container.querySelector('form[action="/api/admin/ama/google/connect"]'),
+    ).not.toBeNull()
   })
 
-  it('renders empty states that preserve every section', () => {
+  it('collapses past Bookings behind a toggle instead of the front page', () => {
+    const { container } = render(<AmaOperations {...fixtures} />)
+
+    const details = container.querySelector('details')!
+    expect(details.open).toBe(false)
+    expect(details.textContent).toContain('Grace Hopper')
+    expect(details.querySelector('summary')?.textContent).toContain('1')
+  })
+
+  it('shows one quiet all-clear line when nothing needs attention', () => {
     const { container } = render(<AmaOperations {...emptyFixtures} />)
     const text = container.textContent!
 
+    expect(text).toContain('All clear.')
     expect(text).toContain('There are no upcoming Bookings.')
-    expect(text).toContain('There are no new Alternate Time Requests.')
-    expect(text).toContain('There are no operations needing recovery.')
-    // The status strip keeps its shape with zero counts.
-    expect(text).toContain('Pending')
-    expect(container.querySelectorAll('section').length).toBeGreaterThanOrEqual(4)
+    expect(text).toContain('There are no past Bookings yet.')
+    expect(container.querySelector('.text-destructive')).toBeNull()
   })
 
-  it('switches booking lists through the tabs', () => {
-    const { container } = render(<AmaOperations {...fixtures} />)
-
-    expect(container.textContent).toContain('Ada Lovelace')
-    expect(container.textContent).not.toContain('Grace Hopper')
-
-    fireEvent.click(buttonWithText(container, 'Past'))
-    expect(container.textContent).toContain('Grace Hopper')
-    expect(container.textContent).not.toContain('Ada Lovelace')
-
-    fireEvent.click(buttonWithText(container, 'Needs attention'))
-    expect(container.textContent).toContain('Alan Turing')
-    expect(container.textContent).toContain('Refund failed')
-  })
-
-  it('resolves an Alternate Time Request and removes its row', async () => {
+  it('resolves an Alternate Time Request, removes its row, and drops the count', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ result: 'done' }))
     const { container } = render(<AmaOperations {...fixtures} />)
 
@@ -192,9 +202,10 @@ describe('AMA operations dashboard', () => {
       }),
     )
     expect(container.textContent).toContain('Marked as resolved.')
+    expect(container.querySelector('h1 + p')?.textContent).toContain('2 ')
   })
 
-  it('retries a failed operation and reconciles its status and the counts', async () => {
+  it('retries a failed operation from the attention section', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ result: 'done' }))
     const { container } = render(<AmaOperations {...fixtures} />)
 
@@ -218,10 +229,7 @@ describe('AMA operations dashboard', () => {
         item.textContent?.includes('Retry'),
       ),
     ).toBe(false)
-    // Counts moved one operation from failed to pending: 2 -> 1, 1 -> 2.
-    const strip = container.querySelector('dl')!
-    expect(strip.textContent).toContain('1')
-    expect(strip.textContent).toContain('2')
+    expect(container.querySelector('h1 + p')?.textContent).toContain('2 ')
   })
 
   it('requires an inline confirm before marking an operation resolved', async () => {

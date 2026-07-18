@@ -1,5 +1,4 @@
 import type { OwnerAccess } from '~/lib/admin/authorization'
-import type { OwnerReverifier } from '~/lib/admin/reverification'
 
 import { securityDenialHeaders } from '../security/request-policy'
 import type { AmaSecurity, PrivilegedAuditEvent } from '../security/service'
@@ -13,7 +12,6 @@ type AdminBookingHandlerDependencies = {
   service: BookingAdminService
   security: AmaSecurity
   baseUrl: URL
-  reverifier: OwnerReverifier
 }
 
 function json(status: number, body: unknown) {
@@ -47,9 +45,8 @@ async function requestJson(request: Request): Promise<Record<string, unknown> | 
 async function authorize(
   dependencies: AdminBookingHandlerDependencies,
   request: Request,
-  options: { reverify: boolean },
 ): Promise<{ response: Response } | { actorId: string }> {
-  const { authenticator, security, reverifier } = dependencies
+  const { authenticator, security } = dependencies
   const blocked = await security.protectOwnerAdminMutation(request)
   if (blocked) return { response: blocked }
 
@@ -72,16 +69,6 @@ async function authorize(
   }
   const limited = await security.limitAdminMutation(request, access.principal.actorId)
   if (limited) return { response: limited }
-  if (options.reverify) {
-    try {
-      const required = await reverifier.verify(request)
-      if (required) return { response: required }
-    } catch {
-      return {
-        response: new Response(null, { status: 503, headers: securityDenialHeaders() }),
-      }
-    }
-  }
   return { actorId: access.principal.actorId }
 }
 
@@ -113,10 +100,7 @@ export function createAdminBookingActionHandler(
     const action = typeof body?.action === 'string' ? body.action : null
     if (!body || !action) return json(400, { error: 'invalid_request' })
 
-    // Cancellation, rescheduling, and refunds move money or destroy a
-    // session; they require a fresh first factor like other high-impact
-    // admin actions.
-    const authorized = await authorize(dependencies, request, { reverify: true })
+    const authorized = await authorize(dependencies, request)
     if ('response' in authorized) return authorized.response
 
     try {
@@ -159,7 +143,7 @@ export function createAdminOperationActionHandler(
     if (!body || (action !== 'retry' && action !== 'resolve')) {
       return json(400, { error: 'invalid_request' })
     }
-    const authorized = await authorize(dependencies, request, { reverify: false })
+    const authorized = await authorize(dependencies, request)
     if ('response' in authorized) return authorized.response
     try {
       const result =
@@ -190,7 +174,7 @@ export function createAdminTimeRequestActionHandler(
     if (!body || (action !== 'resolve' && action !== 'dismiss')) {
       return json(400, { error: 'invalid_request' })
     }
-    const authorized = await authorize(dependencies, request, { reverify: false })
+    const authorized = await authorize(dependencies, request)
     if ('response' in authorized) return authorized.response
     try {
       const result = await service.resolveAlternateTimeRequest(

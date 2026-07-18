@@ -1,69 +1,58 @@
 // @vitest-environment jsdom
 
-import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-const clerk = vi.hoisted(() => ({
-  verifyWithPasskey: vi.fn(),
-}))
-
-vi.mock('@clerk/nextjs', () => ({
-  useSession: () => ({
-    isLoaded: true,
-    session: { id: 'sess_owner', verifyWithPasskey: clerk.verifyWithPasskey },
-  }),
-  useReverification: (fetcher: unknown) => fetcher,
-}))
-
-import { AdminDashboard } from '../../../app/admin/(protected)/AdminDashboard'
-import { AvailabilityWindowForm } from '../../../app/admin/(protected)/AvailabilityWindowForm'
+import {
+  AmaSettings,
+  type AmaSettingsProps,
+} from '../../../app/admin/(protected)/ama/AmaSettings'
+import { AvailabilityWindowForm } from '../../../app/admin/(protected)/ama/AvailabilityWindowForm'
 import { LOCALE_CHANGE_EVENT } from '../../locale-client'
-
-beforeEach(() => {
-  clerk.verifyWithPasskey.mockResolvedValue({ status: 'complete' })
-})
 
 afterEach(() => {
   cleanup()
   vi.restoreAllMocks()
+  vi.useRealTimers()
   delete document.documentElement.dataset.locale
-  clerk.verifyWithPasskey.mockReset()
 })
 
-function renderDashboard(
-  status: Parameters<typeof AdminDashboard>[0]['googleConnection']['status'],
-) {
-  return renderToStaticMarkup(
-    <AdminDashboard
-      windows={[
-        { id: 1, isoWeekday: 1, startMinute: 540, endMinute: 720 },
-      ]}
-      googleConnection={{
-        status,
-        identity:
-          status === 'disconnected'
-            ? null
-            : {
-                calendarId: 'owner@example.com',
-                summary: 'Cali Castle',
-                email: 'owner@example.com',
-              },
-      }}
-      previewSlots={[
-        {
-          startsAt: '2026-07-15T01:00:00.000Z',
-          endsAt: '2026-07-15T02:00:00.000Z',
-        },
-      ]}
-      notices={{ availability: 'invalid', calendar: status }}
-    />,
-  )
+function settingsProps(
+  status: AmaSettingsProps['googleConnection']['status'],
+): AmaSettingsProps {
+  return {
+    windows: [{ id: 1, isoWeekday: 1, startMinute: 540, endMinute: 720 }],
+    googleConnection: {
+      status,
+      identity:
+        status === 'disconnected'
+          ? null
+          : {
+              calendarId: 'owner@example.com',
+              summary: 'Cali Castle',
+              email: 'owner@example.com',
+            },
+    },
+    previewSlots: [
+      {
+        startsAt: '2026-07-15T01:00:00.000Z',
+        endsAt: '2026-07-15T02:00:00.000Z',
+      },
+    ],
+    notices: { availability: 'invalid', calendar: status },
+  }
 }
 
-describe('AMA admin dashboard UI contract', () => {
+function renderSettingsMarkup(
+  status: AmaSettingsProps['googleConnection']['status'],
+) {
+  return renderToStaticMarkup(<AmaSettings {...settingsProps(status)} />)
+}
+
+describe('AMA settings UI contract', () => {
   it('keeps bilingual scheduling content and accessible form recovery in static HTML', () => {
-    const html = renderDashboard('expired')
+    const html = renderSettingsMarkup('expired')
 
     expect(html).toMatch(/<label[^>]+for="[^"]+-weekday-zh"[^>]+data-zh-block="true"/)
     expect(html).toMatch(/<label[^>]+for="[^"]+-weekday-en"[^>]+data-en-block="true"/)
@@ -79,7 +68,7 @@ describe('AMA admin dashboard UI contract', () => {
   })
 
   it('offers recovery and local disconnect for an unhealthy Calendar connection', () => {
-    const html = renderDashboard('revoked')
+    const html = renderSettingsMarkup('revoked')
 
     expect(html).toContain('action="/api/admin/ama/google/connect"')
     expect(html).toContain('action="/api/admin/ama/google/disconnect"')
@@ -87,43 +76,15 @@ describe('AMA admin dashboard UI contract', () => {
   })
 
   it('does not offer disconnect before a Calendar has connected', () => {
-    const html = renderDashboard('disconnected')
+    const html = renderSettingsMarkup('disconnected')
 
     expect(html).toContain('action="/api/admin/ama/google/connect"')
     expect(html).not.toContain('action="/api/admin/ama/google/disconnect"')
   })
 
-  it('does not submit a Google integration change when passkey verification is cancelled', async () => {
-    clerk.verifyWithPasskey.mockRejectedValueOnce(
-      new Error('passkey cancelled'),
-    )
-    const nativeSubmit = vi
-      .spyOn(HTMLFormElement.prototype, 'submit')
-      .mockImplementation(() => undefined)
+  it('submits Google connect directly and locks in a pending state', () => {
     const { container } = render(
-      <AdminDashboard
-        windows={[]}
-        googleConnection={{ status: 'disconnected', identity: null }}
-        previewSlots={[]}
-      />,
-    )
-
-    fireEvent.submit(
-      container.querySelector<HTMLFormElement>(
-        'form[action="/api/admin/ama/google/connect"]',
-      )!,
-    )
-
-    await waitFor(() => expect(clerk.verifyWithPasskey).toHaveBeenCalledOnce())
-    expect(nativeSubmit).not.toHaveBeenCalled()
-  })
-
-  it('submits a Google integration change only after passkey verification', async () => {
-    const nativeSubmit = vi
-      .spyOn(HTMLFormElement.prototype, 'submit')
-      .mockImplementation(() => undefined)
-    const { container } = render(
-      <AdminDashboard
+      <AmaSettings
         windows={[]}
         googleConnection={{ status: 'disconnected', identity: null }}
         previewSlots={[]}
@@ -133,11 +94,52 @@ describe('AMA admin dashboard UI contract', () => {
       'form[action="/api/admin/ama/google/connect"]',
     )!
 
-    fireEvent.submit(form)
+    const firstSubmit = fireEvent.submit(form)
+    expect(firstSubmit).toBe(true)
+    expect(form.querySelector('button')?.textContent).toContain('Connecting')
 
-    await waitFor(() => expect(nativeSubmit).toHaveBeenCalledOnce())
-    expect(clerk.verifyWithPasskey).toHaveBeenCalledOnce()
-    expect(nativeSubmit).toHaveBeenCalledWith()
+    const repeatSubmit = fireEvent.submit(form)
+    expect(repeatSubmit).toBe(false)
+  })
+
+  it('requires arming disconnect before the form posts, and disarms after 4s', () => {
+    vi.useFakeTimers()
+    const { container } = render(
+      <AmaSettings
+        windows={[]}
+        googleConnection={{
+          status: 'connected',
+          identity: {
+            calendarId: 'owner@example.com',
+            summary: 'Cali Castle',
+            email: 'owner@example.com',
+          },
+        }}
+        previewSlots={[]}
+      />,
+    )
+    const form = container.querySelector<HTMLFormElement>(
+      'form[action="/api/admin/ama/google/disconnect"]',
+    )!
+    const button = form.querySelector('button')!
+
+    // The first submit arms the button instead of posting.
+    const armed = fireEvent.submit(form)
+    expect(armed).toBe(false)
+    expect(button.textContent).toContain('Confirm disconnect?')
+
+    // Left alone, the armed state expires.
+    act(() => {
+      vi.advanceTimersByTime(4000)
+    })
+    expect(button.textContent).toContain('Disconnect')
+    expect(button.textContent).not.toContain('Confirm')
+
+    // Arm again and confirm within the window: the form posts.
+    fireEvent.submit(form)
+    const confirmed = fireEvent.submit(form)
+    expect(confirmed).toBe(true)
+    expect(button.textContent).toContain('Disconnecting')
   })
 
   it('preserves an edited weekday when the locale changes mid-form', () => {
@@ -180,7 +182,7 @@ describe('AMA admin dashboard UI contract', () => {
 
   it('restores focus to mutation feedback after a redirect render', () => {
     render(
-      <AdminDashboard
+      <AmaSettings
         windows={[]}
         googleConnection={{ status: 'disconnected', identity: null }}
         previewSlots={[]}
@@ -192,8 +194,8 @@ describe('AMA admin dashboard UI contract', () => {
     expect(document.activeElement?.getAttribute('tabindex')).toBe('-1')
   })
 
-  it('keeps delete idle when confirmation is cancelled and labels the accepted action', () => {
-    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+  it('requires arming delete before the form posts, and disarms after 4s', () => {
+    vi.useFakeTimers()
     const { container } = render(
       <AvailabilityWindowForm
         window={{ id: 1, isoWeekday: 1, startMinute: 540, endMinute: 720 }}
@@ -203,11 +205,19 @@ describe('AMA admin dashboard UI contract', () => {
     form.addEventListener('submit', (event) => event.preventDefault())
     const remove = container.querySelector<HTMLButtonElement>('button[value="delete"]')!
 
+    // The first press arms the button instead of deleting.
     fireEvent.click(remove)
-    expect(confirm).toHaveBeenCalledOnce()
     expect(remove.disabled).toBe(false)
+    expect(remove.textContent).toContain('Confirm delete?')
 
-    confirm.mockReturnValue(true)
+    // Left alone, the armed state expires.
+    act(() => {
+      vi.advanceTimersByTime(4000)
+    })
+    expect(remove.textContent).not.toContain('Confirm')
+
+    // Arm again and confirm within the window: the delete submits.
+    fireEvent.click(remove)
     fireEvent.click(remove)
     expect(remove.disabled).toBe(true)
     expect(remove.textContent).toContain('Deleting')

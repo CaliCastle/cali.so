@@ -86,6 +86,9 @@ describe('SiteDocument analytics', () => {
     expect(html).not.toContain('data-public-route-motion')
     expect(html).not.toContain('data-public-route-transition')
     expect(html).toContain('Owner admin')
+    // The admin shares the warm working-paper palette (July 2026 decision)
+    // while staying outside analytics and social reads.
+    expect(html).toContain('public-site')
     expect(getSocial).not.toHaveBeenCalled()
     expect(getGitHub).not.toHaveBeenCalled()
   })

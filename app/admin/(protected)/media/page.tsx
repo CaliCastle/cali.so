@@ -7,7 +7,7 @@ import { nonPublicRobots } from '~/lib/non-public-metadata'
 import { MediaLibrary } from './MediaLibrary'
 
 export const metadata: Metadata = {
-  title: 'Media Library',
+  title: 'Media',
   robots: nonPublicRobots,
 }
 
@@ -23,7 +23,7 @@ export default async function AdminMediaPage() {
     <MediaLibrary
       initialActive={active}
       initialArchived={archived}
-      initialDraft={draft}
+      selectionIds={draft.mediaAssetIds}
     />
   )
 }

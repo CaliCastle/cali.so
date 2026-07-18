@@ -30,9 +30,8 @@ For each deployed environment:
 3. Allow only verified email codes, Google, and X when public signup is
    eventually approved. Keep passwords, SMS, Apple, and every other social
    provider disabled.
-4. Enable passkeys and register the owner before enforcing the passkey gate.
-   Keep at least two independently recoverable owner passkeys. Do not enable a
-   gate that could lock the owner out before recovery has been exercised.
+4. Enable passkeys and register the owner as the preferred sign-in method.
+   Keep at least two independently recoverable owner passkeys.
 5. Mark only the intended owner record with public metadata
    `{ "siteOwner": "yes" }`. Public metadata is readable by the browser but
    writable only by the server or Clerk Dashboard. Private metadata is
@@ -42,24 +41,24 @@ For each deployed environment:
    marker receives 403, and the marked owner can open `/admin`. Confirm that
    `/api/admin/auth/request` and `/api/admin/auth/verify` remain 404.
 
-## Passkey enforcement boundary
+## Step-up verification (removed July 2026)
 
-The browser runs Clerk's `verifyWithPasskey()` before Google Calendar
-connection changes, Media Asset Purge, and Photo Selection publication. It
-does not send the mutation when the passkey prompt is cancelled. A server
-freshness denial is never retried automatically, avoiding a second prompt or
-an ambiguous duplicate mutation; the owner receives a no-side-effect message
-and explicitly retries the action. The server independently requires a
-first-factor verification age below ten minutes before any effect runs.
+The former high-impact reverification boundary — client-side
+`verifyWithPasskey()` plus a server-checked ten-minute first-factor freshness
+window before Google Calendar changes, Media Asset Purge, Photo Selection
+publication, and destructive Booking actions — was removed by maintainer
+decision in July 2026: on a single-owner personal site the repeated prompts
+gated daily flows without a matching threat. Owner authorization is now
+exclusively the server-side `siteOwner` check, still wrapped in same-origin
+mutation guards, per-actor rate limits, privileged-action audit events, and
+the strict admin CSP. Media Asset Purge additionally requires the literal
+typed `PURGE` confirmation, validated server-side.
 
-Clerk 7.5.19 gives the server factor ages but not the factor strategy. The
-server can prove that the first factor is fresh, but it cannot prove that the
-factor was specifically a passkey. The passkey choice is enforced by the owned
-client flow and must not be described as server-side passkey attestation. An
-exact proof would require a separate app-owned WebAuthn credential system.
-
-Future refunds, exports, security settings, bulk operations, and destructive
-Booking actions must use the same high-impact boundary before they ship.
+Passkeys remain the recommended Clerk sign-in method, and every recovery
+procedure below still applies. Reintroducing a step-up boundary would need
+its own decision and should note that Clerk exposes factor ages but not the
+factor strategy — a server can prove freshness, not that the factor was a
+passkey.
 
 AMA Bookings remain accountless and use private Manage Links. Do not attach a
 Clerk user ID to a Booking until issue #89 has its own threat model and ships.

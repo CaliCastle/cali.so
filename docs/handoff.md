@@ -39,7 +39,19 @@ Current as of July 2026.
 - The owner admin is always reachable for Media and AMA operations, with
   Clerk authentication and an exact server-checked
   `publicMetadata.siteOwner = "yes"` authorization marker. Origin checks, rate
-  limits, audit events, and the strict admin CSP remain in force.
+  limits, audit events, and the strict admin CSP remain in force. Passkey
+  step-up (reverification) was removed entirely in July 2026 (maintainer
+  decision) — see `docs/security/clerk-admin-operations.md`; the typed PURGE
+  confirmation for Media purge is still validated server-side.
+- The admin was redesigned in July 2026 to share the public design language
+  (warm paper, 37.5rem column, an owner dock; spec in
+  `docs/design-language.md` § Owner admin). IA: `/admin` is a one-screen
+  overview, `/admin/ama` holds all AMA operations plus availability and
+  Google Calendar settings, `/admin/media` is the upload-to-archive library,
+  and `/admin/photos` is the Photo Selection curation room. The owner enters
+  from the public dock's Preferences panel (owner-only row, or G then D),
+  backed by a client probe to `GET /api/admin/session` so public pages stay
+  static and Clerk stays off public routes.
 - The complete paid AMA booking system (#79, slices #82 through #87) is
   implemented and enabled by default (maintainer decision, July 2026; the
   former `AMA_*_ENABLED` switches are removed): public `/ama` and
@@ -67,7 +79,10 @@ Current as of July 2026.
   Private Originals stay server-only, while `/photos` and homepage previews
   consume the active Published Photo Selection from Bunny Renditions. Media
   capabilities have no runtime feature switches: Alt Text Suggestions are on
-  by default, and Location Label suggestions follow their provider credential.
+  by default and, since July 2026, auto-apply as the approved bilingual Alt
+  Text when none exists yet (upload-to-archive needs no review step; edits
+  and regeneration remain available in the inspector). Location Label
+  suggestions follow their provider credential.
 
 ## Launch gates
 
@@ -168,9 +183,10 @@ The Vercel runtime receives only the CRUD-only `DATABASE_URL`. Never put
 
 ## Post-launch work
 
-- Maintain #93's Clerk-native passkey-first high-impact boundary without
-  disabling owner admin. Hosted setup, session revocation, credential rotation,
-  and Clerk's server-side factor-strategy limitation are documented in
+- #93's passkey-first high-impact boundary was retired in July 2026
+  (maintainer decision): the owner admin has no step-up verification, and
+  passkeys remain only as the Clerk sign-in method. Hosted setup, session
+  revocation, and credential rotation stay documented in
   `docs/security/clerk-admin-operations.md`. The public AMA product slices
   (#82 through #87) are implemented and enabled by default; going live end
   to end only needs the provider credential pairs and hosted checks in

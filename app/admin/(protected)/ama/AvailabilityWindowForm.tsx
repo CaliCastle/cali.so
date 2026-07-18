@@ -1,6 +1,6 @@
 'use client'
 
-import { useId, useState, type FormEvent } from 'react'
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 
 import { T } from '~/lib/i18n'
 import { localize, useLocale } from '~/lib/locale-client'
@@ -43,33 +43,52 @@ const startOptions = timeOptions(0, 23 * 60 + 30)
 const endOptions = timeOptions(30, 24 * 60)
 
 export function AvailabilityWindowForm({
-  window,
+  window: availabilityWindow,
   describedBy,
 }: AvailabilityWindowFormProps) {
   const locale = useLocale()
   const weekdayId = useId()
-  const [weekday, setWeekday] = useState(window?.isoWeekday ?? 1)
+  const [weekday, setWeekday] = useState(availabilityWindow?.isoWeekday ?? 1)
   const [pending, setPending] = useState<'save' | 'delete' | null>(null)
-  const isExisting = window !== undefined
+  const [deleteArmed, setDeleteArmed] = useState(false)
+  const deleteTimerRef = useRef<number | null>(null)
+  const isExisting = availabilityWindow !== undefined
 
+  useEffect(
+    () => () => {
+      if (deleteTimerRef.current !== null) {
+        window.clearTimeout(deleteTimerRef.current)
+      }
+    },
+    [],
+  )
+
+  // Deleting a window is a two-step armed action: the first press asks for
+  // confirmation on the button itself and disarms after 4 seconds.
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     const submitter = (event.nativeEvent as SubmitEvent).submitter as
       | HTMLButtonElement
       | null
-    if (
-      submitter?.value === 'delete' &&
-      !globalThis.confirm(
-        localize(
-          locale,
-          '删除这个可预约时段？其他时段和日历连接不会受影响。',
-          'Delete this Availability Window? Other windows and the calendar connection stay intact.',
-        ),
-      )
-    ) {
-      event.preventDefault()
+    if (submitter?.value === 'delete') {
+      if (!deleteArmed) {
+        event.preventDefault()
+        setDeleteArmed(true)
+        if (deleteTimerRef.current !== null) {
+          window.clearTimeout(deleteTimerRef.current)
+        }
+        deleteTimerRef.current = window.setTimeout(
+          () => setDeleteArmed(false),
+          4000,
+        )
+        return
+      }
+      if (deleteTimerRef.current !== null) {
+        window.clearTimeout(deleteTimerRef.current)
+      }
+      setPending('delete')
       return
     }
-    setPending(submitter?.value === 'delete' ? 'delete' : 'save')
+    setPending('save')
   }
 
   return (
@@ -80,13 +99,15 @@ export function AvailabilityWindowForm({
       className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto] sm:items-end"
       onSubmit={handleSubmit}
     >
-      {window && <input type="hidden" name="id" value={window.id} />}
+      {availabilityWindow && (
+        <input type="hidden" name="id" value={availabilityWindow.id} />
+      )}
 
       <div className="grid gap-1.5 text-sm">
         <input
           type="hidden"
           name="weekdayOriginal"
-          value={window?.isoWeekday ?? 1}
+          value={availabilityWindow?.isoWeekday ?? 1}
         />
         {(['zh', 'en'] as const).map((language) => {
           const selectId = `${weekdayId}-weekday-${language}`
@@ -126,7 +147,7 @@ export function AvailabilityWindowForm({
         </span>
         <select
           name="start"
-          defaultValue={formatMinute(window?.startMinute ?? 9 * 60)}
+          defaultValue={formatMinute(availabilityWindow?.startMinute ?? 9 * 60)}
           disabled={pending !== null}
           aria-label={localize(locale, '开始时间', 'Start time')}
           className="min-h-11 touch-manipulation rounded-md bg-background px-3 text-base tabular-nums shadow-[0_0_0_1px_var(--border)] outline-none focus-visible:shadow-[0_0_0_1px_var(--foreground)]"
@@ -145,7 +166,7 @@ export function AvailabilityWindowForm({
         </span>
         <select
           name="end"
-          defaultValue={formatMinute(window?.endMinute ?? 12 * 60)}
+          defaultValue={formatMinute(availabilityWindow?.endMinute ?? 12 * 60)}
           disabled={pending !== null}
           aria-label={localize(locale, '结束时间', 'End time')}
           className="min-h-11 touch-manipulation rounded-md bg-background px-3 text-base tabular-nums shadow-[0_0_0_1px_var(--border)] outline-none focus-visible:shadow-[0_0_0_1px_var(--foreground)]"
@@ -164,7 +185,7 @@ export function AvailabilityWindowForm({
           name="intent"
           value={isExisting ? 'update' : 'create'}
           disabled={pending !== null}
-          className="min-h-11 min-w-[5.5rem] touch-manipulation rounded-md bg-foreground px-4 text-sm font-medium text-background outline-none transition-transform duration-100 ease-[ease] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none"
+          className="min-h-11 min-w-[5.5rem] touch-manipulation rounded-full bg-foreground px-4 text-sm font-medium text-background outline-none transition-transform duration-100 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none motion-reduce:transition-none"
         >
           {pending === 'save' ? (
             <T zh="正在保存…" en="Saving…" />
@@ -181,10 +202,16 @@ export function AvailabilityWindowForm({
             value="delete"
             formNoValidate
             disabled={pending !== null}
-            className="min-h-11 min-w-[6rem] touch-manipulation rounded-md px-3 text-sm text-muted-foreground outline-none transition-transform duration-100 ease-[ease] active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 focus-visible:ring-foreground motion-reduce:transform-none motion-reduce:transition-none"
+            className={`min-h-11 min-w-[6rem] touch-manipulation rounded-full px-3 text-sm outline-none transition-transform duration-100 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60 focus-visible:ring-1 motion-reduce:transform-none motion-reduce:transition-none ${
+              deleteArmed
+                ? 'text-destructive focus-visible:ring-destructive'
+                : 'text-muted-foreground focus-visible:ring-foreground'
+            }`}
           >
             {pending === 'delete' ? (
               <T zh="正在删除…" en="Deleting…" />
+            ) : deleteArmed ? (
+              <T zh="确认删除？" en="Confirm delete?" />
             ) : (
               <T zh="删除" en="Delete" />
             )}

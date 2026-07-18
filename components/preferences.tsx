@@ -2,18 +2,24 @@
 
 import { Popover } from '@base-ui/react/popover'
 import { Monitor, Moon, Sun, Volume2, VolumeX } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 import { PreferencesIcon } from '~/components/dock-icons'
 import { useTheme } from '~/components/theme-provider'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { TabItem, Tabs, TabsList } from '~/components/ui/tabs'
 import { Elevated } from '~/lib/elevated'
 import { T } from '~/lib/i18n'
 import { LOCALE_CHANGE_EVENT, localize, useLocale } from '~/lib/locale-client'
 import { localePath, type Locale } from '~/lib/locale-route'
-import { playPreferenceSound, setSoundEnabled, soundEnabled } from '~/lib/sound'
+import {
+  playDockSound,
+  playPreferenceSound,
+  setSoundEnabled,
+  soundEnabled,
+} from '~/lib/sound'
 
 function Row({ zh, en, children }: { zh: string; en: string; children: React.ReactNode }) {
   return (
@@ -27,20 +33,56 @@ function Row({ zh, en, children }: { zh: string; en: string; children: React.Rea
 }
 
 // 偏好 — the dock's preferences panel: language, theme, and UI sound,
-// each as full-width fluid tabs.
-export function Preferences() {
+// each as full-width fluid tabs. On the public dock the site owner gets
+// one more row (the way into the admin); the owner dock's variant swaps
+// it for sign-out and never probes.
+export function Preferences({
+  variant = 'public',
+  ownerAdmin = false,
+  onOwnerAdminChange,
+}: {
+  variant?: 'public' | 'admin'
+  ownerAdmin?: boolean
+  onOwnerAdminChange?: (owner: boolean) => void
+} = {}) {
   const activeLocale = useLocale()
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [locale, setLocale] = useState<'zh' | 'en'>('zh')
   const [sound, setSound] = useState(false)
+  const probedRef = useRef(false)
 
   useEffect(() => {
     setMounted(true)
     setLocale(document.documentElement.dataset.locale === 'en' ? 'en' : 'zh')
     setSound(soundEnabled())
   }, [])
+
+  // The owner probe runs once per mount, the first time the panel opens —
+  // public pages stay static and ordinary visitors never trigger it on
+  // page load. A confirmed answer is remembered so the row (and the G D
+  // chord) is armed instantly on later visits; a stale hint self-corrects
+  // on the next open.
+  function probeOwner(open: boolean) {
+    if (!open || probedRef.current) return
+    probedRef.current = true
+    void fetch('/api/admin/session')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data: { owner?: boolean } | null) => {
+        const owner = data?.owner === true
+        onOwnerAdminChange?.(owner)
+        try {
+          if (owner) localStorage.owner = '1'
+          else delete localStorage.owner
+        } catch {
+          /* private mode */
+        }
+      })
+      .catch(() => {
+        /* offline — leave the current hint alone */
+      })
+  }
 
   function applyLocale(next: string) {
     const nextLocale = next as Locale
@@ -76,7 +118,7 @@ export function Preferences() {
   }
 
   return (
-    <Popover.Root>
+    <Popover.Root onOpenChange={variant === 'public' ? probeOwner : undefined}>
       <Popover.Trigger
         render={
           <button
@@ -146,6 +188,31 @@ export function Preferences() {
                 </TabsList>
               </Tabs>
             </Row>
+            {variant === 'public' && ownerAdmin ? (
+              <Link
+                href="/admin"
+                prefetch={false}
+                className="prefs-row prefs-admin"
+                onClick={() => playDockSound()}
+              >
+                <span className="prefs-row-label">
+                  <T zh="管理" en="Admin" />
+                </span>
+                <span className="dock-tip-keys" aria-hidden>
+                  <kbd className="dock-tip-key">G</kbd>
+                  <kbd className="dock-tip-key">D</kbd>
+                </span>
+              </Link>
+            ) : null}
+            {variant === 'admin' ? (
+              <form method="post" action="/api/admin/auth/logout">
+                <button type="submit" className="prefs-row prefs-admin prefs-signout">
+                  <span className="prefs-row-label">
+                    <T zh="退出登录" en="Sign out" />
+                  </span>
+                </button>
+              </form>
+            ) : null}
           </Popover.Popup>
         </Popover.Positioner>
       </Popover.Portal>

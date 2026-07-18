@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 
 import { InputCopy } from '~/components/ui/input-copy'
 import { AMA_TOPIC_LABELS, type AmaTopic } from '~/lib/ama/booking/topics'
@@ -11,11 +11,6 @@ import type {
   MeetingProviderName,
   RefundStatus,
 } from '~/lib/ama/booking/repository'
-import {
-  isReverificationResponse,
-  PasskeyVerificationError,
-  usePasskeyReverification,
-} from '~/lib/admin/passkey-client'
 import { T } from '~/lib/i18n'
 import { localize, useLocale, type Locale } from '~/lib/locale-client'
 
@@ -161,6 +156,17 @@ function timeLabel(iso: string, zone: string) {
   return formatter.format(new Date(iso))
 }
 
+/** A flat detail object (primitives only) can render as definition rows. */
+function isFlatDetail(detail: Record<string, unknown>) {
+  return Object.values(detail).every(
+    (value) =>
+      value === null ||
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean',
+  )
+}
+
 function DefinitionRow({
   term,
   children,
@@ -226,17 +232,14 @@ export function BookingDetail({
     if (notice) noticeRef.current?.focus()
   }, [notice])
 
-  const performBookingAction = usePasskeyReverification(
-    async (body: Record<string, unknown>) => {
-      const response = await fetch(`/api/admin/ama/bookings/${booking.id}`, {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      if (await isReverificationResponse(response)) return response
-      return responseJson(response)
-    },
-  )
+  async function performBookingAction(body: Record<string, unknown>) {
+    const response = await fetch(`/api/admin/ama/bookings/${booking.id}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    return responseJson(response)
+  }
 
   async function loadSlots() {
     setSlotsState('loading')
@@ -259,14 +262,6 @@ export function BookingDetail({
     }
   }
 
-  function passkeyNotice() {
-    return localize(
-      locale,
-      '未能确认通行密钥验证，没有执行任何更改。请重试。',
-      'Passkey verification could not be confirmed. Nothing was changed. Try again.',
-    )
-  }
-
   async function cancelBooking() {
     setPending('cancel')
     setNotice(null)
@@ -282,9 +277,7 @@ export function BookingDetail({
       )
       router.refresh()
     } catch (error) {
-      if (error instanceof PasskeyVerificationError) {
-        setNotice(passkeyNotice())
-      } else if (error instanceof Error && error.message === 'already_cancelled') {
+      if (error instanceof Error && error.message === 'already_cancelled') {
         setStatus('cancelled')
         setPanel('none')
         setNotice(
@@ -326,9 +319,7 @@ export function BookingDetail({
       )
       router.refresh()
     } catch (error) {
-      if (error instanceof PasskeyVerificationError) {
-        setNotice(passkeyNotice())
-      } else if (
+      if (
         error instanceof Error &&
         (error.message === 'stale_slot' || error.message === 'slot_taken')
       ) {
@@ -373,9 +364,7 @@ export function BookingDetail({
       )
       router.refresh()
     } catch (error) {
-      if (error instanceof PasskeyVerificationError) {
-        setNotice(passkeyNotice())
-      } else if (error instanceof Error && error.message === 'not_applicable') {
+      if (error instanceof Error && error.message === 'not_applicable') {
         setNotice(
           localize(
             locale,
@@ -426,12 +415,12 @@ export function BookingDetail({
   const provider = providerLabels[booking.meetingProvider]
 
   return (
-    <div className="w-full max-w-[46rem]">
-      <p className="text-sm font-medium tracking-[-0.011em] text-muted-foreground">
-        <T zh="AMA 预约" en="AMA BOOKING" />
+    <div className="pb-10">
+      <p className="text-sm font-medium text-muted-foreground">
+        <T zh="咨询预约" en="AMA Booking" />
       </p>
-      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-        <h1 className="text-sm font-semibold">{booking.guestName}</h1>
+      <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+        <h1 className="text-sm font-medium">{booking.guestName}</h1>
         <BookingStatusBadge status={status} />
         {refundStatus !== 'none' && (
           <span
@@ -487,7 +476,7 @@ export function BookingDetail({
         </div>
 
         {panel === 'reschedule' && (
-          <div className="mt-4 rounded-lg border border-dashed border-border px-5 py-5">
+          <div className="mt-4 rounded-md bg-surface-1 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-sm font-medium">
                 <T zh="选择新的时间" en="Pick a new time" />
@@ -504,7 +493,7 @@ export function BookingDetail({
                     role="tab"
                     aria-selected={zoneView === zone}
                     onClick={() => setZoneView(zone)}
-                    className={`min-h-11 rounded-md px-3 text-sm outline-none focus-visible:ring-1 focus-visible:ring-foreground ${
+                    className={`min-h-11 rounded-full px-3 text-sm outline-none focus-visible:ring-1 focus-visible:ring-foreground ${
                       zoneView === zone
                         ? 'bg-foreground text-background'
                         : 'text-muted-foreground hover:bg-hover hover:text-foreground'
@@ -575,12 +564,12 @@ export function BookingDetail({
                     </div>
                   </div>
                 ))}
-                <div className="flex flex-wrap items-center gap-2 border-t border-dotted border-border pt-4">
+                <div className="flex flex-wrap items-center gap-2 hairline-top pt-4">
                   <button
                     type="button"
                     disabled={pending !== null || !selectedSlot}
                     onClick={() => void reschedule()}
-                    className="min-h-11 rounded-md bg-foreground px-4 text-sm font-medium text-background outline-none disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2"
+                    className="min-h-11 rounded-full bg-foreground px-4 text-sm font-medium text-background outline-none transition-transform duration-100 active:scale-[0.97] disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2 motion-reduce:transform-none"
                   >
                     {pending === 'reschedule' ? (
                       <T zh="正在改期…" en="Rescheduling…" />
@@ -603,7 +592,7 @@ export function BookingDetail({
         )}
 
         {panel === 'cancel' && (
-          <div className="mt-4 rounded-lg border border-dashed border-border px-5 py-5">
+          <div className="mt-4 rounded-md bg-surface-1 px-4 py-3">
             <h3 className="text-sm font-medium">
               <T zh="取消这个预约？" en="Cancel this Booking?" />
             </h3>
@@ -627,7 +616,7 @@ export function BookingDetail({
                 type="button"
                 disabled={pending !== null}
                 onClick={() => void cancelBooking()}
-                className="min-h-11 rounded-md border border-destructive px-4 text-sm font-medium text-destructive outline-none disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-destructive"
+                className="min-h-11 rounded-full bg-destructive px-4 text-sm font-medium text-white outline-none disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-destructive focus-visible:ring-offset-2"
               >
                 {pending === 'cancel' ? (
                   <T zh="正在取消…" en="Cancelling…" />
@@ -648,7 +637,7 @@ export function BookingDetail({
         )}
 
         {panel === 'refund' && (
-          <div className="mt-4 rounded-lg border border-dashed border-border px-5 py-5">
+          <div className="mt-4 rounded-md bg-surface-1 px-4 py-3">
             <h3 className="text-sm font-medium">
               <T zh="批准退款例外？" en="Grant a refund exception?" />
             </h3>
@@ -663,7 +652,7 @@ export function BookingDetail({
                 type="button"
                 disabled={pending !== null}
                 onClick={() => void grantRefundException()}
-                className="min-h-11 rounded-md border border-border px-4 text-sm font-medium outline-none disabled:opacity-50 focus-visible:border-foreground"
+                className="min-h-11 rounded-full bg-foreground px-4 text-sm font-medium text-background outline-none disabled:opacity-50 focus-visible:ring-1 focus-visible:ring-foreground focus-visible:ring-offset-2"
               >
                 {pending === 'refund' ? (
                   <T zh="正在退款…" en="Refunding…" />
@@ -688,7 +677,7 @@ export function BookingDetail({
             ref={noticeRef}
             role="status"
             tabIndex={-1}
-            className="mt-4 text-sm leading-5 text-muted-foreground outline-none"
+            className="mt-4 rounded-md bg-surface-1 px-4 py-3 text-sm leading-6 outline-none"
           >
             {notice}
           </p>
@@ -698,7 +687,7 @@ export function BookingDetail({
       {/* Schedule */}
       <section
         aria-labelledby="schedule-heading"
-        className="mt-8 border-t border-dashed border-border pt-6"
+        className="mt-8 hairline-top pt-6"
       >
         <h2 id="schedule-heading" className="text-sm font-medium">
           <T zh="日程" en="Schedule" />
@@ -731,7 +720,7 @@ export function BookingDetail({
       {/* Identity */}
       <section
         aria-labelledby="guest-heading"
-        className="mt-8 border-t border-dashed border-border pt-6"
+        className="mt-8 hairline-top pt-6"
       >
         <h2 id="guest-heading" className="text-sm font-medium">
           <T zh="访客" en="Guest" />
@@ -802,7 +791,7 @@ export function BookingDetail({
       {/* Payment */}
       <section
         aria-labelledby="payment-heading"
-        className="mt-8 border-t border-dashed border-border pt-6"
+        className="mt-8 hairline-top pt-6"
       >
         <h2 id="payment-heading" className="text-sm font-medium">
           <T zh="付款" en="Payment" />
@@ -848,7 +837,7 @@ export function BookingDetail({
       {/* Meeting */}
       <section
         aria-labelledby="meeting-heading"
-        className="mt-8 border-t border-dashed border-border pt-6"
+        className="mt-8 hairline-top pt-6"
       >
         <h2 id="meeting-heading" className="text-sm font-medium">
           <T zh="会议" en="Meeting" />
@@ -893,7 +882,7 @@ export function BookingDetail({
       {/* Operations */}
       <section
         aria-labelledby="booking-operations-heading"
-        className="mt-8 border-t border-dashed border-border pt-6"
+        className="mt-8 hairline-top pt-6"
       >
         <h2 id="booking-operations-heading" className="text-sm font-medium">
           <T zh="后台操作" en="Operations" />
@@ -906,7 +895,7 @@ export function BookingDetail({
       {/* Lifecycle */}
       <section
         aria-labelledby="history-heading"
-        className="mt-8 border-t border-dashed border-border pt-6"
+        className="mt-8 hairline-top pt-6"
       >
         <h2 id="history-heading" className="text-sm font-medium">
           <T zh="生命周期" en="Lifecycle" />
@@ -918,28 +907,37 @@ export function BookingDetail({
         ) : (
           <ol className="mt-3 divide-y divide-border/70">
             {events.map((event) => (
-              <li
-                key={event.id}
-                className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 py-2.5 text-sm"
-              >
-                <span className="min-w-0">
-                  <span className="font-medium">{event.event}</span>
-                  <span className="ml-3 text-muted-foreground">{event.actor}</span>
-                  {Object.keys(event.detail).length > 0 && (
-                    <code className="ml-3 break-all font-mono text-sm text-muted-foreground">
+              <li key={event.id} className="py-2.5 text-sm">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+                  <span className="min-w-0">
+                    <span className="font-medium">{event.event}</span>
+                    <span className="ml-3 text-muted-foreground">{event.actor}</span>
+                  </span>
+                  <time
+                    dateTime={event.occurredAt}
+                    className="tabular-nums text-muted-foreground"
+                  >
+                    <T
+                      zh={zonedDateTime(event.occurredAt, OWNER_TIME_ZONE, 'zh')}
+                      en={zonedDateTime(event.occurredAt, OWNER_TIME_ZONE, 'en')}
+                    />
+                  </time>
+                </div>
+                {Object.keys(event.detail).length > 0 &&
+                  (isFlatDetail(event.detail) ? (
+                    <dl className="mt-1 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-0.5 text-sm">
+                      {Object.entries(event.detail).map(([key, value]) => (
+                        <Fragment key={key}>
+                          <dt className="text-muted-foreground">{key}</dt>
+                          <dd className="min-w-0 break-words">{String(value)}</dd>
+                        </Fragment>
+                      ))}
+                    </dl>
+                  ) : (
+                    <code className="mt-1 block break-all font-mono text-sm text-muted-foreground">
                       {JSON.stringify(event.detail)}
                     </code>
-                  )}
-                </span>
-                <time
-                  dateTime={event.occurredAt}
-                  className="tabular-nums text-muted-foreground"
-                >
-                  <T
-                    zh={zonedDateTime(event.occurredAt, OWNER_TIME_ZONE, 'zh')}
-                    en={zonedDateTime(event.occurredAt, OWNER_TIME_ZONE, 'en')}
-                  />
-                </time>
+                  ))}
               </li>
             ))}
           </ol>

@@ -1,7 +1,6 @@
 import { createGoogleDisconnectHandler } from '~/lib/ama/admin/http'
 import {
   getAmaAdminServices,
-  ownerHighImpactReverifier,
   ownerRequestAuthenticator,
 } from '~/lib/ama/admin/server'
 import { protectAmaLaunchBoundary } from '~/lib/ama/security/launch-boundary-server'
@@ -15,6 +14,5 @@ export async function POST(request: Request) {
     service: google,
     security,
     baseUrl,
-    reverifier: ownerHighImpactReverifier,
   })(request)
 }

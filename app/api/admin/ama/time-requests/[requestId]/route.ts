@@ -1,7 +1,6 @@
 import { createAdminTimeRequestActionHandler } from '~/lib/ama/admin/booking-http'
 import {
   getAmaAdminServices,
-  ownerHighImpactReverifier,
   ownerRequestAuthenticator,
 } from '~/lib/ama/admin/server'
 
@@ -16,6 +15,5 @@ export async function POST(
     service: bookingAdmin,
     security,
     baseUrl,
-    reverifier: ownerHighImpactReverifier,
   })(request, requestId)
 }

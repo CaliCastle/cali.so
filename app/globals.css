@@ -266,8 +266,9 @@
   --guide-opacity: 0.4;
 }
 
-/* Public pages use warm paper and ink. Admin keeps the neutral product
-   palette above so editorial refinements cannot change operational UI. */
+/* The warm working-paper palette. Public pages and the owner admin share
+   it (maintainer decision, July 2026) — the neutral ramp above remains
+   only as the pre-hydration fallback. */
 .public-site {
   --gray-1: oklch(0.99 0.001 95);
   --gray-2: oklch(0.975 0.0015 95);
@@ -4267,6 +4268,51 @@ html[data-locale='en'] [data-en-block] {
 .prefs-panel [role='tab'][aria-selected='true'] svg,
 .prefs-panel [role='tab'][aria-selected='true'] [data-tab-label] {
   color: var(--background) !important;
+}
+
+/* The owner's way in: a quiet link row below a hairline, present only once
+   the owner probe has confirmed the session. Hover deepens the label to
+   full ink; the chord hint reuses the dock tooltip's key chips. */
+.prefs-admin {
+  margin-top: 0.25rem;
+  padding-top: 0.375rem;
+  min-height: 2.75rem;
+  border-top: var(--border-hairline) solid var(--border);
+  text-decoration: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .prefs-admin {
+    min-height: 2rem;
+  }
+
+  .prefs-admin:hover .prefs-row-label {
+    color: var(--foreground);
+  }
+}
+
+.prefs-admin .prefs-row-label {
+  transition: color 150ms ease;
+}
+
+.prefs-admin:focus-visible .prefs-row-label {
+  color: var(--foreground);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prefs-admin .prefs-row-label {
+    transition: none;
+  }
+}
+
+/* Sign-out inside the owner dock's panel: the same quiet row, as a button. */
+.prefs-signout {
+  width: 100%;
+  background: none;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  text-align: left;
 }
 
 /* ── Home nav cards: analog vignettes on soft surfaces ────────────── */

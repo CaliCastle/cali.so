@@ -11,7 +11,6 @@ import {
   type AvailabilityMutationService,
   type OwnerRequestAuthenticator,
 } from './http'
-import { createOwnerReverifier } from '../../admin/reverification'
 import { createAmaSecurity, type SecurityAuditEvent } from '../security/service'
 
 function formRequest(path: string, values: Record<string, string>, authenticated = true) {
@@ -96,9 +95,6 @@ function fixture(rateLimitAllows = true) {
     googleEvents,
     security,
     securityEvents,
-    reverifier: createOwnerReverifier({
-      hasFreshFirstFactor: async () => true,
-    }),
   }
 }
 
@@ -192,7 +188,7 @@ describe('AMA admin HTTP contract', () => {
     for (const response of [createResponse, updateResponse, deleteResponse]) {
       expect(response.status).toBe(303)
       expect(response.headers.get('location')).toBe(
-        'https://cali.so/admin?availability=saved',
+        'https://cali.so/admin/ama?availability=saved',
       )
     }
   })
@@ -216,7 +212,7 @@ describe('AMA admin HTTP contract', () => {
     )
 
     expect(response.headers.get('location')).toBe(
-      'https://cali.so/admin?availability=invalid',
+      'https://cali.so/admin/ama?availability=invalid',
     )
     expect(f.mutations).toEqual([])
   })
@@ -245,7 +241,7 @@ describe('AMA admin HTTP contract', () => {
       ['create', { isoWeekday: 5, startMinute: 540, endMinute: 720 }],
     ])
     expect(response.headers.get('location')).toBe(
-      'https://cali.so/admin?availability=saved',
+      'https://cali.so/admin/ama?availability=saved',
     )
   })
 
@@ -256,7 +252,6 @@ describe('AMA admin HTTP contract', () => {
       service: f.google,
       security: f.security,
       baseUrl: new URL('https://cali.so'),
-      reverifier: f.reverifier,
     })
 
     const response = await handler(
@@ -275,41 +270,6 @@ describe('AMA admin HTTP contract', () => {
     expect(f.googleEvents).toEqual([['begin']])
   })
 
-  it.each([
-    ['connect', createGoogleConnectHandler],
-    ['disconnect', createGoogleDisconnectHandler],
-  ] as const)(
-    'requires recent first-factor verification before Google %s effects',
-    async (_operation, createHandler) => {
-      const f = fixture()
-      const reverifier = createOwnerReverifier({
-        hasFreshFirstFactor: async () => false,
-      })
-      const handler = createHandler({
-        authenticator: f.authenticator,
-        service: f.google,
-        security: f.security,
-        baseUrl: new URL('https://cali.so'),
-        reverifier,
-      })
-
-      const response = await handler(
-        formRequest(`/api/admin/ama/google/${_operation}`, {}),
-      )
-
-      expect(response.status).toBe(403)
-      await expect(response.json()).resolves.toMatchObject({
-        clerk_error: {
-          reason: 'reverification-error',
-          metadata: {
-            reverification: { level: 'first_factor', afterMinutes: 10 },
-          },
-        },
-      })
-      expect(f.googleEvents).toEqual([])
-    },
-  )
-
   it('passes the OAuth callback values through one authenticated boundary', async () => {
     const f = fixture()
     const handler = createGoogleCallbackHandler({
@@ -317,7 +277,6 @@ describe('AMA admin HTTP contract', () => {
       service: f.google,
       security: f.security,
       baseUrl: new URL('https://cali.so'),
-      reverifier: f.reverifier,
     })
     const request = new Request(
       'https://cali.so/api/admin/ama/google/callback?state=s&code=c',
@@ -329,30 +288,9 @@ describe('AMA admin HTTP contract', () => {
     expect(f.googleEvents).toEqual([
       ['complete', { state: 's', code: 'c', error: null }],
     ])
-    expect(response.headers.get('location')).toBe('https://cali.so/admin?calendar=connected')
-  })
-
-  it('does not finalize Google connection after first-factor freshness expires', async () => {
-    const f = fixture()
-    const handler = createGoogleCallbackHandler({
-      authenticator: f.authenticator,
-      service: f.google,
-      security: f.security,
-      baseUrl: new URL('https://cali.so'),
-      reverifier: createOwnerReverifier({
-        hasFreshFirstFactor: async () => false,
-      }),
-    })
-
-    const response = await handler(
-      new Request(
-        'https://cali.so/api/admin/ama/google/callback?state=s&code=c',
-        { headers: { cookie: 'owner=valid' } },
-      ),
+    expect(response.headers.get('location')).toBe(
+      'https://cali.so/admin/ama?calendar=connected',
     )
-
-    expect(response.status).toBe(403)
-    expect(f.googleEvents).toEqual([])
   })
 
   it('disconnects Calendar without touching Availability Windows', async () => {
@@ -362,7 +300,6 @@ describe('AMA admin HTTP contract', () => {
       service: f.google,
       security: f.security,
       baseUrl: new URL('https://cali.so'),
-      reverifier: f.reverifier,
     })
 
     const response = await handler(
@@ -372,7 +309,7 @@ describe('AMA admin HTTP contract', () => {
     expect(f.googleEvents).toEqual([['disconnect']])
     expect(f.mutations).toEqual([])
     expect(response.headers.get('location')).toBe(
-      'https://cali.so/admin?calendar=disconnected',
+      'https://cali.so/admin/ama?calendar=disconnected',
     )
   })
 
@@ -412,7 +349,6 @@ describe('AMA admin HTTP contract', () => {
       service: f.google,
       security: f.security,
       baseUrl: new URL('https://cali.so'),
-      reverifier: f.reverifier,
     })
 
     const response = await handler(

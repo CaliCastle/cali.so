@@ -43,12 +43,16 @@ export async function SiteDocument({
   const english = locale === 'en'
 
   if (isAdmin) {
+    // The owner admin shares the public warm paper, ambient layer, and
+    // column geometry, but stays outside public analytics, social reads,
+    // and route view transitions — its chrome is the owner dock rendered
+    // by the protected admin layout.
     return (
       <html
         lang={english ? 'en' : 'zh-CN'}
         data-locale={english ? 'en' : undefined}
         suppressHydrationWarning
-        className={cn('font-sans', fontVariables)}
+        className={cn('font-sans', fontVariables, 'public-site')}
       >
         <head>
           <script dangerouslySetInnerHTML={{ __html: PREPAINT_SCRIPT }} />
@@ -56,7 +60,10 @@ export async function SiteDocument({
         <body className="antialiased">
           <ThemeProvider>
             {restoreLocale && <LocaleRestorer />}
-            {children}
+            <AmbientBackground />
+            <div className="flex min-h-screen flex-col pb-20">
+              <main className="flex-1 pt-14">{children}</main>
+            </div>
           </ThemeProvider>
         </body>
       </html>
