@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ContourLines, PerlinNoise, Shader } from 'shaders/react'
 
 const SHADER_READY_TIMEOUT_MS = 2000
@@ -12,6 +12,7 @@ function readForegroundInk() {
 export function PortraitShaderField({ onUnavailable }: { onUnavailable: () => void }) {
   const [ink, setInk] = useState(readForegroundInk)
   const [ready, setReady] = useState(false)
+  const handleReady = useCallback(() => setReady(true), [])
 
   useEffect(() => {
     const root = document.documentElement
@@ -32,7 +33,7 @@ export function PortraitShaderField({ onUnavailable }: { onUnavailable: () => vo
         className="portrait-hidden-stage-canvas"
         colorSpace="srgb"
         disableTelemetry
-        onReady={() => setReady(true)}
+        onReady={handleReady}
       >
         <ContourLines
           levels={5}

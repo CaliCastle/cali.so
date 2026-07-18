@@ -2118,6 +2118,9 @@ a:focus-visible .external-label .external-mark {
 [data-portrait-stage][data-active='true'] .portrait-hidden-stage-field {
   opacity: 1;
   transform: scale(1);
+}
+
+[data-portrait-stage][data-motion='true'] .portrait-hidden-stage-field {
   will-change: transform, opacity;
 }
 

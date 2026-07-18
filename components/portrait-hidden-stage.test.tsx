@@ -42,12 +42,14 @@ function setMediaPreference(initialReducedMotion: boolean) {
 }
 
 function enableWebGpu(adapter: unknown | null = {}) {
+  const requestAdapter = vi.fn().mockResolvedValue(adapter)
   Object.defineProperty(navigator, 'gpu', {
     configurable: true,
     value: {
-      requestAdapter: vi.fn().mockResolvedValue(adapter),
+      requestAdapter,
     },
   })
+  return requestAdapter
 }
 
 afterEach(() => {
@@ -92,7 +94,7 @@ describe('PortraitHiddenStage', () => {
 
   it('keeps reduced-motion reveals static even when WebGPU is available', () => {
     setMediaPreference(true)
-    enableWebGpu()
+    const requestAdapter = enableWebGpu()
 
     render(
       <PortraitHiddenStage label="Reveal hidden topographic field">
@@ -105,7 +107,7 @@ describe('PortraitHiddenStage', () => {
 
     expect(trigger.closest('[data-portrait-stage]')?.getAttribute('data-active')).toBe('true')
     expect(trigger.closest('[data-portrait-stage]')?.getAttribute('data-motion')).toBe('false')
-    expect(document.querySelector('[data-hidden-stage-fallback]')).not.toBeNull()
+    expect(requestAdapter).not.toHaveBeenCalled()
     expect(document.querySelector('[data-shader-stage]')).toBeNull()
   })
 
@@ -191,7 +193,7 @@ describe('PortraitHiddenStage', () => {
 
   it('falls back when WebGPU exposes no adapter', async () => {
     setMediaPreference(false)
-    enableWebGpu(null)
+    const requestAdapter = enableWebGpu(null)
 
     render(
       <PortraitHiddenStage label="Reveal hidden topographic field">
@@ -206,7 +208,7 @@ describe('PortraitHiddenStage', () => {
 
     expect(trigger.closest('[data-portrait-stage]')?.getAttribute('data-active')).toBe('true')
     expect(trigger.closest('[data-portrait-stage]')?.getAttribute('data-motion')).toBe('false')
-    expect(document.querySelector('[data-hidden-stage-fallback]')).not.toBeNull()
+    expect(requestAdapter).toHaveBeenCalledOnce()
     expect(document.querySelector('[data-shader-stage]')).toBeNull()
   })
 
