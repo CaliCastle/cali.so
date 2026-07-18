@@ -548,6 +548,7 @@ export function VinylShelf() {
             const activeAmount = Math.max(0, 1 - distance)
             const restingAmount = Math.min(distance, 1)
             const scale = Math.max(0.92, 1 - distance * 0.012 + activeAmount * 0.04)
+            const originX = 50 - Math.max(-1, Math.min(1, offset)) * 50
             const contactScale = Math.max(0.38, Math.cos(inwardAngle * Math.PI / 180))
             const projectedContactScale = Number(
               (contactScale * (0.96 + activeAmount * 0.04)).toFixed(4),
@@ -560,7 +561,6 @@ export function VinylShelf() {
                 className="vinyl"
                 data-active={isActive ? '' : undefined}
                 data-index={index}
-                data-position={Math.abs(offset) < 0.001 ? 'active' : offset < 0 ? 'before' : 'after'}
                 style={
                   {
                     '--vinyl-index': index,
@@ -577,6 +577,7 @@ export function VinylShelf() {
                     '--vinyl-rest-offset': finish.restOffset * restingAmount,
                     '--vinyl-rest-tilt': finish.restTilt * restingAmount,
                     '--vinyl-scale': scale,
+                    '--vinyl-origin-x': `${originX}%`,
                     '--vinyl-spine-tone': spineTone,
                     '--vinyl-spine-color':
                       record.spineColor ??

@@ -2613,7 +2613,7 @@ a:focus-visible .external-label .external-mark {
     rotateZ(calc(var(--vinyl-rest-tilt) * 1deg))
     rotateY(calc(var(--vinyl-direction) * var(--vinyl-inward-angle) * -1deg))
     scale(var(--vinyl-scale));
-  transform-origin: bottom center;
+  transform-origin: var(--vinyl-origin-x) bottom;
   transform-style: preserve-3d;
   transition: transform var(--vinyl-motion-duration) var(--ease-spring);
   will-change: transform;
@@ -2649,14 +2649,6 @@ a:focus-visible .external-label .external-mark {
 .vinyl-hit-corner[data-corner='bottom-left'] {
   bottom: 0;
   left: 0;
-}
-
-.vinyl[data-position='before'] .vinyl-trigger {
-  transform-origin: right bottom;
-}
-
-.vinyl[data-position='after'] .vinyl-trigger {
-  transform-origin: left bottom;
 }
 
 .vinyl-object {
