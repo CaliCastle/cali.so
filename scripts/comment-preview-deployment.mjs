@@ -1,6 +1,7 @@
 import { pathToFileURL } from 'node:url'
 
 const apiVersion = '2022-11-28'
+const previewMarker = '<!-- cali-so-preview-deployment -->'
 
 function required(name, value) {
   if (!value) {
@@ -54,7 +55,7 @@ export function previewComment({
   const runUrl = `${serverUrl}/${repository}/actions/runs/${runId}`
 
   return [
-    '<!-- cali-so-preview-deployment -->',
+    previewMarker,
     '## Preview deployment ready',
     '',
     '| Environment | Deployment | Commit |',
@@ -90,6 +91,25 @@ async function githubRequest({ apiUrl, fetchImpl, path, token }, options = {}) {
   }
 
   return response.json()
+}
+
+async function findPreviewComment({ number, repository, request }) {
+  for (let page = 1; page <= 100; page += 1) {
+    const comments = await request(
+      `/repos/${repository}/issues/${number}/comments?per_page=100&page=${page}`,
+    )
+    const existing = comments.find(
+      (comment) =>
+        comment.user?.login === 'github-actions[bot]' &&
+        comment.body?.includes(previewMarker),
+    )
+
+    if (existing || comments.length < 100) {
+      return existing
+    }
+  }
+
+  throw new Error(`Pull request #${number} comments exceeded 100 pages`)
 }
 
 export async function commentOnPreviewPullRequests(
@@ -142,12 +162,21 @@ export async function commentOnPreviewPullRequests(
   })
 
   for (const pullRequest of pullRequests) {
-    await request(`/repos/${repository}/issues/${pullRequest.number}/comments`, {
+    const existing = await findPreviewComment({
+      number: pullRequest.number,
+      repository,
+      request,
+    })
+    const path = existing
+      ? `/repos/${repository}/issues/comments/${existing.id}`
+      : `/repos/${repository}/issues/${pullRequest.number}/comments`
+
+    await request(path, {
       body: JSON.stringify({ body }),
-      method: 'POST',
+      method: existing ? 'PATCH' : 'POST',
     })
     console.log(
-      `Commented on pull request #${pullRequest.number}: ${normalizedDeployment}`,
+      `${existing ? 'Updated' : 'Commented on'} pull request #${pullRequest.number}: ${normalizedDeployment}`,
     )
   }
 

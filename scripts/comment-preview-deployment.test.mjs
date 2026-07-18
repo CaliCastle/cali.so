@@ -44,37 +44,53 @@ test('Preview comment links the deployment, commit, and workflow run', () => {
   )
 })
 
-test('Successful Preview comments on every open pull request for the branch', async () => {
+test('Successful Preview updates or creates one comment per pull request', async () => {
   const requests = []
   const fetchImpl = async (url, options) => {
     requests.push({ options, url })
 
-    if (options.method === 'POST') {
+    if (options.method === 'PATCH' || options.method === 'POST') {
       return jsonResponse({ id: requests.length }, 201)
     }
 
-    return jsonResponse([{ number: 174 }, { number: 175 }])
+    if (url.includes('/pulls?')) {
+      return jsonResponse([{ number: 174 }, { number: 175 }])
+    }
+
+    if (url.includes('/issues/174/comments?')) {
+      return jsonResponse([
+        {
+          body: '<!-- cali-so-preview-deployment -->\nOld deployment',
+          id: 5011960335,
+          user: { login: 'github-actions[bot]' },
+        },
+      ])
+    }
+
+    return jsonResponse([])
   }
 
   const numbers = await commentOnPreviewPullRequests(deployment, fetchImpl)
 
   assert.deepEqual(numbers, [174, 175])
-  assert.equal(requests.length, 3)
+  assert.equal(requests.length, 5)
   assert.match(
     requests[0].url,
     /head=CaliCastle%3Acali%2Fpreview-comments/,
   )
   assert.equal(
-    requests[1].url,
-    'https://api.github.com/repos/CaliCastle/cali.so/issues/174/comments',
+    requests[2].url,
+    'https://api.github.com/repos/CaliCastle/cali.so/issues/comments/5011960335',
   )
-  assert.equal(requests[1].options.method, 'POST')
-  assert.match(JSON.parse(requests[1].options.body).body, /Visit Preview/)
+  assert.equal(requests[2].options.method, 'PATCH')
+  assert.match(JSON.parse(requests[2].options.body).body, /Visit Preview/)
   assert.equal(
-    requests[1].options.headers.Authorization,
+    requests[2].options.headers.Authorization,
     'Bearer test-token',
   )
-  assert.match(requests[2].url, /issues\/175\/comments$/)
+  assert.match(requests[3].url, /issues\/175\/comments\?/)
+  assert.match(requests[4].url, /issues\/175\/comments$/)
+  assert.equal(requests[4].options.method, 'POST')
 })
 
 test('Successful Preview without an open pull request does not post', async () => {
