@@ -32,6 +32,7 @@ Execute the remaining plans in numeric order:
 2. **006** replaces preview-card keyframes and adds one shared 300ms warm
    window. It is independent of 005.
 3. **007** makes lightbox keyboard activation and Escape instant.
-4. **008** applies the same native click-modality convention to article-map
-   controls. It is source-independent of 007, but running 007 first establishes
-   the interaction-test pattern.
+4. **008** applies the same native click-modality convention to the Motion-owned
+   article-map controls while preserving the phone pointer sequence accepted in
+   PRs #170 and #172. It is source-independent of 007, but running 007 first
+   establishes the interaction-test pattern.

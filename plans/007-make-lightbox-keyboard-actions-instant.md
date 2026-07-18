@@ -1,7 +1,7 @@
 # 007 - Make lightbox keyboard actions instant
 
 - **Status**: TODO
-- **Commit**: dc24eb3
+- **Commit**: 59a39bc
 - **Severity**: HIGH
 - **Category**: Purpose and frequency
 - **Estimated scope**: 2 files, about 100 lines
@@ -132,7 +132,7 @@ at final opacity/transform without a starting-style rule, so no stylesheet
 change is required. Pointer motion remains:
 
 ```css
-/* app/globals.css:1276-1297 - unchanged */
+/* app/globals.css:1277-1298 - unchanged */
 .zoom-overlay-backdrop {
   opacity: 0;
   transition: opacity 300ms var(--ease-swift);

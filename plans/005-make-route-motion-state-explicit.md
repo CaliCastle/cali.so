@@ -1,7 +1,7 @@
 # 005 - Make route motion state explicit
 
 - **Status**: TODO
-- **Commit**: dc24eb3
+- **Commit**: 59a39bc
 - **Severity**: LOW
 - **Category**: Cohesion and tokens
 - **Estimated scope**: 9 files, about 90 lines
@@ -13,7 +13,7 @@ implicit enabled value. The server renders `none`, while a pointer-opened post
 removes the attribute entirely:
 
 ```tsx
-// app/_components/site-document.tsx:70-76 - current
+// app/_components/site-document.tsx:78-84 - current
 <html
   lang={english ? 'en' : 'zh-CN'}
   data-locale={english ? 'en' : undefined}
@@ -42,7 +42,7 @@ The stylesheet therefore treats every missing or misspelled value as an opt-in
 to motion:
 
 ```css
-/* app/globals.css:1449-1455 - current */
+/* app/globals.css:1450-1456 - current */
 html[data-route-motion='none']::view-transition-group(*),
 html[data-route-motion='none']::view-transition-image-pair(*),
 html[data-route-motion='none']::view-transition-old(*),
@@ -124,7 +124,9 @@ eligibility rule, or ordinary destination entrance keyframe.
    reads to this module.
 2. In `app/_components/site-document.tsx`, render public `<html>` with
    `data-route-motion={ROUTE_MOTION.initial}`. Keep admin `<html>` free of the
-   public route-motion attribute and controller.
+   public route-motion attribute and controller. Preserve the owner-admin
+   warm-paper shell, ambient background, column geometry, and protected-layout
+   ownership introduced in PR #171.
 3. In `components/route-motion-controller.tsx`, replace raw string writes with
    `setRouteMotion`. Routine pointer input, any keydown, `popstate`, and the
    final article handoff set `none`. An eligible post `pointerdown` still does
@@ -141,7 +143,9 @@ eligibility rule, or ordinary destination entrance keyframe.
    gestures, loading shell handoff, final cleanup, and listener removal.
 7. Extend `app/site-document.test.tsx` to assert that public markup starts at
    `data-route-motion="initial"` in both locales and admin markup has no
-   `data-route-motion` attribute. Add one sentence to
+   `data-route-motion` attribute. Keep its current admin assertions for the
+   `public-site` class, absence of public chrome/analytics, and absence of
+   social reads. Add one sentence to
    `docs/design-language.md` naming the three states and stating that only
    `post` is permissive.
 
@@ -162,13 +166,15 @@ eligibility rule, or ordinary destination entrance keyframe.
 - Do NOT add a fourth state or use attribute absence as a state.
 - Do NOT put `document`, `window`, React hooks, or client-only directives in
   `lib/route-motion.ts`.
-- Do NOT change admin rendering or add route motion to admin.
+- Do NOT change the PR #171 admin rendering, its `public-site` class, ambient
+  background, or protected-layout chrome ownership; do not add route motion to
+  admin.
 - Do NOT add dependencies.
 - If React/Next no longer exposes the two-stage `onUpdate` lifecycle shown in
   `components/route-motion-controller.tsx:49-62`, STOP and report instead of
   replacing it with timers.
 - If the input contract in `docs/design-language.md:51-63` has changed since
-  commit `dc24eb3`, STOP and report before editing.
+  commit `59a39bc`, STOP and report before editing.
 
 ## Verification
 

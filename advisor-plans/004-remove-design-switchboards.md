@@ -6,7 +6,7 @@
 > plan's status row in `advisor-plans/README.md` when complete.
 >
 > **Drift check (run first)**:
-> `git diff --stat dc24eb3..HEAD -- lib/icon-map.tsx lib/icon-context.tsx lib/shape-context.tsx types/hugeicons.d.ts components/ui/input-copy.tsx components/ui/tabs.tsx components/ui/tooltip.tsx components/ui/button.tsx package.json pnpm-lock.yaml advisor-plans/README.md`
+> `git diff --stat 59a39bc..HEAD -- lib/icon-map.tsx lib/icon-context.tsx lib/shape-context.tsx types/hugeicons.d.ts components/ui/input-copy.tsx components/ui/tabs.tsx components/ui/tooltip.tsx components/ui/button.tsx package.json pnpm-lock.yaml advisor-plans/README.md`
 > Compare every changed source/dependency file with the excerpts and exact
 > fallback inventory below. A status-only index change from completed plans is
 > expected; any meaningful mismatch is a STOP condition.
@@ -18,7 +18,7 @@
 - **Risk**: MED
 - **Depends on**: `advisor-plans/003-remove-unreachable-v3-residue.md`
 - **Category**: tech-debt
-- **Planned at**: commit `dc24eb3`, 2026-07-18
+- **Planned at**: commit `59a39bc`, 2026-07-18
 
 ## Why this matters
 
@@ -293,7 +293,7 @@ git diff --check
 ```
 
 All commands exit 0. The first two scans and direct-icon diff print nothing;
-the unit suite reports 109 passed files and 1,012 passed tests. The exact source
+the unit suite reports 107 passed files and 1,007 passed tests. The exact source
 proof shows that radii remain 20px, 22px, and `rounded-3xl` at the same ownership
 points, and the copy glyph remains Lucide `Copy` at size 14/stroke 1.5.
 `git status --short` may list only the four deletions, four UI modules,

@@ -5,20 +5,19 @@
 > `trash` or a patch, never `rm`. Stop on any STOP condition.
 >
 > **Drift check (run first)**:
-> `git diff --stat dc24eb3..HEAD -- scripts/port-post.mjs scripts/port-post-render.mjs scripts/port-post.test.mjs package.json README.md docs/handoff.md advisor-plans/README.md`
+> `git diff --stat 59a39bc..HEAD -- scripts/port-post.mjs scripts/port-post-render.mjs scripts/port-post.test.mjs package.json README.md docs/handoff.md advisor-plans/README.md`
 > If an in-scope source or documentation file changed, compare every excerpt
-> and expected reference below with live code. A status-only index change from
-> a completed dependency is expected; any meaningful mismatch is a STOP
-> condition.
+> and expected reference below with live code. Status-only index changes are
+> expected; any meaningful mismatch is a STOP condition.
 
 ## Status
 
 - **Priority**: P1
 - **Effort**: S
 - **Risk**: LOW
-- **Depends on**: `advisor-plans/001-stabilize-unit-test-baseline.md`
+- **Depends on**: none; the canonical suite is stable at this baseline
 - **Category**: migration
-- **Planned at**: commit `dc24eb3`, 2026-07-18
+- **Planned at**: commit `59a39bc`, 2026-07-18
 
 ## Why this matters
 
@@ -41,7 +40,7 @@ Active references remain at:
 
 - `package.json:33`: `test:port-post`;
 - `README.md:65`: the release validation list;
-- `docs/handoff.md:105`: the current handoff validation list.
+- `docs/handoff.md:130`: the current handoff validation list.
 
 `docs/adr/0001-content-as-mdx-in-repo.md` records the completed end state:
 Git owns MDX and Sanity is removed after export and migration verification.
@@ -151,8 +150,8 @@ All three commands exit 0.
 
 ### Step 4: Prove v3 is independent
 
-Run the localization suite, deterministic unit suite from plan 001, typecheck,
-and production build.
+Run the localization suite, current deterministic unit suite, typecheck, and
+production build.
 
 **Verify**:
 
@@ -171,8 +170,8 @@ git diff --exit-code -- pnpm-lock.yaml
 git status --short
 ```
 
-The lockfile command exits 0 with no output. `pnpm test:unit` reports 109 passed
-files and 1,012 passed tests. Status lists only the three script
+The lockfile command exits 0 with no output. `pnpm test:unit` reports 107 passed
+files and 1,007 passed tests. Status lists only the three script
 deletions, `package.json`, `README.md`, `docs/handoff.md`, and the permitted
 `advisor-plans/README.md` status edit.
 

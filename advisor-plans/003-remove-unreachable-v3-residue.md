@@ -6,35 +6,34 @@
 > `advisor-plans/README.md` when done.
 >
 > **Drift check (run first)**:
-> `git diff --stat dc24eb3..HEAD -- components/site-frame.tsx components/ui/dropdown.tsx components/ui/select.tsx components/ui/menu-item.tsx lib/ama/cookies.ts lib/springs.ts anims.json public/images/portrait.jpg advisor-plans/README.md`
+> `git diff --stat 59a39bc..HEAD -- components/ui/dropdown.tsx components/ui/select.tsx components/ui/menu-item.tsx lib/ama/cookies.ts lib/springs.ts anims.json public/images/portrait.jpg advisor-plans/README.md`
 > Compare any changed candidate with the excerpts and reachability inventory
-> below. A status-only index change from a completed dependency is expected;
-> any meaningful source or artifact mismatch is a STOP condition.
+> below. Status-only index changes are expected; any meaningful source or
+> artifact mismatch is a STOP condition.
 
 ## Status
 
 - **Priority**: P1
 - **Effort**: S
 - **Risk**: LOW
-- **Depends on**: `advisor-plans/001-stabilize-unit-test-baseline.md`
+- **Depends on**: none; the canonical suite is stable at this baseline
 - **Category**: tech-debt
-- **Planned at**: commit `dc24eb3`, 2026-07-18
+- **Planned at**: commit `59a39bc`, 2026-07-18
 
 ## Why this matters
 
-Six unreachable source modules add exactly 1,490 lines of interface and
+Five unreachable source modules add exactly 1,462 lines of interface and
 implementation that no caller can exercise. The one-line `anims.json` and
-91,893-byte portrait add more repository noise. Removing them improves locality and makes later
-switchboard cleanup smaller without changing runtime behavior.
+91,893-byte portrait add more repository noise. Removing them improves locality
+and makes later switchboard cleanup smaller without changing runtime behavior.
 
 These are July 2026 v3 experiments, not unchanged v2 application source. The
 completed v2 migration residue is handled separately in plan 002.
 
 ## Current state
 
-- `components/site-frame.tsx:5-27` exports `SiteFrame`, but no importer exists.
-  Its shell responsibility is actively owned by
-  `app/_components/site-document.tsx:45-103`.
+- Upstream commit `f801ee1` already removed `components/site-frame.tsx`; it is
+  intentionally absent from this plan's seven-candidate inventory and counts.
 - `components/ui/dropdown.tsx`, `components/ui/select.tsx`, and
   `components/ui/menu-item.tsx` export unused UI systems. Their only internal
   edge is dropdown importing menu-item.
@@ -62,7 +61,6 @@ callers because no caller crosses their interfaces.
 
 **Delete and only delete**:
 
-- `components/site-frame.tsx`
 - `components/ui/dropdown.tsx`
 - `components/ui/select.tsx`
 - `components/ui/menu-item.tsx`
@@ -86,7 +84,7 @@ The only other permitted edit is this plan's status row in
 ## Git workflow
 
 - Branch: `cali/003-remove-unreachable-residue`
-- Stage the eight deletions explicitly.
+- Stage the seven deletions explicitly.
 - Commit: `chore: remove unreachable v3 residue`
 - Do not push or open a pull request unless instructed.
 
@@ -97,17 +95,15 @@ The only other permitted edit is this plan's status row in
 Run both path and symbol searches with every candidate file excluded:
 
 ```bash
-! rg -n 'site-frame|ui/dropdown|ui/select|ui/menu-item|ama/cookies|lib/springs|anims\.json|images/portrait\.jpg' \
+! rg -n 'ui/dropdown|ui/select|ui/menu-item|ama/cookies|lib/springs|anims\.json|images/portrait\.jpg' \
   . --hidden --glob '!.git/**' --glob '!advisor-plans/**' --glob '!plans/**' \
-  --glob '!components/site-frame.tsx' \
   --glob '!components/ui/dropdown.tsx' \
   --glob '!components/ui/select.tsx' \
   --glob '!components/ui/menu-item.tsx' \
   --glob '!lib/ama/cookies.ts' \
   --glob '!lib/springs.ts'
-! rg -n 'SiteFrame|readRequestCookie|exitFallbackMs|spring\(' \
+! rg -n 'readRequestCookie|exitFallbackMs|spring\(' \
   . --hidden --glob '!.git/**' --glob '!advisor-plans/**' --glob '!plans/**' \
-  --glob '!components/site-frame.tsx' \
   --glob '!components/ui/dropdown.tsx' \
   --glob '!components/ui/select.tsx' \
   --glob '!components/ui/menu-item.tsx' \
@@ -122,13 +118,12 @@ dropdown-to-menu-item edge still exists before both modules are deleted.
 
 ### Step 2: Delete only the proven residue
 
-Delete the eight listed files with `trash` or a patch. Do not edit callers,
+Delete the seven listed files with `trash` or a patch. Do not edit callers,
 because there should be none.
 
 **Verify**:
 
 ```bash
-test ! -e components/site-frame.tsx
 test ! -e components/ui/dropdown.tsx
 test ! -e components/ui/select.tsx
 test ! -e components/ui/menu-item.tsx
@@ -148,24 +143,23 @@ canonical verification gates.
 **Verify**:
 
 ```bash
-! rg -n 'site-frame|ui/dropdown|ui/select|ui/menu-item|ama/cookies|lib/springs|anims\.json|images/portrait\.jpg' \
+! rg -n 'ui/dropdown|ui/select|ui/menu-item|ama/cookies|lib/springs|anims\.json|images/portrait\.jpg' \
   . --hidden --glob '!.git/**' --glob '!advisor-plans/**' --glob '!plans/**'
-! rg -n 'SiteFrame|readRequestCookie|exitFallbackMs|spring\(' \
+! rg -n 'readRequestCookie|exitFallbackMs|spring\(' \
   . --hidden --glob '!.git/**' --glob '!advisor-plans/**' --glob '!plans/**'
 pnpm typecheck
 pnpm test:unit
 pnpm build
 git diff --check
 git diff --name-status -- \
-  components/site-frame.tsx components/ui/dropdown.tsx \
-  components/ui/select.tsx components/ui/menu-item.tsx \
+  components/ui/dropdown.tsx components/ui/select.tsx components/ui/menu-item.tsx \
   lib/ama/cookies.ts lib/springs.ts anims.json public/images/portrait.jpg \
-  | awk '$1 != "D" { exit 1 } { count++ } END { if (count != 8) exit 1 }'
+  | awk '$1 != "D" { exit 1 } { count++ } END { if (count != 7) exit 1 }'
 ```
 
 All commands exit 0. The absence scans and `awk` print nothing;
-`pnpm test:unit` reports 109 passed files and 1,012 passed tests. Finally,
-`git status --short` may show only the eight deletions and the permitted
+`pnpm test:unit` reports 107 passed files and 1,007 passed tests. Finally,
+`git status --short` may show only the seven deletions and the permitted
 `advisor-plans/README.md` status edit.
 
 ## Test plan
@@ -177,7 +171,7 @@ reachability can drift faster than a plan.
 
 ## Done criteria
 
-- [ ] All eight candidates are absent.
+- [ ] All seven candidates are absent.
 - [ ] No external path, symbol, registry, or dynamic-import consumer exists.
 - [ ] No package or lockfile changed.
 - [ ] Typecheck, unit tests, build, and patch check pass.

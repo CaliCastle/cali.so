@@ -1,16 +1,17 @@
-# Plan 001: Stabilize the canonical unit-test baseline
+# Plan 001: Consolidate unit-test infrastructure
 
-> **Executor instructions**: Follow this plan step by step. Run every
-> verification command and confirm the expected result before moving on. If a
-> STOP condition occurs, stop and report instead of improvising. When done,
-> update only this plan's status row in `advisor-plans/README.md`.
+> **Executor instructions**: The canonical command passed three consecutive
+> unchanged runs at this baseline, so do not add a worker cap, retry, or timeout.
+> This plan still executes two independent cleanup findings: one rate-limit test
+> bypasses the shared PGlite fixture, and Quality CI reruns Vitest subsets already
+> owned by `test:unit`. Run every Verify gate and update only this plan's status
+> row in `advisor-plans/README.md`.
 >
 > **Drift check (run first)**:
-> `git diff --stat dc24eb3..HEAD -- vitest.config.ts lib/rate-limit/repository.test.ts .github/workflows/security.yml scripts/deployment-workflows.test.mjs advisor-plans/README.md`
-> If any in-scope file changed, compare the excerpts below with live code. A
-> status-only change in `advisor-plans/README.md` is expected when an earlier
-> plan completed; any meaningful mismatch in this plan's row or another
-> in-scope file is a STOP condition.
+> `git diff --stat 59a39bc..HEAD -- lib/rate-limit/repository.test.ts .github/workflows/security.yml scripts/deployment-workflows.test.mjs advisor-plans/README.md`
+> If an in-scope file changed, compare it with the exact ownership and command
+> inventory below. A status-only index change from another completed plan is
+> expected; any other meaningful mismatch is a STOP condition.
 
 ## Status
 
@@ -19,43 +20,26 @@
 - **Risk**: LOW
 - **Depends on**: none
 - **Category**: tests
-- **Planned at**: commit `dc24eb3`, 2026-07-18
+- **Planned at**: commit `59a39bc`, 2026-07-18
 
 ## Why this matters
 
-The canonical unit command is concurrency-sensitive: failures move between
-otherwise unrelated jsdom and PGlite files and pass when isolated. Deleting
-1,000+ lines against that signal would make regressions indistinguishable from
-worker starvation. The target is a bounded, repeatable suite without retries
-or inflated timeouts, followed by removal of CI steps that rerun the same
-Vitest files.
+The current suite is stable without a global concurrency override: three
+consecutive `pnpm test:unit` runs passed 107 files and 1,007 tests. That rejects
+the earlier proposal to set `maxWorkers`, but it does not make the remaining
+duplication useful.
+
+`lib/rate-limit/repository.test.ts` still creates a new WASM database before
+every test even though the repository fixture owns one migrated PGlite instance
+per file and restores its state before each case. Quality CI then runs the full
+non-live Vitest glob once and repeats AMA, security, and every non-live Media
+subset. Consolidating those paths reduces resource churn and CI time while
+preserving every assertion and focused developer command.
 
 ## Current state
 
-`vitest.config.ts:3-8` has no worker bound:
-
-```ts
-export default defineConfig({
-  resolve: { tsconfigPaths: true },
-  test: {
-    environment: 'node',
-    exclude: [...configDefaults.exclude, 'e2e/**', '.claude/**'],
-  },
-})
-```
-
-`package.json:17-31` defines one complete non-live suite plus focused developer
-commands:
-
-```json
-"test:ama": "vitest run lib/ama && pnpm db:validate",
-"test:security": "vitest run lib/security",
-"test:unit": "vitest run app components db lib --exclude='**/*.live.test.ts'",
-"test:media:catalog": "vitest run lib/media/catalog"
-```
-
-`lib/rate-limit/repository.test.ts:23-31` creates and closes a WASM database
-for every test:
+`lib/rate-limit/repository.test.ts:23-31` creates, migrates, and closes PGlite
+for each of its three cases:
 
 ```ts
 beforeEach(async () => {
@@ -70,72 +54,76 @@ afterEach(async () => {
 })
 ```
 
-That contradicts the repository fixture contract at
-`db/testing/pglite.ts:9-18`, which explains that repeated concurrent WASM
-initialization can wedge a worker and provides `usePGliteTestClient` for one
-instance per file.
+That contradicts `db/testing/pglite.ts:9-18`, which documents the worker risk
+from repeated concurrent WASM initialization and exposes
+`usePGliteTestClient()` for one migrated instance per test file.
 
-Observed at `dc24eb3`:
+`.github/workflows/security.yml:66-117` runs `pnpm test:unit`, then reruns:
 
-- Unrestricted direct Vitest run: 9 of 109 files failed, 17 of 1,012 tests
-  failed, all through 5-second test or 10-second hook timeouts.
-- One worker with file parallelism disabled: 109 files and 1,012 tests passed
-  in 46.08 seconds.
-- A separate audit verified two workers twice: 109 files and 1,012 tests passed
-  on both runs in about 21.5 seconds after using the shared rate-limit fixture.
-- The failing files passed when run alone. This is resource contention, not a
-  reason to weaken assertions.
+- `pnpm test:ama`, whose Vitest half is already included but whose
+  `pnpm db:validate` half must remain;
+- `pnpm test:security`;
+- every non-live `pnpm test:media:*` suite.
 
-`.github/workflows/security.yml:66-117` runs `pnpm test:unit`, then reruns the
-AMA, security, and every non-live Media Vitest subset already covered by that
-command. The Node-based migration, deployment, localization, build, audit, and
-verification commands are not duplicates and must remain.
+`package.json` keeps those focused commands for local diagnosis. The Node-based
+deployment tests, production migration compatibility, localization, dependency
+audit, build, link, legacy URL, discovery, and security-boundary commands are
+not duplicates and must remain in Quality.
+
+Historical audit evidence at `dc24eb3` found moving timeout failures under
+unrestricted concurrency. At `59a39bc`, the unchanged suite passed three times,
+so `vitest.config.ts` is explicitly outside this plan. Reopen concurrency work
+only if nondeterminism returns with fresh evidence.
 
 ## Commands you will need
 
 | Purpose | Command | Expected on success |
 | --- | --- | --- |
 | Focused DB test | `pnpm exec vitest run lib/rate-limit/repository.test.ts` | 1 file, 3 tests pass |
-| Canonical tests | `pnpm test:unit` | 109 files, 1,012 tests pass at this baseline |
-| Workflow tests | `pnpm test:deployment` | all Node workflow tests pass |
-| CI ownership scan | `rg -n 'run: pnpm (test:unit|db:validate|test:ama|test:security|test:media:)' .github/workflows/security.yml` | exactly `pnpm test:unit` and `pnpm db:validate` after Step 3 |
+| Canonical tests | `pnpm test:unit` | 107 files, 1,007 tests pass at this baseline |
+| Workflow tests | `pnpm test:deployment` | 20 tests pass after the new ownership assertion |
+| CI ownership scan | focused commands in Step 2 | one canonical Vitest run plus one database validation |
 | Typecheck | `pnpm typecheck` | exit 0, no errors |
 | Patch check | `git diff --check` | no output, exit 0 |
 
 ## Scope
 
-**In scope**:
+**Modify**:
 
-- `vitest.config.ts`
 - `lib/rate-limit/repository.test.ts`
 - `.github/workflows/security.yml`
 - `scripts/deployment-workflows.test.mjs`
 - `advisor-plans/README.md` status row only
 
+**Reference-only**:
+
+- `db/testing/pglite.ts`
+- `package.json`
+- `vitest.config.ts`
+
 **Out of scope**:
 
 - Production rate-limiter code.
-- Global `testTimeout`, `hookTimeout`, retries, or per-test timeout increases.
-- `db/testing/pglite.ts`; the needed harness already exists.
-- Focused `test:ama`, `test:security`, and `test:media:*` package scripts. They
-  remain useful locally.
+- `vitest.config.ts`, worker counts, file parallelism, timeouts, or retries.
+- `db/testing/pglite.ts`; the shared harness already has the required behavior.
+- Focused `test:ama`, `test:security`, and `test:media:*` package scripts.
 - Live provider suites and credentials.
 - Dependency installation or lockfile changes.
 
 ## Git workflow
 
-- Branch: `cali/001-stabilize-unit-suite`
-- Stage only the in-scope paths.
-- Commit: `test: stabilize unit suite concurrency`
-- Do not push or open a pull request unless the operator asks.
+- Branch: `cali/001-consolidate-unit-infrastructure`
+- Stage only the exact Modify paths.
+- Commit: `test: consolidate unit infrastructure`
+- Do not push or open a pull request unless instructed.
 
 ## Steps
 
 ### Step 1: Reuse the per-file PGlite harness
 
-In `lib/rate-limit/repository.test.ts`, replace direct `readFile`, `PGlite`
-construction, migration execution, and per-test close with the established
-repository pattern:
+In `lib/rate-limit/repository.test.ts`, remove the direct `readFile`, migration
+URL, per-test `PGlite` construction, and per-test close. Reuse the established
+fixture without changing any rate-limit assertion:
 
 ```ts
 import { usePGliteTestClient } from '~/db/testing/pglite'
@@ -152,47 +140,36 @@ describe('database rate limiter', () => {
 })
 ```
 
-Retain the `PGlite` type import if it remains useful and preserve every rate
-limiter assertion unchanged.
-
-**Verify**: `pnpm exec vitest run lib/rate-limit/repository.test.ts` -> one
-file and all three tests pass.
-
-### Step 2: Bound Vitest concurrency
-
-Add `maxWorkers: 2` under `test` in `vitest.config.ts`. Add one short comment:
-the bound prevents concurrent PGlite and jsdom suites from starving each
-other. Do not disable file parallelism and do not raise timeouts.
-
-Run `pnpm test:unit` three consecutive times. Each run must pass all 109 files
-and 1,012 tests at this planned baseline. Record the wall times in the commit or
-PR description, not in source.
+Retain the `PGlite` type import, remove the now-unused `afterEach` import, and
+preserve all three test names, clocks, prefixes, inputs, and expected results.
 
 **Verify**:
 
 ```bash
-for run in 1 2 3; do pnpm test:unit || exit 1; done
+pnpm exec vitest run lib/rate-limit/repository.test.ts
+! rg -n 'new PGlite|readFile|migrationUrl|afterEach' \
+  lib/rate-limit/repository.test.ts
+git diff --exit-code -- db/testing/pglite.ts
 ```
 
-The loop exits 0. Every run reports 109 passed files and 1,012 passed tests,
-with no retry.
+All commands exit 0. The focused run reports one file and three tests; the
+negative scan and reference-only diff print nothing.
 
-### Step 3: Remove only proven CI duplication
+### Step 2: Remove only proven CI duplication
 
 In `.github/workflows/security.yml`:
 
-1. Keep `pnpm test:unit`.
-2. Replace the `pnpm test:ama` step with `pnpm db:validate`; only its migration
-   half is outside the canonical Vitest glob. Rename that workflow step from
-   `Test AMA and migrations` to `Validate database migrations` so its label
-   describes the command that remains.
+1. Keep the single `pnpm test:unit` step.
+2. Replace `pnpm test:ama` with `pnpm db:validate`; only its migration half is
+   outside the canonical Vitest glob. Rename the step from
+   `Test AMA and migrations` to `Validate database migrations`.
 3. Remove the separate `pnpm test:security` step.
 4. Remove every separate non-live `pnpm test:media:*` step.
 5. Keep deployment workflow tests, production migration compatibility,
-   localization, dependency audit, build, links, legacy URL, discovery, and
+   localization, dependency audit, build, links, legacy URLs, discovery, and
    security-boundary verification.
 
-Do not delete the focused package scripts.
+Do not remove or change the focused commands in `package.json`.
 
 **Verify**:
 
@@ -240,10 +217,8 @@ NODE
 ```
 
 Every command exits 0. The no-match scan and Node assertion print nothing.
-This treats `package.json` as a read-only assumption: focused developer scripts
-remain present even though the Quality job no longer reruns them.
 
-### Step 4: Protect the deduplicated workflow
+### Step 3: Protect the deduplicated workflow
 
 Add one test to `scripts/deployment-workflows.test.mjs` that parses the Quality
 job and asserts:
@@ -251,68 +226,72 @@ job and asserts:
 - exactly one step runs `pnpm test:unit`;
 - one step named `Validate database migrations` runs `pnpm db:validate`;
 - no step runs `pnpm test:ama`, `pnpm test:security`, or a command beginning
-  with `pnpm test:media:`.
+  with `pnpm test:media:`;
+- every non-Vitest Quality command listed in Step 2 remains in its current
+  relative order.
 
-Follow the existing YAML parser and `stepIndex`/`assertOrdered` style in that
-file. Do not test raw YAML strings.
+Follow the existing YAML parser and `stepIndex`/`assertOrdered` style. Do not
+test raw YAML strings.
 
 **Verify**: `pnpm test:deployment` -> exactly 20 tests pass at this baseline,
-including the new assertion.
+including the new Quality ownership assertion.
 
-### Step 5: Run the final scoped verification
+### Step 4: Run the final scoped verification
 
-Run typecheck and the patch check after the workflow test is green. Inspect the
-clean-worktree diff rather than staging unrelated files.
+Run the canonical suite once after the focused fixture test and workflow test
+are green. A worker-cap experiment is not part of this verification.
 
 **Verify**:
 
 ```bash
+pnpm test:unit
 pnpm typecheck
 git diff --check
+git diff --exit-code -- vitest.config.ts db/testing/pglite.ts package.json \
+  pnpm-lock.yaml
 git status --short
 ```
 
-The first two commands exit 0. `git status --short` lists only
-`vitest.config.ts`, `lib/rate-limit/repository.test.ts`,
-`.github/workflows/security.yml`, `scripts/deployment-workflows.test.mjs`, and
-the permitted `advisor-plans/README.md` status edit.
+The first four commands exit 0. `pnpm test:unit` reports 107 files and 1,007
+tests. Status lists only the three modified implementation/test paths plus the
+permitted `advisor-plans/README.md` status edit.
 
 ## Test plan
 
-- Preserve all three concurrency assertions in
-  `lib/rate-limit/repository.test.ts`.
-- Add the workflow ownership test described above.
-- Run the canonical suite three times because one passing run is insufficient
-  evidence for the observed nondeterminism.
-- Do not add snapshots, retries, or timeout-based assertions.
+- Preserve all three rate-limit assertions while moving setup to the shared
+  per-file fixture.
+- Add the parsed workflow ownership test described above.
+- Run the canonical suite once; the unchanged baseline already passed three
+  consecutive pre-plan runs without a worker cap.
+- Keep focused package scripts as local diagnostic entry points.
+- Do not add snapshots, retries, timeouts, or concurrency configuration.
 
 ## Done criteria
 
-- [ ] `pnpm exec vitest run lib/rate-limit/repository.test.ts` passes 3 tests.
-- [ ] `pnpm test:unit` passes three consecutive times with two workers.
-- [ ] `pnpm test:deployment` exits 0.
-- [ ] `pnpm typecheck` exits 0.
-- [ ] CI runs the canonical Vitest suite once and retains every non-duplicate
-      release/security gate.
-- [ ] Focused package scripts still exist.
-- [ ] No timeout or retry value changed.
-- [ ] `git diff --check` exits 0.
-- [ ] Only in-scope paths and the plan status row are modified.
+- [ ] The rate-limit repository test uses `usePGliteTestClient` and passes all
+      three cases.
+- [ ] CI runs the canonical non-live Vitest suite once and retains database
+      validation plus every non-duplicate release/security gate.
+- [ ] Focused package scripts remain unchanged.
+- [ ] `pnpm test:deployment` reports 20 passing tests.
+- [ ] `pnpm test:unit` reports 107 files and 1,007 tests.
+- [ ] `pnpm typecheck` and `git diff --check` exit 0.
+- [ ] No worker, timeout, retry, dependency, or production source changed.
+- [ ] Only exact Modify paths and the status row are changed.
 
 ## STOP conditions
 
-- Any canonical run still fails after the fixture conversion and two-worker
-  cap.
-- A failure passes only in isolation. Do not mask it with retries or timeouts.
-- Stabilization requires production-source changes.
-- A proposed removed CI command covers a file outside the canonical test glob
-  or includes a live suite.
-- The suite requires more than two workers to remain within the CI timeout.
-- The package manager proposes reinstalling or purging `node_modules`; stop and
-  report the toolchain mismatch instead of accepting it inside this plan.
+- The shared PGlite fixture cannot preserve all three exact rate-limit cases.
+- The canonical suite fails after the fixture-only test change.
+- A proposed removed CI command owns tests outside the canonical non-live glob,
+  includes a live suite, or performs non-Vitest validation.
+- A non-duplicate Quality command or focused package script would be removed.
+- Completion requires a worker cap, retry, timeout, dependency, or production
+  source change. Report fresh evidence and plan that work separately.
+- The available pnpm toolchain does not match the declared package manager.
 
 ## Maintenance notes
 
 New PGlite repository tests should use `usePGliteTestClient`, one instance per
-file. Focused scripts remain valid developer tools, but CI should not rerun
+file. Focused scripts remain valid developer tools, but Quality should not rerun
 suites already owned by `test:unit`.

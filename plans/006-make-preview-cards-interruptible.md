@@ -1,7 +1,7 @@
 # 006 - Make preview cards interruptible and share their warm window
 
 - **Status**: TODO
-- **Commit**: dc24eb3
+- **Commit**: 59a39bc
 - **Severity**: MEDIUM
 - **Category**: Interruptibility
 - **Estimated scope**: 7 files, about 190 lines
@@ -13,7 +13,7 @@ and re-entering a trigger can restart the popup instead of retargeting from its
 current frame:
 
 ```css
-/* app/globals.css:1869-1881, 1977-1983 - current */
+/* app/globals.css:1870-1882, 1978-1984 - current */
 @keyframes link-card-in {
   from {
     opacity: 0;
@@ -40,7 +40,7 @@ current frame:
 Service cards add another entry keyframe:
 
 ```css
-/* app/globals.css:2942-2960 - current */
+/* app/globals.css:2944-2961 - current */
 .service-card[data-open] {
   animation: service-pop 200ms var(--ease-swift);
 }
@@ -81,7 +81,7 @@ Every trigger also owns an isolated Base UI root and always waits 300ms:
   >
 ```
 
-Independent roots cannot implement `docs/design-language.md:180-186`: the
+Independent roots cannot implement `docs/design-language.md:182-186`: the
 first hover waits 300ms, movement between adjacent triggers is instant, one
 surface follows the active trigger, and pointer reversal stays interruptible.
 A delay-only context is insufficient because two independent roots can remain
@@ -129,8 +129,8 @@ type PreviewCardPayload = {
 
 `SitePreviewCard` creates the `id` with `useId()` so it is stable for that
 trigger. The Root render function receives `payload | undefined`; it returns
-`null` before a trigger is active and otherwise renders exactly one keyed,
-settled surface:
+`null` before a trigger is active and otherwise renders exactly one stable
+surface with a keyed payload subtree:
 
 ```tsx
 {({ payload }) =>
@@ -143,12 +143,11 @@ settled surface:
         className="pointer-events-none z-[var(--z-card)]"
       >
         <PreviewCard.Popup
-          key={payload.id}
           className={(state) =>
             `${payload.popupClassName}${state.instant ? ' preview-card-instant' : ''}`
           }
         >
-          {payload.popup}
+          <Fragment key={payload.id}>{payload.popup}</Fragment>
         </PreviewCard.Popup>
       </PreviewCard.Positioner>
     </PreviewCard.Portal>
@@ -161,10 +160,14 @@ triggers and opens an inactive trigger immediately while the root is open or
 in its hover-driven closing transition. It also guarantees one popup surface,
 so moving A to B cannot leave two independent cards mounted.
 
-The keyed Popup is deliberate: switching between differently sized payloads
-replaces the settled popup node instead of reusing one DOM node and making it
-resize while open. There is still exactly one mounted popup, and no width or
-height transition is added.
+The Popup DOM node deliberately stays stable. Base UI can reopen the shared
+root for one render while `transitionStatus` is still `ending`; replacing the
+Popup at that point would mount the next card at the exit target and restart a
+130ms transition instead of reversing from the current frame. The keyed
+Fragment replaces only the payload subtree. Differently sized cards adopt their
+new intrinsic dimensions immediately, with no width or height transition, while
+the stable Popup keeps opacity/transform interruption continuous. There is
+still exactly one mounted popup.
 
 Outside the provider, `SitePreviewCard` falls back to one local Root with the
 same surface and a 300ms delay. Standalone tests and reuse remain functional.
@@ -254,7 +257,7 @@ class makes the container and every contribution cell settle without motion.
 
 - `docs/design-language.md:23-35` assigns hover-card chrome 150-200ms
   `--ease-swift`, with exit around two-thirds of enter. Preserve 200ms/130ms.
-- `docs/design-language.md:180-186` assigns a 300ms cold intent delay, 0ms
+- `docs/design-language.md:182-186` assigns a 300ms cold intent delay, 0ms
   adjacent movement, trigger-relative origin, and interruptible reversal.
 - `components/ui/tooltip.tsx:38-73` is the local ownership exemplar for one
   app-level timing group plus a safe standalone fallback.
@@ -262,7 +265,7 @@ class makes the container and every contribution cell settle without motion.
   `node_modules/@base-ui/react/preview-card/root/PreviewCardRoot.d.ts` and
   `trigger/PreviewCardTrigger.d.ts`: Root accepts `handle` and render-function
   payload; detached Trigger accepts the same `handle` and a `payload`.
-- `app/globals.css:1883-1898` already sets trigger-relative
+- `app/globals.css:1884-1899` already sets trigger-relative
   `transform-origin: var(--transform-origin)` and
   `backface-visibility: hidden`. Preserve both.
 
@@ -277,9 +280,12 @@ class makes the container and every contribution cell settle without motion.
    and two differently sized `SitePreviewCard` consumers. Prove no cold surface
    before a payload, one shared Root/surface, initial delay 300, delay 0 after
    open, 0 through 299ms after close, 300 at 300ms, canceled cooldown on reopen,
-   payload/content/side switching replaces the keyed Popup DOM node while only
-   one is mounted, `focus`/`dismiss` instant states add the settled instant
-   class, timer cleanup, and one local Root at delay 300 outside the provider.
+   payload/content/side switching preserves one Popup DOM node while replacing
+   the keyed payload subtree, `focus`/`dismiss` instant states add the settled
+   instant class, timer cleanup, and one local Root at delay 300 outside the
+   provider. Add the critical reversal case: start A's exit, switch to B while
+   Base UI still reports `transitionStatus="ending"`, and prove the same Popup
+   node now owns B so no exit-target remount can restart the transition.
    A focused Base UI mock may expose Trigger delay/payload, Popup state, and Root
    lifecycle; do not mock the provider's own state machine.
    Include a GitHub-like popup containing `.contrib-grid i`, and assert the
@@ -290,6 +296,9 @@ class makes the container and every contribution cell settle without motion.
    body, footer, and dock in one `PreviewCardTimingProvider` inside
    `ThemeProvider`. Do not add it to admin. Update `app/site-document.test.tsx`
    with a lightweight provider marker so public/admin ownership is asserted.
+   Preserve its PR #171 expectations that admin keeps the `public-site` class
+   while remaining outside public chrome, analytics, route motion, and social
+   reads.
 4. Replace the local Root/Portal/Positioner/Popup assembly in
    `components/external-link.tsx` with `SitePreviewCard`. Pass its existing
    anchor props, popup body, computed popup class, default side, and 100ms close
@@ -320,12 +329,14 @@ class makes the container and every contribution cell settle without motion.
   `scale(0.92) translateY(4px)` through `data-starting-style`.
 - Do NOT animate layout properties, add a second public root, or retain local
   roots when the provider is present.
-- Do NOT reuse one Popup DOM node across different payload identities or animate
-  its dimensions; each payload mounts keyed at settled dimensions.
+- Do NOT key or replace the Popup DOM node across payload identities. Key only
+  the inner Fragment; changing intrinsic dimensions is immediate and must not
+  gain a width/height transition.
 - Do NOT remove/change the GitHub contribution-cell cascade for pointer opens;
   only `preview-card-instant` may suppress it.
 - Do NOT make previews available on touch or turn popups into pointer targets.
-- Do NOT put the timing provider around admin.
+- Do NOT put the timing provider around admin or disturb the PR #171 admin
+  `SiteDocument` shell and its existing tests.
 - If public Base UI 1.6 no longer supports shared handles, payload render
   functions, or immediate inactive-trigger switching, STOP and report instead
   of reaching into its internal store.
@@ -345,9 +356,9 @@ class makes the container and every contribution cell settle without motion.
     prints no popup-container animation matches and exits 0.
   - `! rg -n '<PreviewCard.Root>|delay=\{300\}' components/external-link.tsx components/social-cards.tsx`
     prints no matches and exits 0.
-  - `rg -n 'PreviewCard.createHandle|data-starting-style|PREVIEW_WARM_WINDOW_MS|preview-card-instant|key=\{payload\.id\}' components/preview-card-timing.tsx app/globals.css`
-    finds the shared handle, keyed surface, transition/instant lifecycle, and
-    exact timer constant.
+  - `rg -n 'PreviewCard.createHandle|data-starting-style|PREVIEW_WARM_WINDOW_MS|preview-card-instant|Fragment key=\{payload\.id\}' components/preview-card-timing.tsx app/globals.css`
+    finds the shared handle, stable surface with keyed payload content,
+    transition/instant lifecycle, and exact timer constant.
   - `rg -nF '.link-card.preview-card-instant .contrib-grid i' app/globals.css`
     finds one descendant override whose declaration is `animation: none`, while
     the baseline `.contrib-grid i` rule still owns `contrib-cell-in`.
@@ -355,13 +366,14 @@ class makes the container and every contribution cell settle without motion.
   - Hover the first eligible prose or footer trigger. It opens after 300ms.
   - Move to an adjacent trigger. One popup follows the active trigger and
     swaps to the correct payload/side without another wait or a second popup.
-    Move between a short service card and a taller prose card: the old keyed
-    node is replaced by the new card at settled dimensions, with no width/height
-    tween or intermediate resize.
+    Move between a short service card and a taller prose card: the payload
+    subtree changes inside the same Popup, intrinsic dimensions update
+    immediately, and there is no width/height tween or intermediate resize.
   - Leave all triggers for less than 300ms, then enter another. It opens
     immediately. Wait longer than 300ms and confirm the cold delay returns.
-  - Reverse direction repeatedly during enter and exit. Opacity and transform
-    retarget from the current frame without a restart or flash.
+  - Reverse direction repeatedly during enter and exit, including moving to a
+    different trigger mid-exit. The stable Popup retargets opacity and transform
+    from the current frame without an exit-target remount, restart, or flash.
   - Generic cards enter from scale 0.95; service cards retain scale 0.92 plus
     4px downward offset; all exit toward scale 0.97 in 130ms.
   - Tab-focus a trigger, then press Escape. Base UI reports the focus/dismiss
@@ -373,6 +385,7 @@ class makes the container and every contribution cell settle without motion.
   - Confirm touch remains a plain destination link with no preview surface.
 - **Done when**: public previews use one shared Base UI root, adjacent triggers
   share the tested warm window, container transitions are interruptible,
-  keyboard focus/Escape are instant, payload changes mount one keyed settled
-  card, service geometry and reduced motion are correct, standalone fallback
-  works, and card content/geometry contracts remain intact.
+  keyboard focus/Escape are instant, payload changes replace keyed content
+  inside one stable Popup even during exit reversal, service geometry and
+  reduced motion are correct, standalone fallback works, and card
+  content/geometry contracts remain intact.

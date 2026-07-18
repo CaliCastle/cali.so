@@ -7,7 +7,9 @@
 > update only this plan's status row in `advisor-plans/README.md`.
 >
 > **Drift check (run first)**:
-> `git diff --stat dc24eb3..HEAD -- docs/forking.md scripts/template-check.mjs scripts/template-check.test.mjs scripts/forking-docs.test.mjs scripts/refresh-link-previews.test.mjs README.md docs/handoff.md .env.example LICENSE package.json scripts/refresh-link-previews.mjs content/link-previews.json content/blog/guide-for-cloning-my-site/index.mdx content/blog/guide-for-cloning-my-site/index.en.mdx content/blog/guide-for-cloning-my-site/image-1.png content/blog/guide-for-cloning-my-site/image-2.png content/blog/guide-for-cloning-my-site/image-3.png content/blog/guide-for-cloning-my-site/image-4.png content/blog/guide-for-cloning-my-site/image-5.png content/blog/guide-for-cloning-my-site/image-6.png content/blog/guide-for-cloning-my-site/image-7.png content/blog/guide-for-cloning-my-site/image-8.png content/blog/guide-for-cloning-my-site/image-9.png content/blog/guide-for-cloning-my-site/image-10.png content/blog/guide-for-cloning-my-site/image-11.png content/blog/guide-for-cloning-my-site/image-12.png content/blog/guide-for-cloning-my-site/image-13.png content/blog/guide-for-cloning-my-site/image-14.png content/blog/guide-for-cloning-my-site/image-15.png .github/workflows/cleanup-preview.yml .github/workflows/deploy-staging.yml .github/workflows/deploy-production.yml .github/workflows/refresh-preview.yml .github/workflows/media-storage-live.yml scripts/deployment-workflows.test.mjs advisor-plans/README.md`
+> `git diff --stat 59a39bc..HEAD -- docs/forking.md scripts/template-check.mjs scripts/template-check.test.mjs scripts/forking-docs.test.mjs scripts/refresh-link-previews.test.mjs README.md docs/handoff.md .env.example LICENSE package.json scripts/refresh-link-previews.mjs content/link-previews.json content/blog/guide-for-cloning-my-site/index.mdx content/blog/guide-for-cloning-my-site/index.en.mdx content/blog/guide-for-cloning-my-site/image-1.png content/blog/guide-for-cloning-my-site/image-2.png content/blog/guide-for-cloning-my-site/image-3.png content/blog/guide-for-cloning-my-site/image-4.png content/blog/guide-for-cloning-my-site/image-5.png content/blog/guide-for-cloning-my-site/image-6.png content/blog/guide-for-cloning-my-site/image-7.png content/blog/guide-for-cloning-my-site/image-8.png content/blog/guide-for-cloning-my-site/image-9.png content/blog/guide-for-cloning-my-site/image-10.png content/blog/guide-for-cloning-my-site/image-11.png content/blog/guide-for-cloning-my-site/image-12.png content/blog/guide-for-cloning-my-site/image-13.png content/blog/guide-for-cloning-my-site/image-14.png content/blog/guide-for-cloning-my-site/image-15.png .github/workflows/cleanup-preview.yml .github/workflows/deploy-staging.yml .github/workflows/deploy-production.yml .github/workflows/refresh-preview.yml .github/workflows/media-storage-live.yml scripts/deployment-workflows.test.mjs advisor-plans/README.md`
+> Also run
+> `git diff --stat 59a39bc..HEAD -- docs/v3-cutover-ops-runbook.md docs/security/baseline.md docs/security/verification.md`.
 > Compare changed paths with the exact docs/frontmatter/workflow/cache contracts
 > below. Changes from dependency plans 002/004/005/006 and status-only index
 > changes are expected; any other meaningful mismatch is a STOP condition.
@@ -19,7 +21,7 @@
 - **Risk**: MED
 - **Depends on**: plans 002, 004, 005, and 006 in `advisor-plans/README.md`
 - **Category**: docs
-- **Planned at**: commit `dc24eb3`, 2026-07-18
+- **Planned at**: commit `59a39bc`, 2026-07-18
 
 ## Why this matters
 
@@ -49,12 +51,30 @@ Existing automation is mixed:
 - cleanup, staging, production, refresh-preview, and media-storage-live jobs
   mutate Cali-specific infrastructure and need upstream guards.
 
+`docs/handoff.md:39-64` now records the July 2026 owner-admin contract: public
+Preferences plus G-D reveal the owner entry through `GET /api/admin/session`;
+`/admin` is Overview, with AMA, Media, and Photos as separate owner-dock
+destinations; static shells and fixed fallbacks partially prerender while
+server loaders call `requireOwnerPage`; client `ClerkProvider`, per-request
+nonce CSP, and passkey reverification are intentionally absent. Preserve those
+decisions. Its older “always reachable” wording is true only for the committed
+`operatorStack: true` profile and must be qualified by profile, never by
+environment.
+
+`docs/v3-cutover-ops-runbook.md:65-69` still carries an obsolete Staging smoke
+check that treats `/admin/photos` as a redirect to `/admin/media#publish`.
+Those are separate current owner surfaces and must be tested independently.
+
 ## Target documentation contract
 
 - `docs/forking.md` is the only detailed technical guide.
 - README identifies cali.so as the live working example, links the guide, and
   names public-only/full Operator Stack profiles.
 - Both public articles become concise localized v3 overviews linking the guide.
+- Fork documentation preserves the current admin IA, owner entry, PPR/server
+  authorization boundary, static nonce-free CSP, and passkey-removal decision.
+  “Owner admin is always reachable” is stated only for a committed true profile;
+  public-only forks have no owner probe, Admin row, G-D, or admin routes.
 - Personal content stays checked in as the example but replacement/removal is
   mandatory. There is no template branch.
 - `pnpm template:check` is read-only, non-networked, non-mutating, and never
@@ -77,6 +97,23 @@ The checker prints these four stable headings exactly once:
 2. `Identity residue`
 3. `Mandatory replacements`
 4. `Operator Stack`
+
+Before scanning residue, the `Site Profile` section imports the committed
+profile and mirrors Plan 005's structural gates exactly:
+
+- `id` and `keyNamespace` match
+  `^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$`, so neither is empty, padded,
+  uppercase, colon-bearing, or delimiter-suffixed;
+- `repository.fullName` contains exactly one non-empty owner/repository pair;
+- `repository.url` equals
+  `https://github.com/${repository.fullName}` exactly, with no stale owner/repo,
+  alternate origin, trailing slash, query, or hash;
+- Cali's upstream full name still requires `id === 'cali.so'` and
+  `keyNamespace === 'cali'`.
+
+Invalid structure exits nonzero without printing field values. `site.config.ts`
+is excluded only from identity-residue matching; it is never excluded from this
+structural validation.
 
 Its scan contract is exact:
 
@@ -140,8 +177,10 @@ reading their values:
 For `operatorStack: false`, report zero required operator environment names and
 these disabled families with descendants: `/photos`, `/en/photos`, `/ama`,
 `/en/ama`, `/admin`, `/api/admin`, `/api/ama`, `/api/internal/ama`, and
-`/api/internal/media`. Keep these literal name sets in the checker test so drift
-from `.env.example` or the schema fails visibly.
+`/api/internal/media`. Also report that the public owner-session probe,
+`localStorage.owner` hint, Admin row, and G-D chord are disabled. Keep these
+literal name sets and owner-entry semantics in the checker test so drift from
+`.env.example`, the schema, or the committed UI contract fails visibly.
 
 ## Mandatory replacement inventory
 
@@ -193,6 +232,7 @@ No fork workflow may require production DB/Bunny data, Clerk users, or secrets.
 
 - `README.md`
 - `docs/handoff.md`
+- `docs/v3-cutover-ops-runbook.md`
 - `.env.example`
 - `LICENSE` only to link the guide without changing legal terms
 - `package.json`
@@ -216,6 +256,8 @@ No fork workflow may require production DB/Bunny data, Clerk users, or secrets.
 
 - `.github/workflows/deploy-preview.yml` (existing guard exemplar)
 - `.github/workflows/security.yml` (must remain runnable in forks)
+- `docs/security/baseline.md` and `docs/security/verification.md` (canonical
+  security wording reconciled by plan 006)
 - `.github/FUNDING.yml`, `.github/actions/deploy-neon-vercel/action.yml`, and
   `vercel.json`, plus `AGENTS.md` and `SECURITY.md` (mandatory fork reviews or
   replacements documented/reported, not changed upstream)
@@ -243,12 +285,19 @@ No fork workflow may require production DB/Bunny data, Clerk users, or secrets.
 
 Implement the exact Checker interface through exported pure analysis functions
 or temporary fixture directories. Tests cover valid source profile, missing
-asset, every marker with file/line, false profile with zero required env, true
-profile exact names/pairs/tunables plus the local/CI-only Gateway credential,
+asset, every invalid namespace fixture from Plan 005 (empty, whitespace,
+uppercase, leading/trailing punctuation, any colon, and a colon-suffixed
+namespace), missing/multiple repository segments, stale Cali repository URL
+after a full-name change, non-GitHub URL, URL suffixes, every marker with
+file/line, false profile with zero required env, true profile exact
+names/pairs/tunables plus the local/CI-only Gateway credential,
 `AGENTS.md`/`SECURITY.md`/handoff/security-workflow reporting, and sentinel
-secret redaction. Stub `fetch`, filesystem write/delete, prompt/stdin,
-browser-open, and child-process APIs to prove none is called; snapshot fixture
-trees before/after to prove no mutation.
+secret redaction. Repository fixtures must enforce the exact
+`https://github.com/${fullName}` equality. Stub `fetch`, filesystem
+write/delete, prompt/stdin, browser-open, and child-process APIs to prove none
+is called; snapshot fixture trees before/after to prove no mutation. Failure
+output reports only safe labels and paths, never configured namespace or
+repository values.
 
 **Verify**:
 
@@ -269,8 +318,10 @@ Create `docs/forking.md` with sections in this order:
 3. clone/install and edit Site Profile before first operator use;
 4. exact Mandatory replacement inventory;
 5. MDX/content/assets and paired zh/en contract;
-6. public-only setup and unreachable Photos/AMA/admin/operator APIs;
-7. full-stack setup linking Neon/Clerk/Bunny/AMA/security operations docs;
+6. public-only setup and unreachable Photos/AMA/admin/operator APIs, including
+   no owner-session probe, cached owner hint, Admin row, or G-D chord;
+7. full-stack setup linking Neon/Clerk/Bunny/AMA/security operations docs and
+   preserving the current owner-admin IA/PPR/auth/security decisions;
 8. deployment choices;
 9. license and personal-content removal;
 10. mechanical/browser smoke checklist.
@@ -278,11 +329,27 @@ Create `docs/forking.md` with sections in this order:
 Public-only deployment removes both operator crons from its own `vercel.json`
 and re-enables ordinary Vercel Git deployment. Full-stack forks replace repo
 guards/infrastructure while preserving migration-before-deploy ordering.
+The guide must state that owner admin is always reachable across deployed
+environments only when the committed profile is `operatorStack: true`.
+The Site Profile instructions require forks to change both namespace tokens,
+`repository.fullName`, and its exactly matching GitHub URL together before the
+first build or operator record.
 
-Create `scripts/forking-docs.test.mjs` with named subtests for `canonical guide
-contract`, `repository pointers and license`, and `localized article contract`.
+The full-stack section names `/admin` Overview, `/admin/ama`, `/admin/media`,
+and `/admin/photos`, plus public Preferences/G-D entry and the owner-dock chord
+set. It explains that static shells/fallbacks prerender, provider/data work stays
+behind `requireOwnerPage` in server Suspense loaders, Clerk remains server/proxy
+only, the static CSP is intentionally nonce-free, and passkey reverification is
+not part of the current architecture. These are current contracts, not setup
+steps for a fork to redesign.
+
+Create `scripts/forking-docs.test.mjs` with named subtests for
+`canonical guide contract`, `repository pointers and license`, and
+`localized article contract`.
 Implement the first subtest now: it asserts the ten-section order, both profile
-names, exact mandatory replacement paths, exact environment-name sets, and the
+names, exact mandatory replacement paths, exact environment-name sets, the
+profile-qualified admin availability rule, public-only owner-entry omissions,
+the full-stack IA/PPR/static-CSP/no-passkey contract, and the
 no-production-data/no-initializer rules.
 
 **Verify**:
@@ -295,19 +362,34 @@ node --test --test-name-pattern='canonical guide contract' \
 The canonical-guide subtest passes; later named subtests may be reported as
 skipped until their scoped files are updated.
 
-### Step 3: Align README, environment, handoff, and license
+### Step 3: Align repository and operations documentation
 
 README says this is the live working example, supports two profiles via the
 guide, and is not a zero-config theme. Correct AMA capability copy and link the
 canonical guide. `docs/handoff.md` records cali.so's committed true profile and
-points fork setup to that guide. `.env.example` groups the exact true-profile
-names from Checker interface, documents `AI_GATEWAY_API_KEY` as local/CI-only,
+points fork setup to that guide. Keep its current owner-entry, Overview/AMA/
+Media/Photos IA, PPR/Suspense/`requireOwnerPage`, server-only Clerk, static
+nonce-free CSP, and passkey-removal details intact. Qualify its owner admin as
+always reachable in every deployed environment only while the committed profile
+is true; do not recast that rule as an environment switch. `.env.example`
+groups the exact true-profile names from Checker interface, documents
+`AI_GATEWAY_API_KEY` as local/CI-only,
 says false requires none of them, and preserves all provider-pair/fail-closed
 rules. LICENSE only appends a guide pointer after the existing text; preserve
 its upstream notice, grant, warranty, and content exception byte-for-byte.
 
+Correct only the stale Staging smoke paragraph in
+`docs/v3-cutover-ops-runbook.md`: verify `/admin/media` and `/admin/photos` as
+separate current surfaces, and remove the obsolete redirect expectation.
+Preserve every unrelated deployment, environment, migration, branch, and dated
+hosted-evidence instruction verbatim.
+
 Implement the `repository pointers and license` subtest to assert those README,
-handoff, environment, and unchanged-license contracts.
+handoff, environment, unchanged-license, and preserved admin-architecture
+contracts, plus the runbook's separate `/admin/media` and `/admin/photos`
+Staging checks. The test must fail if the handoff reintroduces client Clerk,
+nonce CSP, or passkey reverification, states unqualified admin availability, or
+the runbook restores the obsolete `/admin/photos` redirect.
 
 **Verify**:
 
@@ -431,7 +513,9 @@ repository but requires no credentials and is not a substitute for those tests.
 
 - Checker tests prove pure read-only/secret-safe behavior for both profiles.
 - Docs tests prove guide ordering, legal notice, links, frontmatter, and binary
-  deletion boundaries.
+  deletion boundaries, plus profile-qualified admin availability and the
+  current IA/PPR/static-CSP/no-passkey contract. They also prove the operations
+  runbook smokes `/admin/media` and `/admin/photos` as separate current surfaces.
 - Refresh tests prove exact active-key and atomic failure semantics.
 - Deployment tests prove guards without suppressing fork CI.
 - Localization/unit/type/build/public verifiers protect the live site.
@@ -440,11 +524,21 @@ repository but requires no credentials and is not a substitute for those tests.
 
 - [ ] `docs/forking.md` is the one detailed source of truth.
 - [ ] README/articles are short, accurate pointers for both profiles.
+- [ ] Guide and handoff preserve the current admin IA, owner entry, PPR/server
+      auth boundary, static nonce-free CSP, and passkey-removal decision.
+- [ ] Admin is described as always reachable only for committed
+      `operatorStack: true`; public-only docs state that owner
+      probe/hint/Admin/G-D behavior is disabled.
+- [ ] The Staging operations runbook tests `/admin/media` and `/admin/photos`
+      separately, contains no obsolete redirect between them, and preserves
+      unrelated deployment instructions.
 - [ ] Fifteen screenshots are absent and `cover.png`/frontmatter remain exact.
 - [ ] Cache keys equal active localized blog and newsletter URLs with tested
       failure rules.
 - [ ] `template:check` is read-only, non-networked, secret-safe, and exits 0 on
       valid source warnings.
+- [ ] `template:check` rejects invalid/delimited namespaces and any repository
+      full-name/URL mismatch without printing configured values.
 - [ ] Mandatory personal/license replacement is operational and preserves the
       upstream MIT notice.
 - [ ] Exact Cali automation is guarded; `security.yml` remains fork-runnable.
@@ -460,6 +554,8 @@ repository but requires no credentials and is not a substitute for those tests.
 - An out-of-scope file is required.
 - A workflow guard would suppress fork CI or change current cali.so behavior.
 - Guide instructions conflict with current operations/security docs.
+- Documentation flattens the admin PPR model, adds client Clerk or nonce CSP,
+  restores passkey reverification, or leaves admin availability unqualified.
 - A missing active preview would require fabricated metadata.
 - Article pairing/frontmatter changes or any personal asset beyond the 15
   screenshots would be deleted.

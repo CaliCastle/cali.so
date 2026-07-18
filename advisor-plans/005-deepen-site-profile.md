@@ -7,20 +7,19 @@
 > status row in `advisor-plans/README.md` when complete.
 >
 > **Drift check (run first)**:
-> `git diff --stat dc24eb3..HEAD -- site.config.ts lib/site/site-config.test.ts CONTEXT-MAP.md lib/site/CONTEXT.md docs/adr/0011-committed-site-profile.md app/_components/site-document.tsx app/global-error.tsx app/global-not-found.tsx app/global-metadata.test.tsx app/newsletter-retired-metadata.test.ts app/non-public-metadata.test.ts app/seo-routes.test.ts app/site-document.test.tsx app/_views/home-page.tsx app/_views/home-page.test.tsx app/_views/newsletter-retired-page.tsx app/feed.xml/route.ts app/feed.en.xml/route.ts components/dock.tsx components/dock.test.tsx components/footer-clock.tsx components/footer-clock.test.tsx components/home-introduction.tsx components/home-introduction.test.tsx components/site-footer.tsx components/site-footer.test.tsx components/social-cards.tsx components/social-cards.test.tsx content/github.json content/social.json lib/content.test.ts lib/date.ts lib/date.test.ts lib/locale-client.ts lib/locale-metadata.ts lib/locale-metadata.test.ts lib/non-public-metadata.ts lib/og-image.tsx lib/og-route-metadata.test.ts lib/public-page-metadata.ts lib/public-page-metadata.test.ts lib/seo.ts lib/social-live.ts lib/social-live.test.ts next.config.ts scripts/refresh-github.mjs scripts/refresh-social.mjs scripts/refresh-link-previews.mjs scripts/verify-production-security-boundary.mjs scripts/verify-public-discovery.mjs scripts/verify-public-links.mjs advisor-plans/README.md`
+> `git diff --stat 59a39bc..HEAD -- site.config.ts lib/site/site-config.test.ts CONTEXT-MAP.md lib/site/CONTEXT.md docs/adr/0011-committed-site-profile.md app/_components/site-document.tsx app/global-error.tsx app/global-not-found.tsx app/global-metadata.test.tsx app/newsletter-retired-metadata.test.ts app/non-public-metadata.test.ts app/seo-routes.test.ts app/site-document.test.tsx app/_views/home-page.tsx app/_views/home-page.test.tsx app/_views/newsletter-retired-page.tsx app/feed.xml/route.ts app/feed.en.xml/route.ts components/dock.tsx components/dock.test.tsx components/footer-clock.tsx components/footer-clock.test.tsx components/home-introduction.tsx components/home-introduction.test.tsx components/site-footer.tsx components/site-footer.test.tsx components/social-cards.tsx components/social-cards.test.tsx content/github.json content/social.json lib/content.test.ts lib/date.ts lib/date.test.ts lib/locale-client.ts lib/locale-metadata.ts lib/locale-metadata.test.ts lib/non-public-metadata.ts lib/og-image.tsx lib/og-route-metadata.test.ts lib/public-page-metadata.ts lib/public-page-metadata.test.ts lib/seo.ts lib/social-live.ts lib/social-live.test.ts next.config.ts scripts/refresh-github.mjs scripts/refresh-social.mjs scripts/refresh-link-previews.mjs scripts/verify-production-security-boundary.mjs scripts/verify-public-discovery.mjs scripts/verify-public-links.mjs advisor-plans/README.md`
 > Compare every changed in-scope file with the excerpts and exact output
-> inventory below. Status-only changes in the advisor index and completed
-> dependency changes are expected; any other meaningful mismatch is a STOP
-> condition.
+> inventory below. Status-only index changes and completed deletion-plan
+> changes are expected; any other meaningful mismatch is a STOP condition.
 
 ## Status
 
 - **Priority**: P1
 - **Effort**: L
 - **Risk**: MED
-- **Depends on**: `advisor-plans/001-stabilize-unit-test-baseline.md`
+- **Depends on**: none; the canonical suite is stable at this baseline
 - **Category**: tech-debt
-- **Planned at**: commit `dc24eb3`, 2026-07-18
+- **Planned at**: commit `59a39bc`, 2026-07-18
 
 ## Why this matters
 
@@ -36,10 +35,10 @@ arbitrary JSX or biography into the interface would make the module shallow.
 
 ## Current state
 
-Representative duplication at `dc24eb3`:
+Representative duplication at `59a39bc`:
 
 ```tsx
-// app/_components/site-document.tsx:24-29
+// app/_components/site-document.tsx:24-30
 export const rootMetadata: Metadata = {
   metadataBase: seo.url,
   title: {
@@ -50,7 +49,7 @@ export const rootMetadata: Metadata = {
 ```
 
 ```ts
-// lib/seo.ts:3-9
+// lib/seo.ts:3-10
 export const seo = {
   title: publicPageMetadata.home.zh.title,
   description: publicPageMetadata.home.zh.description,
@@ -100,9 +99,9 @@ type PublicPath = `/${string}`
 type Profile<T> = T | null
 
 export interface SiteConfig {
-  /** Stable namespace. Change only before a fork creates operator data. */
+  /** Stable delimiter-free token. Change only before creating operator data. */
   id: string
-  /** Stable prefix for browser/local-storage/rate-limit keys such as cali:. */
+  /** Stable delimiter-free prefix for browser/storage/rate-limit keys. */
   keyNamespace: string
   canonicalUrl: HttpsUrl
   owner: {
@@ -184,6 +183,15 @@ same as `owner.publicEmail`.
 durable/provider domain separators beginning `cali.so:`. `keyNamespace`
 preserves browser events, local-storage keys, and rate-limit scopes beginning
 `cali:`. A fork chooses both before creating operator data or shipping clients.
+Both values must match
+`^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$`: non-empty, already trimmed,
+lowercase ASCII tokens with no colon or trailing delimiter. Callers add their
+own single `:` separator; the configured token never contains one.
+
+`repository.fullName` must contain exactly one non-empty `owner/repository`
+pair, and `repository.url` must be exactly
+`https://github.com/${repository.fullName}` with no trailing slash, query, or
+hash. These fields cannot vary independently; a fork must change both together.
 
 ## Commands you will need
 
@@ -260,6 +268,10 @@ preserves browser events, local-storage keys, and rate-limit scopes beginning
 **Out of scope**:
 
 - `operatorStack` behavior and operator route gating; plan 006 owns it.
+- Owner discovery and admin navigation outside `components/dock.tsx`, including
+  `components/preferences.tsx`, `components/admin-dock.tsx`,
+  `hooks/use-dock-go-shortcuts.ts`, and `app/api/admin/session/route.ts`; these
+  remain unchanged until plan 006.
 - Biography JSX in `components/home-introduction.tsx`, project/experience/book/
   record arrays, posts, newsletters, photos, and other authored content. They
   stay as the working example and plan 007 lists them for mandatory replacement.
@@ -306,7 +318,7 @@ done
 rg -qF '[Site Profile](./lib/site/CONTEXT.md)' CONTEXT-MAP.md
 ```
 
-Both commands exit 0 with no output. The terms mean exactly what Current state
+All commands exit 0 with no output. The terms mean exactly what Current state
 defines; no extra module, adapter, or locale interface is introduced.
 
 ### Step 2: Add and validate the Site Profile
@@ -314,15 +326,22 @@ defines; no extra module, adapter, or locale interface is introduced.
 Create `site.config.ts` with the exact interface above and the current cali.so
 values. Add `lib/site/site-config.test.ts` covering:
 
-- HTTPS canonical origin with pathname `/`, no query, and no hash; repository
-  URL is a general HTTPS URL and may contain its repository path;
+- HTTPS canonical origin with pathname `/`, no query, and no hash;
 - valid public `/...` asset paths whose files exist under `public/`;
 - syntactically valid public email and non-empty handles;
 - valid IANA time zone by constructing `Intl.DateTimeFormat`;
 - alternate values satisfying the exported `SiteConfig` type with each of the
   five optional profiles set to null;
+- both namespace fields match the exact lowercase delimiter-free token rule;
+  negative fixtures cover empty, whitespace, uppercase, leading/trailing
+  punctuation, and any colon, including a colon-suffixed `keyNamespace`;
+- repository `fullName` has one non-empty owner/repository pair and its URL is
+  exactly `https://github.com/${fullName}` with no trailing slash, query, or
+  hash; negative fixtures cover missing or multiple segments, stale Cali URLs
+  after a name change, non-GitHub origins, and URL suffixes;
 - `id === 'cali.so'` and `keyNamespace === 'cali'` only when
-  `repository.fullName === 'CaliCastle/cali.so'`; forks may change all three;
+  `repository.fullName === 'CaliCastle/cali.so'`; forks change both namespace
+  fields, `fullName`, and its matching URL together;
 - no field names containing `secret`, `token`, `password`, or `credential`, or
   conventional secret names such as `apiKey`, `privateKey`, `secretKey`, or
   `encryptionKey`; `keyNamespace` is an explicit non-secret identifier and must
@@ -335,11 +354,27 @@ the interface.
 
 ```bash
 pnpm exec vitest run lib/site/site-config.test.ts
-node --input-type=module -e "const {siteConfig}=await import('./site.config.ts'); if (siteConfig.repository.fullName === 'CaliCastle/cali.so' && (siteConfig.id !== 'cali.so' || siteConfig.keyNamespace !== 'cali')) process.exit(1)"
+node --input-type=module <<'NODE'
+import assert from 'node:assert/strict'
+
+const { siteConfig } = await import('./site.config.ts')
+const namespaceToken = /^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$/
+assert.match(siteConfig.id, namespaceToken)
+assert.match(siteConfig.keyNamespace, namespaceToken)
+assert.equal(
+  siteConfig.repository.url,
+  `https://github.com/${siteConfig.repository.fullName}`,
+)
+if (siteConfig.repository.fullName === 'CaliCastle/cali.so') {
+  assert.equal(siteConfig.id, 'cali.so')
+  assert.equal(siteConfig.keyNamespace, 'cali')
+}
+NODE
 ```
 
 The config tests pass and Node 24 imports the TypeScript config without a
-loader. The source-repository compatibility assertion exits 0.
+loader. The namespace, repository-pairing, and source-repository compatibility
+assertions exit 0.
 
 ### Step 3: Migrate public metadata and chrome
 
@@ -354,12 +389,24 @@ files listed in Scope:
 - public page descriptions only where the shared given/display name is
   interpolated. Preserve the authored sentence around it.
 
-Keep Local's `http://localhost:3199` fallback and Preview `SITE_URL` behavior in
-`lib/seo.ts`; replace only the production hardcoded default with
-`siteConfig.canonicalUrl`.
+In `lib/seo.ts`, trim `process.env.SITE_URL` once and treat an empty or
+whitespace-only value as absent. Preserve every non-empty Local/Preview
+`SITE_URL`, keep Local's `http://localhost:3199` fallback, and replace only the
+production hardcoded default with `siteConfig.canonicalUrl`. The blank-value
+fallback is required so Plan 006 can override a populated local env file with
+`SITE_URL=` and prove a public-only production build needs no deployed origin
+variable.
 
 Do not turn `siteConfig` into React context. Direct imports are the intended
 small interface for server, client, and build-time callers.
+
+Preserve the current public/admin document split in
+`app/_components/site-document.tsx`: the owner-admin branch remains a static,
+provider-free shell outside public analytics, social reads, public Dock, and
+route transitions. In `components/dock.tsx`, migrate shared avatar identity
+without changing the cached owner hint, Preferences-triggered
+`/api/admin/session` probe, Admin-row visibility, or G-D ownership added before
+this plan. Plan 006 owns profile-aware gating for those operator affordances.
 
 **Verify**:
 
@@ -373,7 +420,10 @@ pnpm exec vitest run lib/site/site-config.test.ts \
   lib/og-route-metadata.test.ts lib/public-page-metadata.test.ts
 ```
 
-All files pass and retain exact cali.so output expectations.
+All files pass and retain exact cali.so output expectations. Metadata coverage
+proves a non-empty `SITE_URL` still wins, while blank/whitespace production
+values use `siteConfig.canonicalUrl` and blank Local values use the existing
+localhost fallback.
 
 ### Step 4: Separate social identity from snapshot metrics
 
@@ -457,7 +507,9 @@ exact marker set:
   identity markers embedded in authored destinations, but not shared runtime
   chrome/configuration;
 - operator identity deferred only in the complete production file inventory
-  in plan 006, including `lib/media/storage/contract.ts`;
+  in plan 006, including `app/admin/(protected)/AdminOverview.tsx`,
+  `app/admin/(protected)/ama/AmaSettings.tsx`, and
+  `lib/media/storage/contract.ts`;
 - explicit protocol URL fixtures in tests only. Production source may not use
   this category.
 
@@ -501,7 +553,7 @@ git status --short
 The first nine commands exit 0; every discovered test passes without retries or
 raised timeouts. Its file/case count reflects any completed deletion plans plus
 the seven new canonical test files and new cases in this plan, rather than the
-pre-plan 109-file/1,012-test baseline. Exact-output tests cover the named
+pre-plan 107-file/1,007-test baseline. Exact-output tests cover the named
 surfaces. Status contains only the fully enumerated Create/Modify paths and the
 permitted index row; any other path is a STOP condition.
 
@@ -519,6 +571,8 @@ permitted index row; any other path is a STOP condition.
 
 - [ ] `site.config.ts` is the only committed interface for shared non-secret
       identity.
+- [ ] Namespace tokens are non-empty, lowercase, delimiter-free, and compose
+      with exactly one caller-owned colon; repository full name and URL match.
 - [ ] The module imports no React, environment, provider, or secret code.
 - [ ] Public metadata/chrome/social/scripts use it and render unchanged output.
 - [ ] Social snapshot files no longer duplicate configured names/handles.
@@ -535,6 +589,8 @@ permitted index row; any other path is a STOP condition.
 
 - An in-scope consumer has drifted enough that exact current output cannot be
   preserved from the plan.
+- Identity migration would alter the static owner-admin document shell, public
+  owner-discovery probe, Admin-row visibility, or public/admin shortcut split.
 - A proposed field would contain a secret, provider credential, or
   environment-specific capability.
 - A config change requires serializing functions, JSX, React elements, or a
