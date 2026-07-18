@@ -325,13 +325,13 @@ typewriter/ascii textures, measuring ticks, registration marks. Rules:
   `pointer-events: none; user-select: none` — a card is a printed label,
   never a control. Email's card is a little paper ENVELOPE (folded flap,
   perforated avatar stamp, mono address); the trigger opens mailto:.
-- **Room shelves** (`.room-shelf-plank`): records and books rest on an
-  actual wooden plank. The record shelf has a 6px top plane above its 12px
-  front face, low-contrast irregular longitudinal grain over an oak tone
-  (walnut in dark), and a layered wall shadow beneath. One upper-left light
-  source governs its top highlight, underside, sleeve edges, side faces, and
-  the per-item contact shadows where things meet the wood. The plank runs the
-  full framed width even when half empty — that's the point. A persistent
+- **Room shelves** (`.room-shelf-plank`): records and books rest on the same
+  material system: a 6px top plane above a 12px front face, low-contrast
+  irregular longitudinal grain over an oak tone (walnut in dark), and a
+  layered wall shadow beneath. One upper-left light source governs the top
+  highlight, underside, sleeve and cover edges, side faces, and the per-item
+  contact shadows where things meet the wood. The plank runs the full framed
+  width even when half empty — that's the point. A persistent
   muted plain-text annotation directly below it names the selected object and
   is the shelf's only external link. Covers always select; they never navigate.
   Record and book spines use static cover-derived color and contrasting ink
@@ -379,8 +379,10 @@ typewriter/ascii textures, measuring ticks, registration marks. Rules:
   aspect ratio at a fixed 210px book height; source dimensions drive the 3D
   projection, so square and narrow editions render whole without shifting the
   shelf. A closed book selects and opens into the accordion; activating the
-  open book leaves it selected. The annotation below the plank is the only link
-  to its official author or publisher page.
+  open book leaves it selected. Each projected book owns a shelf-plane contact
+  shadow that expands with its visible width but stays on the wood when the
+  jacket lifts on hover. The annotation below the plank is the only link to its
+  official author or publisher page.
 - Future candidates: ascii-on-hover for photos, dithered media
   placeholders, line-screen section dividers. One instrument per page —
   never stack rasters over each other.

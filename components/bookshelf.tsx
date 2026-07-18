@@ -67,6 +67,8 @@ function coverWidth(book: (typeof books)[number]) {
   return (BOOK_H * book.coverWidth) / book.coverHeight
 }
 
+const BOOK_COVER_WIDTHS = books.map(coverWidth)
+
 function projectBookBounds(
   spine: number,
   nativeCoverWidth: number,
@@ -120,7 +122,7 @@ function shelfPoses(progress: number[], tilts: number[]) {
 
   return books.map((book, i) => {
     const spine = book.spine ?? 24
-    const next = pose(progress[i], tilts[i], spine, coverWidth(book))
+    const next = pose(progress[i], tilts[i], spine, BOOK_COVER_WIDTHS[i])
     const frameX = projectedX - baseX
 
     baseX += spine + SHELF_GAP
@@ -249,6 +251,10 @@ export function Bookshelf() {
 
       frame.style.zIndex = progress[i] > 0.01 ? '2' : '1'
       frame.style.transform = `translateX(${next.frameX.toFixed(2)}px)`
+      frame.style.setProperty(
+        '--book-contact-scale',
+        (next.width / BOOK_COVER_WIDTHS[i]).toFixed(4),
+      )
       inner.style.transform = `translateX(${next.offsetX.toFixed(2)}px) rotate(${next.tilt.toFixed(3)}deg) rotateY(${next.rotateY.toFixed(3)}deg)`
     })
 
@@ -487,7 +493,7 @@ export function Bookshelf() {
         {books.map((book, i) => {
           const isOpen = i === open
           const spine = book.spine ?? 24
-          const nativeCoverWidth = coverWidth(book)
+          const nativeCoverWidth = BOOK_COVER_WIDTHS[i]
           const initialPose = renderedPoses[i]
           const content = (
             <span
@@ -542,12 +548,17 @@ export function Bookshelf() {
                 bookRefs.current[i] = node
               }}
               className="book3-frame"
-              style={{
-                width: spine,
-                zIndex: progressRef.current[i] > 0.01 ? 2 : 1,
-                transform: `translateX(${initialPose.frameX.toFixed(2)}px)`,
-              }}
+              style={
+                {
+                  width: spine,
+                  zIndex: progressRef.current[i] > 0.01 ? 2 : 1,
+                  transform: `translateX(${initialPose.frameX.toFixed(2)}px)`,
+                  '--book-contact-width': `${nativeCoverWidth.toFixed(2)}px`,
+                  '--book-contact-scale': (initialPose.width / nativeCoverWidth).toFixed(4),
+                } as React.CSSProperties
+              }
             >
+              <span className="book3-contact-shadow" aria-hidden />
               <button
                 ref={(node) => {
                   controlRefs.current[i] = node

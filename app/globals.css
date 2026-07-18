@@ -2301,7 +2301,23 @@ a:focus-visible .external-label .external-mark {
 /* ── Room shelves: records and books rest on a real wooden plank ──── */
 
 .room-shelf {
+  --room-shelf-shadow-rgb: 27 22 17;
+  --room-shelf-wood-front-bottom: oklch(0.61 0.065 64);
+  --room-shelf-wood-front-top: oklch(0.79 0.05 74);
+  --room-shelf-wood-grain: rgb(71 42 17 / 0.08);
+  --room-shelf-wood-top-back: oklch(0.77 0.045 75);
+  --room-shelf-wood-top-front: oklch(0.84 0.04 78);
+
   position: relative;
+}
+
+.dark .room-shelf {
+  --room-shelf-shadow-rgb: 0 0 0;
+  --room-shelf-wood-front-bottom: oklch(0.29 0.035 49);
+  --room-shelf-wood-front-top: oklch(0.43 0.04 59);
+  --room-shelf-wood-grain: rgb(0 0 0 / 0.15);
+  --room-shelf-wood-top-back: oklch(0.38 0.035 56);
+  --room-shelf-wood-top-front: oklch(0.47 0.035 62);
 }
 
 .shelf-annotation {
@@ -2343,47 +2359,68 @@ a:focus-visible .external-label .external-mark {
   outline-offset: 3px;
 }
 
-/* the plank's front face: edge grain drawn with layered streaks over an
-   oak tone; a wall shadow hangs beneath */
+/* One wooden material and upper-left light source ground both collections. */
 .room-shelf-plank {
   display: block;
   position: relative;
+  z-index: 1;
   height: 12px;
-  border-radius: 2px;
+  border-radius: 1px 1px 2px 2px;
   background:
-    repeating-linear-gradient(0deg, rgb(60 34 12 / 0.09) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg, transparent 0 5px, rgb(60 34 12 / 0.06) 5px 6px, transparent 6px 13px),
-    linear-gradient(180deg, oklch(0.8 0.055 75), oklch(0.7 0.065 70) 45%, oklch(0.62 0.07 65));
+    radial-gradient(ellipse 22% 38% at 12% 22%, transparent 0 92%, var(--room-shelf-wood-grain) 93% 95%, transparent 96%),
+    radial-gradient(ellipse 32% 42% at 67% 70%, transparent 0 93%, var(--room-shelf-wood-grain) 94% 96%, transparent 97%),
+    linear-gradient(92deg, transparent 0 8%, var(--room-shelf-wood-grain) 14%, transparent 22% 54%, var(--room-shelf-wood-grain) 61%, transparent 72%),
+    linear-gradient(180deg, var(--room-shelf-wood-front-top), var(--room-shelf-wood-front-bottom));
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.35),
-    inset 0 -1px 0 rgb(0 0 0 / 0.18),
-    0 7px 14px -4px rgb(0 0 0 / 0.25),
-    0 2px 3px rgb(0 0 0 / 0.12);
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    inset 0 -1px 0 rgb(51 28 10 / 0.2),
+    1px 3px 3px -2px rgb(var(--room-shelf-shadow-rgb) / 0.24),
+    3px 10px 16px -8px rgb(var(--room-shelf-shadow-rgb) / 0.34),
+    6px 24px 34px -18px rgb(var(--room-shelf-shadow-rgb) / 0.28);
+}
+
+.room-shelf-plank::before,
+.room-shelf-plank::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.room-shelf-plank::before {
+  top: -6px;
+  height: 6px;
+  clip-path: polygon(0.8% 0, 99.2% 0, 100% 100%, 0 100%);
+  background:
+    radial-gradient(ellipse 28% 70% at 23% 45%, transparent 0 90%, var(--room-shelf-wood-grain) 91% 93%, transparent 94%),
+    linear-gradient(91deg, transparent 0 16%, var(--room-shelf-wood-grain) 25%, transparent 34% 67%, var(--room-shelf-wood-grain) 75%, transparent 83%),
+    linear-gradient(180deg, var(--room-shelf-wood-top-front), var(--room-shelf-wood-top-back));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 -1px 0 rgb(52 29 11 / 0.18);
+}
+
+.room-shelf-plank::after {
+  bottom: -2px;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: linear-gradient(180deg, rgb(var(--room-shelf-shadow-rgb) / 0.24), rgb(var(--room-shelf-shadow-rgb) / 0.08));
 }
 
 .dark .room-shelf-plank {
-  /* walnut after dark */
-  background:
-    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.22) 0 1px, transparent 1px 4px),
-    repeating-linear-gradient(0deg, transparent 0 5px, rgb(0 0 0 / 0.16) 5px 6px, transparent 6px 13px),
-    linear-gradient(180deg, oklch(0.44 0.045 60), oklch(0.36 0.045 55) 45%, oklch(0.3 0.04 50));
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.09),
-    inset 0 -1px 0 rgb(0 0 0 / 0.45),
-    0 7px 14px -4px rgb(0 0 0 / 0.55),
-    0 2px 3px rgb(0 0 0 / 0.3);
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 -1px 0 rgb(0 0 0 / 0.48),
+    1px 3px 3px -2px rgb(var(--room-shelf-shadow-rgb) / 0.45),
+    3px 10px 16px -8px rgb(var(--room-shelf-shadow-rgb) / 0.62),
+    6px 24px 34px -18px rgb(var(--room-shelf-shadow-rgb) / 0.5);
 }
 
-/* bookshelf contact shadows stay on their translated book elements */
-.room-shelf .book3::after {
-  content: '';
-  position: absolute;
-  left: 7%;
-  right: 7%;
-  bottom: -2px;
-  height: 5px;
-  background: radial-gradient(50% 100% at 50% 100%, rgb(0 0 0 / 0.3), transparent 78%);
-  pointer-events: none;
+.dark .room-shelf-plank::before {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 -1px 0 rgb(0 0 0 / 0.4);
 }
 
 /* ── Post images: scattered prints that straighten on attention ───── */
@@ -2475,12 +2512,7 @@ a:focus-visible .external-label .external-mark {
 .vinyl-room {
   --vinyl-depth: 3px;
   --vinyl-motion-duration: 330ms;
-  --vinyl-shadow-rgb: 27 22 17;
-  --vinyl-wood-front-bottom: oklch(0.61 0.065 64);
-  --vinyl-wood-front-top: oklch(0.79 0.05 74);
-  --vinyl-wood-grain: rgb(71 42 17 / 0.08);
-  --vinyl-wood-top-back: oklch(0.77 0.045 75);
-  --vinyl-wood-top-front: oklch(0.84 0.04 78);
+  --vinyl-shadow-rgb: var(--room-shelf-shadow-rgb);
 
   left: 50%;
   width: min(37.5rem, calc(100vw - 2rem));
@@ -2488,77 +2520,8 @@ a:focus-visible .external-label .external-mark {
   transform: translateX(-50%);
 }
 
-.vinyl-room > .room-shelf-plank {
-  z-index: 1;
-  border-radius: 1px 1px 2px 2px;
-  background:
-    radial-gradient(ellipse 22% 38% at 12% 22%, transparent 0 92%, var(--vinyl-wood-grain) 93% 95%, transparent 96%),
-    radial-gradient(ellipse 32% 42% at 67% 70%, transparent 0 93%, var(--vinyl-wood-grain) 94% 96%, transparent 97%),
-    linear-gradient(92deg, transparent 0 8%, var(--vinyl-wood-grain) 14%, transparent 22% 54%, var(--vinyl-wood-grain) 61%, transparent 72%),
-    linear-gradient(180deg, var(--vinyl-wood-front-top), var(--vinyl-wood-front-bottom));
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.28),
-    inset 0 -1px 0 rgb(51 28 10 / 0.2),
-    1px 3px 3px -2px rgb(var(--vinyl-shadow-rgb) / 0.24),
-    3px 10px 16px -8px rgb(var(--vinyl-shadow-rgb) / 0.34),
-    6px 24px 34px -18px rgb(var(--vinyl-shadow-rgb) / 0.28);
-}
-
-.vinyl-room > .room-shelf-plank::before,
-.vinyl-room > .room-shelf-plank::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  left: 0;
-  pointer-events: none;
-}
-
-.vinyl-room > .room-shelf-plank::before {
-  top: -6px;
-  height: 6px;
-  clip-path: polygon(0.8% 0, 99.2% 0, 100% 100%, 0 100%);
-  background:
-    radial-gradient(ellipse 28% 70% at 23% 45%, transparent 0 90%, var(--vinyl-wood-grain) 91% 93%, transparent 94%),
-    linear-gradient(91deg, transparent 0 16%, var(--vinyl-wood-grain) 25%, transparent 34% 67%, var(--vinyl-wood-grain) 75%, transparent 83%),
-    linear-gradient(180deg, var(--vinyl-wood-top-front), var(--vinyl-wood-top-back));
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.32),
-    inset 0 -1px 0 rgb(52 29 11 / 0.18);
-}
-
-.vinyl-room > .room-shelf-plank::after {
-  bottom: -2px;
-  height: 2px;
-  border-radius: 0 0 2px 2px;
-  background: linear-gradient(180deg, rgb(var(--vinyl-shadow-rgb) / 0.24), rgb(var(--vinyl-shadow-rgb) / 0.08));
-}
-
 .vinyl-annotation {
   z-index: 2;
-}
-
-.dark .vinyl-room {
-  --vinyl-shadow-rgb: 0 0 0;
-  --vinyl-wood-front-bottom: oklch(0.29 0.035 49);
-  --vinyl-wood-front-top: oklch(0.43 0.04 59);
-  --vinyl-wood-grain: rgb(0 0 0 / 0.15);
-  --vinyl-wood-top-back: oklch(0.38 0.035 56);
-  --vinyl-wood-top-front: oklch(0.47 0.035 62);
-}
-
-.dark .vinyl-room > .room-shelf-plank {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    inset 0 -1px 0 rgb(0 0 0 / 0.48),
-    1px 3px 3px -2px rgb(var(--vinyl-shadow-rgb) / 0.45),
-    3px 10px 16px -8px rgb(var(--vinyl-shadow-rgb) / 0.62),
-    6px 24px 34px -18px rgb(var(--vinyl-shadow-rgb) / 0.5);
-}
-
-.dark .vinyl-room > .room-shelf-plank::before {
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
-    inset 0 -1px 0 rgb(0 0 0 / 0.4);
 }
 
 .vinyl-viewport {
@@ -2905,6 +2868,8 @@ a:focus-visible .external-label .external-mark {
 /* ── Bookshelf: 3D accordion (components/bookshelf.tsx) ───────────── */
 
 .bookshelf-viewport {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: 216px;
   overflow: clip;
@@ -2929,8 +2894,30 @@ a:focus-visible .external-label .external-mark {
   flex-shrink: 0;
 }
 
+.book3-contact-shadow {
+  position: absolute;
+  z-index: 0;
+  bottom: -3px;
+  left: 0;
+  width: var(--book-contact-width);
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(var(--room-shelf-shadow-rgb) / 0.38) 0%,
+    rgb(var(--room-shelf-shadow-rgb) / 0.16) 48%,
+    transparent 84%
+  );
+  opacity: 0.9;
+  pointer-events: none;
+  transform: scaleX(var(--book-contact-scale));
+  transform-origin: left center;
+  will-change: transform;
+}
+
 .book3 {
   position: relative;
+  z-index: 1;
   display: block;
   width: 100%;
   height: 100%;
@@ -2986,7 +2973,10 @@ a:focus-visible .external-label .external-mark {
   backface-visibility: hidden;
   overflow: hidden;
   border-radius: 2px 4px 4px 2px;
-  filter: drop-shadow(2px 4px 15px rgb(0 0 0 / 0.14));
+  box-shadow:
+    0 0 0 var(--border-hairline) rgb(0 0 0 / 0.09),
+    1px 2px 3px -1px rgb(var(--room-shelf-shadow-rgb) / 0.2),
+    4px 9px 16px -9px rgb(var(--room-shelf-shadow-rgb) / 0.3);
   user-select: none;
 }
 

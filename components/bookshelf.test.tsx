@@ -4,6 +4,8 @@ import { forwardRef } from 'react'
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { books } from '~/lib/personal'
+
 import { Bookshelf } from './bookshelf'
 
 vi.mock('next/image', () => ({
@@ -40,6 +42,29 @@ afterEach(() => {
 })
 
 describe('Bookshelf', () => {
+  it('grounds every book on one decorative wooden shelf', () => {
+    const { container } = render(<Bookshelf />)
+    const room = container.querySelector<HTMLElement>('.bookshelf-room')
+    const viewport = container.querySelector<HTMLElement>('.bookshelf-viewport')
+    const plank = container.querySelector<HTMLElement>('.room-shelf-plank')
+    const frames = [...container.querySelectorAll<HTMLElement>('.book3-frame')]
+    const shadows = [...container.querySelectorAll<HTMLElement>('.book3-contact-shadow')]
+
+    expect(frames).toHaveLength(books.length)
+    expect(shadows).toHaveLength(books.length)
+    expect(viewport?.parentElement).toBe(room)
+    expect(plank?.parentElement).toBe(room)
+    expect(shadows.every((shadow) => shadow.getAttribute('aria-hidden') === 'true')).toBe(true)
+    expect(shadows.every((shadow) => !shadow.matches('a, button, [tabindex]'))).toBe(true)
+    expect(
+      frames.every(
+        (frame) =>
+          frame.style.getPropertyValue('--book-contact-width') !== '' &&
+          frame.style.getPropertyValue('--book-contact-scale') !== '',
+      ),
+    ).toBe(true)
+  })
+
   it('waits for the selected cover to decode before opening it', async () => {
     let finishDecode: (() => void) | undefined
     const decode = vi.fn(
