@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 
 import { requireOwnerPage } from '~/lib/admin/server'
 import { getAmaAdminServices } from '~/lib/ama/admin/server'
+import { T } from '~/lib/i18n'
 import type {
   AlternateTimeRequestRecord,
   BookingRecord,
@@ -22,8 +24,7 @@ export const metadata: Metadata = {
   robots: nonPublicRobots,
 }
 
-// Booking operations data intentionally renders per request.
-export const instant = false
+export const instant = true
 
 function bookingRow(booking: BookingRecord): BookingRowViewModel {
   return {
@@ -111,14 +112,30 @@ function connectionStatus(status: string | undefined): GoogleConnectionStatus {
   return 'disconnected'
 }
 
-export default async function AdminAmaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{
-    availability?: string | string[]
-    calendar?: string | string[]
-  }>
-}) {
+type AmaSearchParams = Promise<{
+  availability?: string | string[]
+  calendar?: string | string[]
+}>
+
+function AmaFallback() {
+  return (
+    <div className="pb-10" aria-busy="true">
+      <h1 className="text-sm font-medium text-muted-foreground">
+        <T zh="咨询" en="AMA" />
+      </h1>
+      <p className="mt-1 text-sm text-muted-foreground">…</p>
+      <ul className="mt-6 hairline-top pt-4">
+        {Array.from({ length: 3 }, (_, index) => (
+          <li key={index} className="flex min-h-11 items-center py-1.5" aria-hidden>
+            <span className="h-4 w-full max-w-72 rounded-sm bg-surface-1" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+async function AmaLoader({ searchParams }: { searchParams: AmaSearchParams }) {
   await requireOwnerPage('/admin/ama')
   const { availability, bookingAdmin, google } = getAmaAdminServices()
   const [
@@ -183,5 +200,17 @@ export default async function AdminAmaPage({
         notices: queryNotices(params),
       }}
     />
+  )
+}
+
+export default function AdminAmaPage({
+  searchParams,
+}: {
+  searchParams: AmaSearchParams
+}) {
+  return (
+    <Suspense fallback={<AmaFallback />}>
+      <AmaLoader searchParams={searchParams} />
+    </Suspense>
   )
 }

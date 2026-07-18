@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { clerkMiddleware } from '@clerk/nextjs/server'
 import type { NextFetchEvent, NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
@@ -8,7 +6,6 @@ import {
   isArchivedNewsletterId,
   isPublishedPostSlug,
 } from './lib/public-content-routes'
-import { adminContentSecurityPolicy } from './lib/security/headers'
 
 function missingPublicContent(pathname: string) {
   const postMatch = pathname.match(/^\/(?:en\/)?blog\/([^/]+)\/?$/)
@@ -38,6 +35,9 @@ function usesClerk(pathname: string) {
   )
 }
 
+// Admin pages use the static site CSP from next.config (July 2026): the
+// former per-request nonce policy forced dynamic rendering, which is
+// incompatible with the admin's prerendered instant-navigation shells.
 export function siteProxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -47,19 +47,7 @@ export function siteProxy(request: NextRequest) {
     return NextResponse.rewrite(notFoundUrl, { status: 404 })
   }
 
-  if (!isAdminPage(pathname)) {
-    return NextResponse.next()
-  }
-
-  const nonce = Buffer.from(randomUUID()).toString('base64')
-  const policy = adminContentSecurityPolicy(nonce)
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('content-security-policy', policy)
-  requestHeaders.set('x-nonce', nonce)
-
-  const response = NextResponse.next({ request: { headers: requestHeaders } })
-  response.headers.set('content-security-policy', policy)
-  return response
+  return NextResponse.next()
 }
 
 const clerkProxy = clerkMiddleware(async (auth, request) => {

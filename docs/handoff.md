@@ -52,6 +52,16 @@ Current as of July 2026.
   from the public dock's Preferences panel (owner-only row, or G then D),
   backed by a client probe to `GET /api/admin/session` so public pages stay
   static and Clerk stays off public routes.
+- Admin routes adopt Cache Components (July 2026): every surface partially
+  prerenders (`◐`) — the shell (paper, column, owner dock, page header,
+  fixed-dimension skeletons) is static and prefetches, while owner data
+  streams behind per-page Suspense loaders that each call
+  `requireOwnerPage` before touching data; `clerkMiddleware` still gates
+  every request, and `/admin/login` stays a deliberate `instant = false`
+  redirect. Consequences: the admin has no client-side ClerkProvider (no
+  Clerk JS ships to the admin at all), and the former per-request nonce
+  admin CSP is retired — nonces force dynamic rendering — so admin pages
+  use the static site policy from `lib/security/headers.ts`.
 - The complete paid AMA booking system (#79, slices #82 through #87) is
   implemented and enabled by default (maintainer decision, July 2026; the
   former `AMA_*_ENABLED` switches are removed): public `/ama` and

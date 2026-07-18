@@ -49,7 +49,6 @@ function OverviewRow({
     <li>
       <Link
         href={href}
-        prefetch={false}
         className="group flex min-h-11 items-center gap-3 py-1.5 text-sm outline-none focus-visible:rounded-sm focus-visible:ring-1 focus-visible:ring-foreground"
       >
         <span className="shrink-0">{label}</span>

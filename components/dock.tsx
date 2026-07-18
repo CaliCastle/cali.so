@@ -63,7 +63,6 @@ export function DockItem({
   en,
   goKey,
   active = false,
-  prefetch,
   itemRef,
   onNavigate,
   children,
@@ -74,7 +73,6 @@ export function DockItem({
   en: string
   goKey?: string
   active?: boolean
-  prefetch?: false
   itemRef?: (element: HTMLAnchorElement | null) => void
   onNavigate?: (href: string, keyboardInitiated: boolean) => void
   children: React.ReactNode
@@ -88,7 +86,6 @@ export function DockItem({
     <Link
       ref={itemRef}
       href={href}
-      prefetch={prefetch}
       className="dock-item"
       data-active={active || undefined}
       aria-label={ariaLabel}

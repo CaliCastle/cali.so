@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { Suspense } from 'react'
 
 import { requireOwnerPage } from '~/lib/admin/server'
 import { getAmaAdminServices } from '~/lib/ama/admin/server'
+import { T } from '~/lib/i18n'
 import type {
   BookingEventRecord,
   BookingRecord,
@@ -21,8 +23,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-// Booking detail intentionally renders per request.
-export const instant = false
+export const instant = true
 
 function bookingViewModel(booking: BookingRecord): BookingViewModel {
   return {
@@ -79,7 +80,23 @@ function operationViewModel(operation: DurableOperationRecord): OperationViewMod
   }
 }
 
-export default async function AdminAmaBookingPage({
+function BookingFallback() {
+  return (
+    <div className="pb-10" aria-busy="true">
+      <p className="text-sm font-medium tracking-[-0.011em] text-muted-foreground">
+        <T zh="咨询预约" en="AMA BOOKING" />
+      </p>
+      <div className="mt-2 h-5 w-44 rounded-sm bg-surface-1" aria-hidden />
+      <div className="mt-6 grid gap-4 hairline-top pt-4" aria-hidden>
+        <div className="h-4 w-full max-w-80 rounded-sm bg-surface-1" />
+        <div className="h-4 w-full max-w-64 rounded-sm bg-surface-1" />
+        <div className="h-4 w-full max-w-72 rounded-sm bg-surface-1" />
+      </div>
+    </div>
+  )
+}
+
+async function BookingLoader({
   params,
 }: {
   params: Promise<{ bookingId: string }>
@@ -96,5 +113,17 @@ export default async function AdminAmaBookingPage({
       events={detail.events.map(eventViewModel)}
       operations={detail.operations.map(operationViewModel)}
     />
+  )
+}
+
+export default function AdminAmaBookingPage({
+  params,
+}: {
+  params: Promise<{ bookingId: string }>
+}) {
+  return (
+    <Suspense fallback={<BookingFallback />}>
+      <BookingLoader params={params} />
+    </Suspense>
   )
 }

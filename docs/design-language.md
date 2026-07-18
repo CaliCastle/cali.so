@@ -534,6 +534,12 @@ public analytics, social reads, and route view transitions. Its contract:
 - **No entrance animations** — the admin is daily-use chrome (frequency
   principle). Status is a quiet dot: amber for in-flight, red only for
   broken or destructive. Numbers are always `tabular-nums`.
+- **Instant shells.** Every admin surface partially prerenders: the paper,
+  column, dock, page header, and fixed-dimension skeleton placeholders are
+  the static shell (prefetched, so dock navigation is instant), and owner
+  data streams in behind each page's Suspense loader. Skeletons follow the
+  photo-index rule — quiet, nonanimated, final geometry, zero layout
+  shift. Only `/admin/login` (a pure redirect) stays a blocking route.
 - There is no step-up verification anywhere in the admin (July 2026
   decision); owner authorization is the server-side Clerk `siteOwner`
   check plus origin guards, rate limits, and audit events.

@@ -194,7 +194,6 @@ export function Preferences({
             {variant === 'public' && ownerAdmin ? (
               <Link
                 href="/admin"
-                prefetch={false}
                 className="prefs-row prefs-admin"
                 onClick={() => playDockSound()}
               >

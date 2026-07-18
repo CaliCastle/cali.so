@@ -17,6 +17,7 @@ const previousClerkEnvironment = vi.hoisted(() => {
 })
 
 import { siteProxy } from '../../proxy'
+import { securityHeaders } from './headers'
 
 const throughRealClerkMiddleware = clerkMiddleware((_auth, request) =>
   siteProxy(request),
@@ -41,55 +42,36 @@ afterAll(() => {
   }
 })
 
-describe('admin CSP proxy', () => {
-  it('allows Clerk to keep the browser session synchronized', () => {
-    const previousPublishableKey =
-      process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-    process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY =
-      'pk_live_Y2xlcmsuY2FsaS5zbyQ'
+describe('admin CSP', () => {
+  // The per-request nonce policy was retired in July 2026: nonces require
+  // dynamic rendering, which is incompatible with the admin's prerendered
+  // instant-navigation shells. Admin pages rely on the static site policy
+  // configured in next.config.
+  it('stamps no per-request policy in the proxy', () => {
+    const response = siteProxy(new NextRequest('https://cali.so/admin/media'))
 
-    try {
-      const policy = siteProxy(
-        new NextRequest('https://cali.so/admin/media'),
-      ).headers.get('content-security-policy')
-
-      expect(policy).toContain("connect-src 'self' https://clerk.cali.so")
-    } finally {
-      if (previousPublishableKey === undefined) {
-        delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-      } else {
-        process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = previousPublishableKey
-      }
-    }
+    expect(response.headers.get('content-security-policy')).toBeNull()
+    expect(response.headers.get('x-middleware-request-x-nonce')).toBeNull()
   })
 
-  it('uses a fresh strict nonce policy for each admin render', () => {
-    const request = new NextRequest('https://cali.so/admin/login')
-    const first = siteProxy(request).headers.get('content-security-policy')
-    const second = siteProxy(request).headers.get('content-security-policy')
+  it('keeps the static site policy strict and nonce-free', () => {
+    const policy = securityHeaders.find(
+      ({ key }) => key === 'Content-Security-Policy',
+    )?.value
 
-    expect(first).toMatch(
-      /script-src 'self' 'nonce-[^']+' 'sha256-[^']+' 'strict-dynamic'/,
-    )
-    expect(first).not.toContain("script-src 'self' 'unsafe-inline'")
-    expect(first?.match(/'sha256-[^']+'/g)).toHaveLength(1)
-    expect(first).toContain("style-src 'self' 'unsafe-inline'")
-    expect(first).not.toBe(second)
+    expect(policy).toContain("script-src 'self' 'unsafe-inline'")
+    expect(policy).toContain("frame-src 'none'")
+    expect(policy).toContain("object-src 'none'")
+    expect(policy).not.toContain('nonce-')
+    expect(policy).not.toContain('strict-dynamic')
   })
 
-  it('preserves the strict nonce policy through the real Clerk middleware', async () => {
+  it('passes admin requests through the real Clerk middleware unchanged', async () => {
     const response = await throughRealClerkMiddleware(
       new NextRequest('https://cali.so/admin/photos'),
       event,
     )
-    const policy = response?.headers.get('content-security-policy')
 
-    expect(policy).toMatch(
-      /script-src 'self' 'nonce-[^']+' 'sha256-[^']+' 'strict-dynamic'/,
-    )
-    expect(response?.headers.get('x-middleware-request-x-nonce')).toBeTruthy()
-    expect(
-      response?.headers.get('x-middleware-request-content-security-policy'),
-    ).toBe(policy)
+    expect(response?.headers.get('content-security-policy')).toBeNull()
   })
 })

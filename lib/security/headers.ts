@@ -1,12 +1,4 @@
-import { createHash } from 'node:crypto'
-
-import { PREPAINT_SCRIPT } from './inline-scripts'
-
 const isDevelopment = process.env.NODE_ENV === 'development'
-
-const prepaintScriptHash = `'sha256-${createHash('sha256')
-  .update(PREPAINT_SCRIPT)
-  .digest('base64')}'`
 
 function optionalMediaImageSource() {
   const value = process.env.BUNNY_RENDITIONS_CDN_URL
@@ -14,24 +6,6 @@ function optionalMediaImageSource() {
   try {
     const url = new URL(value)
     return url.protocol === 'https:' && !url.username && !url.password
-      ? ` ${url.origin}`
-      : ''
-  } catch {
-    return ''
-  }
-}
-
-function clerkFrontendApiSource() {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-  const encodedHost = publishableKey?.match(/^pk_(?:test|live)_(.+)$/)?.[1]
-  if (!encodedHost) return ''
-
-  try {
-    const decodedHost = Buffer.from(encodedHost, 'base64url')
-      .toString('utf8')
-      .replace(/\$$/, '')
-    const url = new URL(`https://${decodedHost}`)
-    return url.protocol === 'https:' && url.hostname === decodedHost
       ? ` ${url.origin}`
       : ''
   } catch {
@@ -63,19 +37,15 @@ function contentSecurityPolicy(
   ].join('; ')
 }
 
+// One static policy for the whole site. The admin's former per-request
+// nonce policy was retired in July 2026: nonces require dynamic rendering,
+// which is incompatible with the admin's prerendered instant-navigation
+// shells — and with the passkey client removed, no Clerk JS runs in the
+// admin, so no provider origins are needed either.
 const publicContentSecurityPolicy = contentSecurityPolicy(
   `'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''}`,
   "'self' 'unsafe-inline'",
 )
-
-export function adminContentSecurityPolicy(nonce: string) {
-  const nonceSource = `'nonce-${nonce}'`
-  return contentSecurityPolicy(
-    `'self' ${nonceSource} ${prepaintScriptHash} 'strict-dynamic'${isDevelopment ? " 'unsafe-eval'" : ''}`,
-    "'self' 'unsafe-inline'",
-    clerkFrontendApiSource(),
-  )
-}
 
 export const securityHeaders = [
   { key: 'Content-Security-Policy', value: publicContentSecurityPolicy },

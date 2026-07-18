@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('~/components/admin-dock', () => ({
   AdminDock: () => <span data-admin-dock="" />,
+  AdminDockFallback: () => <span data-admin-dock-fallback="" />,
 }))
 
 import { AdminShell } from './AdminShell'

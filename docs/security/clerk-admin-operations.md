@@ -54,6 +54,12 @@ mutation guards, per-actor rate limits, privileged-action audit events, and
 the strict admin CSP. Media Asset Purge additionally requires the literal
 typed `PURGE` confirmation, validated server-side.
 
+Alongside it, the admin's per-request nonce CSP was retired when admin
+routes adopted prerendered instant-navigation shells (nonces require
+dynamic rendering). Admin pages use the static site policy from
+`lib/security/headers.ts`; with no client-side Clerk remaining, no
+provider origins are needed in it.
+
 Passkeys remain the recommended Clerk sign-in method, and every recovery
 procedure below still applies. Reintroducing a step-up boundary would need
 its own decision and should note that Clerk exposes factor ages but not the
