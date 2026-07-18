@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
 
 import { act, cleanup, fireEvent, render } from '@testing-library/react'
+import { Profiler } from 'react'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { records } from '~/lib/personal'
@@ -90,13 +91,14 @@ describe('VinylShelf', () => {
 
     const finishTuple = (sleeve: HTMLElement) => {
       const crease = sleeve.querySelector<HTMLElement>('.vinyl-creases')
+      const trigger = sleeve.querySelector<HTMLElement>('.vinyl-trigger')
       const fields = [
-        sleeve.style.getPropertyValue('--vinyl-contact-scale'),
+        trigger?.style.getPropertyValue('--vinyl-contact-scale') ?? '',
         sleeve.style.getPropertyValue('--vinyl-paper-size'),
         sleeve.style.getPropertyValue('--vinyl-paper-x'),
         sleeve.style.getPropertyValue('--vinyl-paper-y'),
-        sleeve.style.getPropertyValue('--vinyl-rest-offset'),
-        sleeve.style.getPropertyValue('--vinyl-rest-tilt'),
+        trigger?.style.getPropertyValue('--vinyl-rest-offset') ?? '',
+        trigger?.style.getPropertyValue('--vinyl-rest-tilt') ?? '',
         sleeve.style.getPropertyValue('--vinyl-wear-opacity'),
         sleeve.style.getPropertyValue('--vinyl-wear-x'),
         sleeve.style.getPropertyValue('--vinyl-wear-y'),
@@ -236,7 +238,9 @@ describe('VinylShelf', () => {
 
       pivots.push(
         Number.parseFloat(
-          crossingSleeve?.style.getPropertyValue('--vinyl-origin-x') ?? '',
+          crossingSleeve
+            ?.querySelector<HTMLElement>('.vinyl-trigger')
+            ?.style.getPropertyValue('--vinyl-origin-x') ?? '',
         ),
       )
     }
@@ -246,6 +250,53 @@ describe('VinylShelf', () => {
 
     fireEvent.pointerUp(viewport!, {
       clientX: 235,
+      clientY: 100,
+      isPrimary: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+    })
+  })
+
+  it('keeps continuous panning outside the React render loop', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }) as MediaQueryList),
+    )
+    const onRender = vi.fn()
+    const { container } = render(
+      <Profiler id="vinyl-shelf" onRender={onRender}>
+        <VinylShelf />
+      </Profiler>,
+    )
+    const viewport = container.querySelector<HTMLElement>('.vinyl-viewport')
+    const initialRenderCount = onRender.mock.calls.length
+
+    fireEvent.pointerDown(viewport!, {
+      button: 0,
+      clientX: 300,
+      clientY: 100,
+      isPrimary: true,
+      pointerId: 1,
+      pointerType: 'mouse',
+    })
+
+    for (const clientX of [280, 260, 240, 220]) {
+      fireEvent.pointerMove(viewport!, {
+        clientX,
+        clientY: 100,
+        isPrimary: true,
+        pointerId: 1,
+        pointerType: 'mouse',
+      })
+      await act(
+        () => new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve())),
+      )
+    }
+
+    expect(onRender.mock.calls.length - initialRenderCount).toBeLessThanOrEqual(2)
+
+    fireEvent.pointerUp(viewport!, {
+      clientX: 220,
       clientY: 100,
       isPrimary: true,
       pointerId: 1,

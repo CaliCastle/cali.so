@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 
 import { ExternalLabel } from '~/components/external-mark'
 import { localize, useLocale } from '~/lib/locale-client'
@@ -37,6 +38,20 @@ interface PointerSession {
   selectionStep: number
   intent: PointerIntent
   focusWasInside: boolean
+}
+
+interface SleeveMotion {
+  contactOpacity: number
+  contactScale: number
+  direction: number
+  forward: number
+  inwardAngle: number
+  offset: number
+  originX: string
+  restOffset: number
+  restTilt: number
+  scale: number
+  stackOrder: number
 }
 
 function hashOf(s: string): number {
@@ -95,6 +110,64 @@ const sleeveFinishes = records.map((record) =>
   sleeveFinish(`${record.artist}, ${record.album} (${record.year})`),
 )
 
+function sleeveMotion(index: number, selectionPosition: number): SleeveMotion {
+  const offset = index - selectionPosition
+  const distance = Math.abs(offset)
+  const activeAmount = Math.max(0, 1 - distance)
+  const restingAmount = Math.min(distance, 1)
+  const inwardAngle = Math.min(68, 16 * Math.min(distance, 1) + distance * 13)
+  const contactScale = Math.max(0.38, Math.cos(inwardAngle * Math.PI / 180))
+  const finish = sleeveFinishes[index]
+
+  return {
+    contactOpacity: Math.max(0.16, 0.34 - distance * 0.035),
+    contactScale: Number((contactScale * (0.96 + activeAmount * 0.04)).toFixed(4)),
+    direction: Math.sign(offset),
+    forward: activeAmount * 4,
+    inwardAngle,
+    offset,
+    originX: `${50 - Math.max(-1, Math.min(1, offset)) * 50}%`,
+    restOffset: finish.restOffset * restingAmount,
+    restTilt: finish.restTilt * restingAmount,
+    scale: Math.max(0.92, 1 - distance * 0.012 + activeAmount * 0.04),
+    stackOrder: Math.max(
+      1,
+      Math.round((records.length - distance) * 100) +
+        (index === Math.round(selectionPosition) ? 1 : 0),
+    ),
+  }
+}
+
+function sleeveMotionStyle(motion: SleeveMotion): React.CSSProperties {
+  return {
+    '--vinyl-offset': motion.offset,
+    '--vinyl-direction': motion.direction,
+    '--vinyl-contact-opacity': motion.contactOpacity,
+    '--vinyl-contact-scale': motion.contactScale,
+    '--vinyl-forward': motion.forward,
+    '--vinyl-inward-angle': motion.inwardAngle,
+    '--vinyl-rest-offset': motion.restOffset,
+    '--vinyl-rest-tilt': motion.restTilt,
+    '--vinyl-scale': motion.scale,
+    '--vinyl-origin-x': motion.originX,
+  } as React.CSSProperties
+}
+
+function sleeveMotionCssText(motion: SleeveMotion) {
+  return [
+    `--vinyl-offset:${motion.offset}`,
+    `--vinyl-direction:${motion.direction}`,
+    `--vinyl-contact-opacity:${motion.contactOpacity}`,
+    `--vinyl-contact-scale:${motion.contactScale}`,
+    `--vinyl-forward:${motion.forward}`,
+    `--vinyl-inward-angle:${motion.inwardAngle}`,
+    `--vinyl-rest-offset:${motion.restOffset}`,
+    `--vinyl-rest-tilt:${motion.restTilt}`,
+    `--vinyl-scale:${motion.scale}`,
+    `--vinyl-origin-x:${motion.originX}`,
+  ].join(';')
+}
+
 // Favorite records as an overlapping horizontal stack of worn-paper
 // sleeves. Every interaction selects a sleeve; the separate annotation is
 // the only external destination.
@@ -107,6 +180,7 @@ export function VinylShelf() {
   const [pointerOwnerIndex, setPointerOwnerIndex] = useState<number | null>(null)
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const shelfRef = useRef<HTMLUListElement | null>(null)
+  const sleeveRefs = useRef<Array<HTMLLIElement | null>>([])
   const triggerRefs = useRef<Array<HTMLButtonElement | null>>([])
   const hitCornerRefs = useRef<Array<Array<HTMLSpanElement | null>>>([])
   const selectionPositionRef = useRef(initialIndex)
@@ -125,7 +199,6 @@ export function VinylShelf() {
   const pointerFocusWasInsideRef = useRef(false)
 
   const activeRecord = records[activeIndex]
-  const visualFrontIndex = Math.round(selectionPosition)
 
   function clampPosition(position: number) {
     return Math.min(records.length - 1, Math.max(0, position))
@@ -143,13 +216,25 @@ export function VinylShelf() {
     setSelectionPosition(nextPosition)
   }
 
+  function applySelectionPosition(position: number) {
+    for (let index = 0; index < records.length; index++) {
+      const sleeve = sleeveRefs.current[index]
+      const trigger = triggerRefs.current[index]
+      if (!sleeve || !trigger) continue
+
+      const motion = sleeveMotion(index, position)
+      trigger.style.cssText = sleeveMotionCssText(motion)
+      sleeve.style.setProperty('--vinyl-stack-order', String(motion.stackOrder))
+    }
+  }
+
   function queueSelectionUpdate(position: number) {
     selectionPositionRef.current = clampPosition(position)
     if (selectionFrameRef.current !== null) return
 
     selectionFrameRef.current = window.requestAnimationFrame(() => {
       selectionFrameRef.current = null
-      setSelectionPosition(selectionPositionRef.current)
+      applySelectionPosition(selectionPositionRef.current)
     })
   }
 
@@ -229,6 +314,12 @@ export function VinylShelf() {
     const nextIndex = Math.min(records.length - 1, Math.max(0, index))
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const isAlreadySnapped = Math.abs(selectionPositionRef.current - nextIndex) < 0.001
+
+    if (interactionPhaseRef.current === 'panning') {
+      // Reconcile React with the last imperative frame before the snap. The
+      // following state update can then transition from that exact geometry.
+      flushSync(() => setSelectionPosition(selectionPositionRef.current))
+    }
 
     clearSettleTimer()
     clearInstantFrame()
@@ -535,49 +626,28 @@ export function VinylShelf() {
           className="vinyl-shelf"
           aria-label={localize(locale, '喜欢的唱片', 'Favorite records')}
           data-active-index={activeIndex}
-          style={{ '--vinyl-selection-position': selectionPosition } as React.CSSProperties}
         >
           {records.map((record, index) => {
-            const offset = index - selectionPosition
-            const distance = Math.abs(offset)
             const isActive = index === activeIndex
-            const isVisualFront = index === visualFrontIndex
-            const inwardAngle = Math.min(68, 16 * Math.min(distance, 1) + distance * 13)
             const accessibleName = `${record.artist}, ${record.album} (${record.year})`
             const finish = sleeveFinishes[index]
-            const activeAmount = Math.max(0, 1 - distance)
-            const restingAmount = Math.min(distance, 1)
-            const scale = Math.max(0.92, 1 - distance * 0.012 + activeAmount * 0.04)
-            const originX = 50 - Math.max(-1, Math.min(1, offset)) * 50
-            const contactScale = Math.max(0.38, Math.cos(inwardAngle * Math.PI / 180))
-            const projectedContactScale = Number(
-              (contactScale * (0.96 + activeAmount * 0.04)).toFixed(4),
-            )
+            const motion = sleeveMotion(index, selectionPosition)
             const spineTone = hashOf(accessibleName) % 5
 
             return (
               <li
                 key={`${record.artist}-${record.album}`}
+                ref={(element) => {
+                  sleeveRefs.current[index] = element
+                }}
                 className="vinyl"
                 data-active={isActive ? '' : undefined}
                 data-index={index}
                 style={
                   {
-                    '--vinyl-index': index,
-                    '--vinyl-offset': offset,
-                    '--vinyl-distance': distance,
-                    '--vinyl-direction': Math.sign(offset),
-                    '--vinyl-contact-opacity': Math.max(0.16, 0.34 - distance * 0.035),
-                    '--vinyl-contact-scale': projectedContactScale,
-                    '--vinyl-forward': activeAmount * 4,
-                    '--vinyl-inward-angle': inwardAngle,
                     '--vinyl-paper-size': `${finish.paperSize}px`,
                     '--vinyl-paper-x': `${finish.paperX}px`,
                     '--vinyl-paper-y': `${finish.paperY}px`,
-                    '--vinyl-rest-offset': finish.restOffset * restingAmount,
-                    '--vinyl-rest-tilt': finish.restTilt * restingAmount,
-                    '--vinyl-scale': scale,
-                    '--vinyl-origin-x': `${originX}%`,
                     '--vinyl-spine-tone': spineTone,
                     '--vinyl-spine-color':
                       record.spineColor ??
@@ -586,11 +656,7 @@ export function VinylShelf() {
                     '--vinyl-wear-opacity': finish.wearOpacity,
                     '--vinyl-wear-x': `${finish.wearX}%`,
                     '--vinyl-wear-y': `${finish.wearY}%`,
-                    '--vinyl-stack-order': Math.max(
-                      1,
-                      Math.round((records.length - distance) * 100) +
-                        (isVisualFront ? 1 : 0),
-                    ),
+                    '--vinyl-stack-order': motion.stackOrder,
                   } as React.CSSProperties
                 }
               >
@@ -598,6 +664,7 @@ export function VinylShelf() {
                   ref={(element) => {
                     triggerRefs.current[index] = element
                   }}
+                  style={sleeveMotionStyle(motion)}
                   type="button"
                   className="vinyl-trigger"
                   id={`vinyl-trigger-${index}`}

@@ -367,9 +367,11 @@ typewriter/ascii textures, measuring ticks, registration marks. Rules:
   leave the old selection covering the current centered album. Each sleeve's
   bottom pivot also moves continuously from its outer edge through the center as
   it crosses the physical midpoint, so the jacket never jumps beneath a held
-  pointer. The frame is tuned for nine albums: one centered selection and four
-  progressively turned sleeves on either side. Sleeves without art retain the
-  word-raster fallback.
+  pointer. Pointer and wheel frames are coalesced through one animation frame
+  and update only the sleeves' motion styles; React commits at gesture
+  boundaries instead of on every movement. The frame is tuned for nine albums:
+  one centered selection and four progressively turned sleeves on either side.
+  Sleeves without art retain the word-raster fallback.
 - **Bookshelf** (`components/bookshelf.tsx`): one book opens at a time while
   the other books remain as tightly packed spines with 1px seams. The books are
   ordered by relevance to Cali's work as a designer, developer, and founder,
