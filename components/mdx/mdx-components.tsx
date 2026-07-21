@@ -2,6 +2,7 @@ import type { MDXComponents } from 'mdx/types'
 
 import { CodeBlockPre } from './code-block'
 import { MermaidDiagram } from './mermaid-diagram'
+import { TimeAllocationChart } from './time-allocation-chart'
 import { Tweet } from './tweet'
 import { ExternalLink } from '~/components/external-link'
 import { ZoomImage } from '~/components/zoom-image'
@@ -44,6 +45,7 @@ export function mdxComponents(slug: string, locale: Locale = 'zh'): MDXComponent
     MermaidDiagram: (props: { code: string; caption?: string }) => (
       <MermaidDiagram {...props} locale={locale} />
     ),
+    TimeAllocationChart: () => <TimeAllocationChart locale={locale} />,
     Tweet: ({ id }: { id: string }) => <Tweet slug={slug} id={id} />,
     img: (props) => (
       <PostImage slug={slug} src={props.src as string} alt={props.alt} title={props.title} />

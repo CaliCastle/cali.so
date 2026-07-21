@@ -1956,6 +1956,103 @@ figure[data-rehype-pretty-code-figure] {
   }
 }
 
+/* ── Editorial data figures ──────────────────────────────────────── */
+
+.time-allocation-chart {
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: var(--border-hairline) solid var(--border);
+  border-radius: 2px;
+  background: var(--surface-1);
+}
+
+.time-allocation-chart__header {
+  padding-bottom: 1rem;
+  border-bottom: var(--border-hairline) solid
+    color-mix(in oklab, var(--border) 72%, transparent);
+}
+
+.time-allocation-chart__eyebrow {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-family: var(--font-geist-mono), var(--font-frex-gb), ui-monospace,
+    monospace;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.time-allocation-chart__title {
+  margin: 0.375rem 0 0;
+  color: var(--gray-12, var(--foreground));
+  font-size: clamp(1rem, 3.5vw, 1.125rem);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.time-allocation-chart__rows {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.time-allocation-chart__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.375rem;
+  color: var(--gray-11, var(--foreground));
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.time-allocation-chart__value {
+  flex: none;
+  color: var(--gray-12, var(--foreground));
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-allocation-chart__track {
+  height: 0.6875rem;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--muted-foreground) 8%, transparent);
+  box-shadow: inset 0 0 0 var(--border-hairline)
+    color-mix(in oklab, var(--border) 78%, transparent);
+}
+
+.time-allocation-chart__bar {
+  display: block;
+  width: var(--allocation);
+  min-width: var(--border-hairline);
+  height: 100%;
+}
+
+.time-allocation-chart__bar[data-tone='context'] {
+  background: color-mix(in oklab, var(--muted-foreground) 54%, transparent);
+}
+
+.time-allocation-chart__bar[data-tone='primary'] {
+  background: var(--gray-12, var(--foreground));
+}
+
+.time-allocation-chart__bar[data-tone='secondary'] {
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, var(--gray-11, var(--foreground)) 76%, transparent) 0,
+    color-mix(in oklab, var(--gray-11, var(--foreground)) 76%, transparent) 1px,
+    transparent 1px,
+    transparent 3.5px
+  );
+  box-shadow: inset 0 0 0 var(--border-hairline)
+    color-mix(in oklab, var(--gray-11, var(--foreground)) 55%, transparent);
+}
+
 /* ── Mermaid diagrams (beautiful-mermaid, server-rendered svg) ────── */
 
 /* the diagram rests on the same sheet treatment as code: hairline frame,
