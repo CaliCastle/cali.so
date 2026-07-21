@@ -8,13 +8,18 @@ import { InlineProductName } from './inline-product-name'
 afterEach(cleanup)
 
 describe('InlineProductName', () => {
-  it('renders Codex with its existing decorative mark', () => {
-    const { container } = render(<InlineProductName product="Codex" />)
+  it.each([
+    ['ATS', '/images/products/ats.svg'],
+    ['App Store', '/images/products/app-store.svg'],
+    ['Codex', '/images/codex.svg'],
+    ['Control', '/images/products/control.svg'],
+    ['Dex', '/images/products/dex.svg'],
+    ['Slack', '/images/products/slack.svg'],
+  ] as const)('renders %s with its decorative mark', (product, src) => {
+    const { container } = render(<InlineProductName product={product} />)
 
-    expect(container.textContent).toBe('Codex')
-    expect(
-      container.querySelector('img[src="/images/codex.svg"]')?.getAttribute('aria-hidden'),
-    ).toBe('true')
+    expect(container.textContent).toBe(product)
+    expect(container.querySelector(`img[src="${src}"]`)?.getAttribute('aria-hidden')).toBe('true')
   })
 
   it('reuses the Claude mark without hiding the product name', () => {

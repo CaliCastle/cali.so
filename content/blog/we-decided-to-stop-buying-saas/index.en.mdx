@@ -106,7 +106,9 @@ So we built our own documentation and knowledge system. Today, the team uses Dex
 
 Viewed separately, these look like a few unrelated small products.
 
-One manages candidates. One tracks clients. One stores documents.
+- <InlineProductName product="ATS" /> manages candidates
+- <InlineProductName product="Control" /> tracks clients and opportunities
+- <InlineProductName product="Dex" /> stores documents and knowledge
 
 But as they appeared one after another, I realized that we were not simply rebuilding a few SaaS products.
 
@@ -152,7 +154,7 @@ flowchart TB
   V["Visitor"] --> W["Website agent"] --> U["Services, pricing, and the need"] --> Q["Initial qualification"] --> H{"Team review<br/>Human judgment"} --> C["Control CRM"] --> F["Follow-up"]
 ```
 
-The website captures the opportunity. The agent organizes it. Slack brings people into the decision. Control preserves the relationship and its status.
+The website captures the opportunity. The agent organizes it. <InlineProductName product="Slack" /> brings people into the decision. Control preserves the relationship and its status.
 
 At that point, software is no longer just a tool in an employee's hands.
 
@@ -188,7 +190,7 @@ Every option was possible, and every option had a reasonable argument behind it.
 
 AI could implement each one quickly, but it could not decide which cost I should accept.
 
-In the end, I returned to the native tab bar and put the quick entry point in the middle. I also replaced the fixed features with an App Store-like collection of tools, letting each family add or remove the ones they needed.
+In the end, I returned to the native tab bar and put the quick entry point in the middle. I also replaced the fixed features with a collection of tools modeled after the <InlineProductName product="App Store" />, letting each family add or remove the ones they needed.
 
 That made the app work well with either hand, preserved native capabilities, and kept the product from becoming more bloated as new features were added.
 

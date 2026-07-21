@@ -1281,6 +1281,12 @@
   user-select: none;
 }
 
+.dark .prose .inline-product-logo-ats,
+.dark .prose .inline-product-logo-control,
+.dark .prose .inline-product-logo-dex {
+  filter: brightness(1.45) contrast(0.9);
+}
+
 .dark .prose .inline-product-logo-codex {
   filter: invert(1);
 }
