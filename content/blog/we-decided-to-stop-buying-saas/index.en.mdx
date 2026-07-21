@@ -17,6 +17,8 @@ If we cannot find something, we build it.
 
 This did not start inside the company.
 
+![A parent uses a baby tracking app one-handed beside a crib](./figure-1-personal-origin.jpg#1600x900 "A deeply personal need became the first piece of software we truly owned.")
+
 After our second baby was born, I wanted an app for tracking diaper changes, nursing, and bottle feeds. There were plenty of options, and I downloaded nearly every app in the category. But once I started using them many times a day, something always felt off.
 
 Some had so many features that the home screen looked like a control panel. Some buried logging behind too many steps, making them hard to use while holding a baby with one hand. Some looked cute but were not fast when it mattered. Others kept adding features until even the most basic logging became a chore.
@@ -49,6 +51,24 @@ This time, we just built it.
 
 Over one weekend, Codex, Claude Code, and I got the entire flow running: automatic email intake, organizing and scoring candidates against the criteria for each role, automatic interview scheduling, and team evaluations and decisions after each interview.
 
+```mermaid caption="The cost boundary for the same ATS moved from one or two months to one weekend."
+flowchart LR
+  subgraph PAST["Before · 1 to 2 months"]
+    direction TB
+    P1["Requirements"] --> P2["Product scope"] --> P3["Design handoff"] --> P4["Engineering"] --> P5["Test and fix"] --> P6["Ship"]
+  end
+  subgraph NOW["Now · one weekend"]
+    direction TB
+    N1["Clear need"] --> N2["Spec planning"] --> N3["Founder + Coding Agents"]
+    N3 --> I["Build"]
+    N3 --> T["Test"]
+    N3 --> R["Review"]
+    I --> ATS["Working ATS: intake · scoring · scheduling · team review"]
+    T --> ATS
+    R --> ATS
+  end
+```
+
 It is not a prototype that exists only in screenshots. It is already managing real candidates. The final decisions still belong to the team, and the system is working well.
 
 What matters is not just that AI saved us a month.
@@ -79,6 +99,15 @@ But as they appeared one after another, I realized that we were not simply rebui
 
 We were moving different parts of the company into software we owned.
 
+```mermaid caption="ATS, Control, and Dex are not isolated tools. They are one Company OS."
+flowchart TB
+  COLLAB["Slack · Linear<br/>Collaboration and context"] --> PEOPLE["People<br/>Judgment · Review · Tradeoffs"]
+  PEOPLE --> OWNED["Software we own"]
+  OWNED --> ATS["ATS<br/>Hiring"] & CONTROL["Control<br/>Relationships"] & DEX["Dex<br/>Knowledge"]
+  ATS & CONTROL & DEX --> CORE["Workflow · Memory · Agents"]
+  CORE --> RUN["Daily execution"]
+```
+
 ## No More Making the Way We Work Fit Someone Else's Software
 
 In the past, most companies bought general-purpose software, then adapted the way they worked to fit it.
@@ -104,6 +133,11 @@ Now, for a team like ours, making software adapt to us has become a realistic op
 We are rebuilding the Zolplay website, and we plan to continue in the same direction.
 
 The new site will not be just a storefront for our work and services. We plan to let visitors talk directly with an agent on the site, learn what Zolplay offers, understand the rough price range for a project, and see whether it makes sense for both sides to keep talking. After the agent organizes the initial information, it will send a suitable lead to Slack for the team to review, then record it in Control for follow-up.
+
+```mermaid caption="The agent organizes and qualifies. The team keeps the real decision."
+flowchart TB
+  V["Visitor"] --> W["Website agent"] --> U["Services, pricing, and the need"] --> Q["Initial qualification"] --> H{"Team review<br/>Human judgment"} --> C["Control CRM"] --> F["Follow-up"]
+```
 
 The website captures the opportunity. The agent organizes it. Slack brings people into the decision. Control preserves the relationship and its status.
 
@@ -165,6 +199,15 @@ Experience has not become less valuable because of AI.
 
 It is simply starting to live somewhere else.
 
+```mermaid caption="People curate experience before it enters a system that can run repeatedly."
+flowchart TB
+  E1["Failures · Comparisons · Repeated use"] --> H{"Human curation<br/>Curate"}
+  E2["User feedback · Project tradeoffs"] --> H
+  H --> K["Principles · Counterexamples · Review criteria<br/>Boundaries · Examples"]
+  K --> S["Prompt · Workflow · Memory<br/>Skill · Agent · Internal software"]
+  S --> R["Everyday company capability"]
+```
+
 In the past, experience lived mainly in one person's head. Someone who has spent ten years building products knows which problems deserve caution and which clever-looking ideas will eventually become burdens. But it is difficult for a team to inherit all of that judgment.
 
 Today, some of that experience can be organized and curated into Prompts, Workflows, Memory, review criteria, examples, counterexamples, and even skills that agents can install.
@@ -180,6 +223,8 @@ Without deep enough practice, it is hard to distinguish a real principle from a 
 AI can shorten the time it takes experience to spread, but it cannot create experience out of thin air.
 
 What I am still least willing to hand over completely to agents is visual design.
+
+![A designer reviews the final product direction among several working prototypes](./figure-6-system-boundary.jpg#1600x900 "A system can generate options. A person still decides what is worth shipping.")
 
 It is not because AI cannot make something that looks good. It can already generate many options quickly and keep moving toward a specified style.
 
