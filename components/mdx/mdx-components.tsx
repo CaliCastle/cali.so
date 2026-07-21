@@ -2,6 +2,7 @@ import type { MDXComponents } from 'mdx/types'
 
 import { CodeBlockPre } from './code-block'
 import { MermaidDiagram } from './mermaid-diagram'
+import { PhotoStack, PhotoStackCaption, PhotoStackFrames } from './photo-stack'
 import { TimeAllocationChart } from './time-allocation-chart'
 import { Tweet } from './tweet'
 import { ExternalLink } from '~/components/external-link'
@@ -45,6 +46,9 @@ export function mdxComponents(slug: string, locale: Locale = 'zh'): MDXComponent
     MermaidDiagram: (props: { code: string; caption?: string }) => (
       <MermaidDiagram {...props} locale={locale} />
     ),
+    PhotoStack,
+    PhotoStackCaption,
+    PhotoStackFrames,
     TimeAllocationChart: () => <TimeAllocationChart locale={locale} />,
     Tweet: ({ id }: { id: string }) => <Tweet slug={slug} id={id} />,
     img: (props) => (
