@@ -1,6 +1,7 @@
 import type { MDXComponents } from 'mdx/types'
 
 import { CodeBlockPre } from './code-block'
+import { InlineProductName } from './inline-product-name'
 import { MermaidDiagram } from './mermaid-diagram'
 import { PhotoStack, PhotoStackCaption, PhotoStackFrames } from './photo-stack'
 import { TimeAllocationChart } from './time-allocation-chart'
@@ -43,6 +44,7 @@ function PostImage({ slug, src, alt, title }: { slug: string; src: string; alt?:
 export function mdxComponents(slug: string, locale: Locale = 'zh'): MDXComponents {
   return {
     pre: (props) => <CodeBlockPre {...props} />,
+    InlineProductName,
     MermaidDiagram: (props: { code: string; caption?: string }) => (
       <MermaidDiagram {...props} locale={locale} />
     ),
