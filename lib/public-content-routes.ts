@@ -10,6 +10,7 @@ export const publishedPostSlugs = [
   'how-to-protect-your-site-with-upstash',
   'im-gonna-be-a-father',
   'react-or-vue-my-take-on-web-dev',
+  'we-decided-to-stop-buying-saas',
 ] as const
 
 export const archivedNewsletterIds = ['1'] as const
