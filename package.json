@@ -72,7 +72,7 @@
     "heic-decode": "^2.1.0",
     "lucide-react": "^1.25.0",
     "motion": "^12.42.2",
-    "next": "16.3.0-preview.6",
+    "next": "16.3.0-preview.8",
     "next-mdx-remote": "^6.0.0",
     "pg": "^8.22.0",
     "react": "^19.2.8",
@@ -93,7 +93,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.4",
-    "@next/playwright": "16.3.0-preview.6",
+    "@next/playwright": "16.3.0-preview.8",
     "@playwright/test": "1.61.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.2",
