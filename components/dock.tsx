@@ -32,6 +32,10 @@ const ITEMS = [
   { href: '/ama', zh: '咨询', en: 'AMA', icon: AmaIcon },
 ] as const
 
+const DOCK_VIEW_TRANSITION_STYLE = {
+  viewTransitionName: 'site-dock',
+} as React.CSSProperties
+
 export function DockTip({
   zh,
   en,
@@ -111,6 +115,7 @@ export function DockFallback({ locale }: { locale: Locale }) {
   return (
     <nav
       className="dock"
+      style={DOCK_VIEW_TRANSITION_STYLE}
       aria-label={localize(locale, '主导航', 'Main navigation')}
       aria-busy="true"
     >
@@ -184,7 +189,12 @@ export function Dock() {
   }, [])
 
   return (
-    <nav ref={dockRef} className="dock" aria-label={localize(locale, '主导航', 'Main navigation')}>
+    <nav
+      ref={dockRef}
+      className="dock"
+      style={DOCK_VIEW_TRANSITION_STYLE}
+      aria-label={localize(locale, '主导航', 'Main navigation')}
+    >
       <LiquidGlass />
       <span ref={indicatorRef} className="dock-active-indicator" aria-hidden />
       <DockItem

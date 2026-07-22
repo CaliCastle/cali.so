@@ -2449,6 +2449,19 @@ html[data-visited] .enter-polaroid .polaroid {
   animation: none;
 }
 
+::view-transition-group(site-dock) {
+  z-index: var(--z-nav);
+  animation: none;
+}
+
+::view-transition-old(site-dock) {
+  display: none;
+}
+
+::view-transition-new(site-dock) {
+  animation: none;
+}
+
 ::view-transition-old(.route-content) {
   animation: vt-defocus 250ms var(--ease-swift) both;
 }
