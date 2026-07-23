@@ -1,6 +1,5 @@
 @import 'tailwindcss';
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -2650,6 +2649,19 @@ html[data-visited] .enter-polaroid .polaroid {
 }
 
 ::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(site-dock) {
+  z-index: var(--z-nav);
+  animation: none;
+}
+
+::view-transition-old(site-dock) {
+  display: none;
+}
+
+::view-transition-new(site-dock) {
   animation: none;
 }
 
