@@ -184,6 +184,20 @@
       "status": 200,
       "contains": "<article"
     },
+    {
+      "kind": "page",
+      "source": "/blog/we-decided-to-stop-buying-saas",
+      "probes": ["/blog/we-decided-to-stop-buying-saas"],
+      "status": 200,
+      "contains": "<article"
+    },
+    {
+      "kind": "page",
+      "source": "/en/blog/we-decided-to-stop-buying-saas",
+      "probes": ["/en/blog/we-decided-to-stop-buying-saas"],
+      "status": 200,
+      "contains": "<article"
+    },
 
     {
       "kind": "feed",
