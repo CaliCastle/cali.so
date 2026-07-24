@@ -12,7 +12,6 @@ import {
   ProjectsIcon,
   WritingIcon,
 } from '~/components/dock-icons'
-import { LiquidGlass } from '~/components/liquid-glass'
 import { Preferences } from '~/components/preferences'
 import { useDockActiveIndicator } from '~/hooks/use-dock-active-indicator'
 import { dockGoKeyFor, useDockGoShortcuts } from '~/hooks/use-dock-go-shortcuts'
@@ -35,6 +34,19 @@ const ITEMS = [
 const DOCK_VIEW_TRANSITION_STYLE = {
   viewTransitionName: 'site-dock',
 } as React.CSSProperties
+
+// The frosted pane behind the dock: plain translucency over the pill's 68%
+// background, no refraction. The backdrop-filter must stay inline — never in
+// the stylesheet — because LightningCSS strips raw backdrop-filter
+// declarations.
+const DOCK_GLASS_STYLE = {
+  backdropFilter: 'blur(12px) saturate(1.25)',
+  WebkitBackdropFilter: 'blur(12px) saturate(1.25)',
+} as React.CSSProperties
+
+export function DockGlass() {
+  return <span className="dock-glass" aria-hidden style={DOCK_GLASS_STYLE} />
+}
 
 export function DockTip({
   zh,
@@ -119,7 +131,7 @@ export function DockFallback({ locale }: { locale: Locale }) {
       aria-label={localize(locale, '主导航', 'Main navigation')}
       aria-busy="true"
     >
-      <LiquidGlass />
+      <DockGlass />
       <DockItem
         href={localePath(locale, '/')}
         locale={locale}
@@ -195,7 +207,7 @@ export function Dock() {
       style={DOCK_VIEW_TRANSITION_STYLE}
       aria-label={localize(locale, '主导航', 'Main navigation')}
     >
-      <LiquidGlass />
+      <DockGlass />
       <span ref={indicatorRef} className="dock-active-indicator" aria-hidden />
       <DockItem
         href={localePath(locale, '/')}

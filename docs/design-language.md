@@ -958,24 +958,18 @@ public analytics, social reads, and route view transitions. Its contract:
   decision); owner authorization is the server-side Clerk `siteOwner`
   check plus origin guards, rate limits, and audit events.
 
-## Liquid glass dock
+## Frosted dock
 
-The dock pill is real glass: a runtime-built displacement map (rounded-rect
-SDF, four-fold symmetric — one quadrant computed, mirrored into four; R/G
-channels encode the x/y bend, ramping outward through a 16px edge band,
-curve 1.6) drives an SVG `feDisplacementMap` applied as an inline-style
-`backdrop-filter: url(#…) blur(4px) saturate(1.25)` over a 68% paper
-background. The backdrop is frosted first (7px Gaussian inside the filter)
-so the lens bends diffused light — refracting raw glyphs smears them into
-legible-but-warped ghosts that read as grime. Three displacement passes at
-staggered scales (32 ±5%) split
-the RGB channels for a faint chromatic fringe along the rim, recombined
-with screen blends; an inset top highlight (white 0.2 over, 0.06 under) plays the
-specular. The map and
-filter get a fresh id on every resize. Chromium-only by design —
-Safari/Firefox can't run SVG filters in `backdrop-filter` and get a plain
-frosted pane (blur 6px) instead. The `backdrop-filter` must stay inline:
-LightningCSS strips the raw property from stylesheets.
+The dock pill is a plain frosted pane: `backdrop-filter: blur(12px)
+saturate(1.25)` over the pill's 68% paper background, with an inset top
+highlight (white 0.2 over, 0.06 under) playing the specular. Identical in
+every browser. An earlier SVG-refraction "liquid glass" treatment
+(`feDisplacementMap` lens, July 2026) was removed — Chromium's handling of
+reference filters in `backdrop-filter` was too fragile (unclipped fog halo,
+milky pane) and the refraction never earned its complexity; don't reintroduce
+it. The `backdrop-filter` must stay inline on the `DockGlass` span
+(`components/dock.tsx`): LightningCSS strips the raw property from
+stylesheets.
 
 When UI sound is enabled, moving to a different dock destination uses Cuelume's
 soft two-note `chime` cue; changing language, theme, or sound uses its warm
