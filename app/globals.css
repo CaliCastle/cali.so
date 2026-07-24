@@ -5894,9 +5894,9 @@ html[data-locale='en'] [data-en-block] {
   }
 }
 
-/* the refraction layer — its backdrop-filter is set inline from the
+/* the frosted pane — its backdrop-filter is set inline from the
    component (LightningCSS strips the property from stylesheets) */
-.liquid-glass {
+.dock-glass {
   position: absolute;
   inset: 0;
   border-radius: inherit;

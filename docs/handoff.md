@@ -220,9 +220,9 @@ The Vercel runtime receives only the CRUD-only `DATABASE_URL`. Never put
 - OG font subsetting runs only in the prebuild script. Runtime image routes
   load the generated `FrexSansGB-OG-*.ttf` files so HarfBuzz WASM stays out of
   Turbopack tracing. Preserve that boundary.
-- Raw stylesheet `backdrop-filter` is stripped by the CSS pipeline. The liquid
-  dock owns its SVG filter as an inline style; ordinary blur uses Tailwind
-  utilities.
+- Raw stylesheet `backdrop-filter` is stripped by the CSS pipeline. The
+  dock's frosted pane (`DockGlass` in `components/dock.tsx`) carries its
+  backdrop-filter as an inline style; ordinary blur uses Tailwind utilities.
 - Staging/Preview and Production credentials and data are isolated in separate
   Neon projects. Non-production data must be disposable or irreversibly
   sanitized. Never attach Redis credentials to Staging or Preview; their

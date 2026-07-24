@@ -11,10 +11,6 @@ vi.mock('next/image', () => ({
     <img {...props} />
   ),
 }))
-vi.mock('~/components/liquid-glass', () => ({
-  LiquidGlass: () => <span aria-hidden />,
-}))
-
 afterEach(cleanup)
 
 describe('DockFallback', () => {
