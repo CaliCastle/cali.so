@@ -965,7 +965,10 @@ SDF, four-fold symmetric — one quadrant computed, mirrored into four; R/G
 channels encode the x/y bend, ramping outward through a 16px edge band,
 curve 1.6) drives an SVG `feDisplacementMap` applied as an inline-style
 `backdrop-filter: url(#…) blur(4px) saturate(1.25)` over a 68% paper
-background. Three displacement passes at staggered scales (44 ±10%) split
+background. The backdrop is frosted first (7px Gaussian inside the filter)
+so the lens bends diffused light — refracting raw glyphs smears them into
+legible-but-warped ghosts that read as grime. Three displacement passes at
+staggered scales (32 ±5%) split
 the RGB channels for a faint chromatic fringe along the rim, recombined
 with screen blends; an inset top highlight (white 0.2 over, 0.06 under) plays the
 specular. The map and

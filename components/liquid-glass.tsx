@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react'
 // the refraction; Safari/Firefox can't do SVG filters in backdrop-filter
 // and quietly ignore the layer, leaving the host's own translucency.
 
-const TAU = { depth: 16, curve: 1.6, scale: 44, chroma: 0.1 }
+const TAU = { depth: 16, curve: 1.6, scale: 32, chroma: 0.05, frost: 7 }
 
 function makeDisplacementMap(w: number, h: number, radius: number): string {
   const canvas = document.createElement('canvas')
@@ -150,10 +150,14 @@ export function LiquidGlass({ blur = 4, saturate = 1.25 }: { blur?: number; satu
               preserveAspectRatio="none"
               result="map"
             />
+            {/* frost before the lens: the displacement bends diffused
+                light, not raw glyphs — refracting sharp text smears it
+                into legible-but-warped ghosts that read as grime */}
+            <feGaussianBlur in="SourceGraphic" stdDeviation={TAU.frost} result="frost" />
             {/* chromatic fringe: each channel refracts at a slightly
                 different strength, recombined additively */}
             <feDisplacementMap
-              in="SourceGraphic"
+              in="frost"
               in2="map"
               scale={TAU.scale * (1 - TAU.chroma)}
               xChannelSelector="R"
@@ -162,7 +166,7 @@ export function LiquidGlass({ blur = 4, saturate = 1.25 }: { blur?: number; satu
             />
             <feColorMatrix in="dr" type="matrix" values={channel(0)} result="r" />
             <feDisplacementMap
-              in="SourceGraphic"
+              in="frost"
               in2="map"
               scale={TAU.scale}
               xChannelSelector="R"
@@ -171,7 +175,7 @@ export function LiquidGlass({ blur = 4, saturate = 1.25 }: { blur?: number; satu
             />
             <feColorMatrix in="dg" type="matrix" values={channel(1)} result="g" />
             <feDisplacementMap
-              in="SourceGraphic"
+              in="frost"
               in2="map"
               scale={TAU.scale * (1 + TAU.chroma)}
               xChannelSelector="R"
