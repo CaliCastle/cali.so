@@ -1,0 +1,274 @@
+---
+title: "I Decided to Stop Buying SaaS"
+description: "AI didn't make maintenance free. It gave us the freedom to build. We used to buy software and adapt to it. Now we shape it around how we work."
+---
+
+I decided to stop buying SaaS.
+
+We still pay for plenty of software. I'm not about to rebuild payments, accounting, or cloud infrastructure just to save a few dollars a month in subscriptions.
+
+Software needs maintenance after it ships, and internal tools collect technical debt like everything else. Rebuilding every wheel to satisfy a few personal preferences isn't AI-native. It's usually just underestimating the long-term cost.
+
+But over the past few months, I really did stop searching for the tool that comes closest to what we need.
+
+**When the right tool doesn't exist, it's easier now to just build it.**
+
+This didn't start at the company.
+
+<PhotoStack>
+  <PhotoStackFrames>
+
+![Cali holding Jensen during a feed](./jensen-feeding.webp#1600x2134)
+
+![Newborn Jensen sleeping soundly](./jensen-sleeping.webp#1200x1200)
+
+![Jensen resting against Cali with one small hand reaching out](./jensen-hand.webp#1200x1200)
+
+![Jensen's two little feet](./jensen-feet.webp#1200x1200)
+
+  </PhotoStackFrames>
+  <PhotoStackCaption>Daily life after Jensen was born. The baby companion app grew out of these small, frequent, one-handed tasks.</PhotoStackCaption>
+</PhotoStack>
+
+After our second child was born, I wanted an app to track diapers, breastfeeding, and bottle feeds. There were plenty of options. I downloaded almost every one I could find. But once I was using them many times a day, little things kept bothering me.
+
+Some had too many features, and the home screen turned into a control panel. Some buried frequent actions several levels deep, which is hard when you're holding a baby in one arm. Some looked cute but were slow where it mattered. Others kept stacking features until even basic logging became a chore.
+
+Most of the Chinese apps I tried came loaded with ads, including that classic of the genre, the full-screen launch ad. The international ones were usually cleaner, but the visual design never quite got there. Different problems on each side. Nothing scratched the itch.
+
+**I couldn't find one that met my bar, so I thought: why not make it myself?**
+
+AI pushed the business logic, tests, and prototypes forward fast. The slow part was turning a version that could run into a product I'd actually want to use every day.
+
+The polishing took two months.
+
+At the time I didn't read it as a trend. It was a personal need: I couldn't find it, I could build it, so I built it for my family.
+
+Then the same thing started happening at the company.
+
+## Software That Wasn't Worth Building Before Is Worth Building Now
+
+Zolplay hires in China and around the world.
+
+We tried a good number of applicant tracking systems. Every product demos well. Put one inside your actual hiring process and there's always something to work around.
+
+How do candidate emails enter the pipeline on their own? How does interview scheduling work across regions and time zones? How does AI scoring map to different roles? How do interviewers score independently after each interview, before the team decides whether to move forward?
+
+Every product solved a piece of it. None of them had grown around the way we actually work.
+
+In the past I would probably have accepted the bad fit.
+
+A custom ATS means product, design, and engineering time: two months at least, maybe three. Internal tools rarely win resources against client work and company products. So you buy the SaaS that's close enough and let the team hand-stitch the gaps.
+
+**This time, I just started building.**
+
+Over one weekend, <InlineProductName product="Codex" />, <InlineProductName product="Claude Code" />, and I got the whole flow running: automatic email ingestion, organizing and scoring candidates against each role's criteria, interview scheduling, and the team's post-interview evaluation.
+
+```mermaid caption="The cost boundary for the same ATS moved from a few months to one weekend."
+flowchart LR
+  subgraph PAST["Before · 2-3 months"]
+    direction TB
+    P1["Requirements"] --> P2["Product scoping"] --> P3["Design handoff"] --> P4["Engineering"] --> P5["Testing and fixes"] --> P6["In production"]
+  end
+  subgraph NOW["Now · One weekend"]
+    direction TB
+    N1["Define the need"] --> N2["Spec planning"] --> N3["Founder + coding agents"]
+    N3 --> I["Implementation"]
+    N3 --> T["Testing"]
+    N3 --> R["Review"]
+    I --> ATS["Working ATS: ingestion · scoring · scheduling · team evaluation"]
+    T --> ATS
+    R --> ATS
+  end
+```
+
+It's not a prototype living in screenshots. It's managing real candidates right now. The team still makes the final call, and it runs well.
+
+**→ What changed isn't just development speed. It's which software deserves a spot on the roadmap at all.**
+
+An internal tool that would never have made the schedule is now something you can validate over a weekend.
+
+Build versus buy used to be a short conversation.
+
+Buying was cheap. Building was expensive. Unless your needs were truly unusual, you bought.
+
+AI didn't make maintenance free, and it didn't make every internal build a good idea. But it clearly moved the line. Building software around the way your team works no longer means signing up for a long, expensive project.
+
+So we built **Control**.
+
+It's Zolplay's own CRM: clients, prospects, project opportunities, and follow-up status.
+
+Then came **Dex**.
+
+We'd been feeling that Notion had gotten heavy. It kept adding AI and database capabilities, but not necessarily going deeper on the things we cared about: clean documents, a knowledge base, Markdown, project handoffs, client assets, and content structures an agent can read reliably.
+
+So we built our own documents and knowledge system. The team shares internal docs, project handoffs, and client assets in Dex now, and we talk through ideas with AI agents right inside it.
+
+Looked at separately, these seem like a few unrelated little products.
+
+- <InlineProductName product="ATS" /> manages candidates
+- <InlineProductName product="Control" /> records clients and opportunities
+- <InlineProductName product="Dex" /> keeps documents and knowledge
+
+But as they showed up one after another, I realized we weren't just rebuilding a few SaaS products.
+
+**→ We were moving pieces of the company into software we own.**
+
+```mermaid caption="ATS, Control, and Dex aren't three isolated tools. They're one Company OS."
+flowchart TB
+  COLLAB["Slack · Linear<br/>Collaboration and context"] --> PEOPLE["People<br/>Judgment · review · tradeoffs"]
+  PEOPLE --> OWNED["Company-owned software"]
+  OWNED --> ATS["ATS<br/>Hiring"] & CONTROL["Control<br/>Business relationships"] & DEX["Dex<br/>Knowledge"]
+  ATS & CONTROL & DEX --> CORE["Workflows · memory · agents"]
+  CORE --> RUN["Daily execution"]
+```
+
+## Stop Making the Company Fit the Software
+
+Most companies buy general-purpose software, then bend the way they work to fit it.
+
+Fields don't fit? Add another table. Two workflows don't connect? Someone carries the data across by hand. Permissions fall short? Find a plugin. Context scattered across five systems? Meetings and Slack messages stitch it back together, temporarily, forever.
+
+**The cost of SaaS was never just the subscription.**
+
+It's also how much of the team's natural way of working gets given up, piece by piece, to accommodate the software.
+
+That doesn't mean build everything.
+
+Payments, tax, compliance, cloud infrastructure, mature general-purpose capability: leave those to the teams that specialize in them. AI writing code doesn't mean a design and software company should casually rebuild Stripe, GitHub, or its accounting system.
+
+**The category worth rethinking is a different one.**
+
+How hiring standards get applied. How a promising client gets recognized. How project experience gets preserved. Which decisions need review, and what kind. These look like software features. They're actually part of how a company works.
+
+We used to have no choice but to leave these workflows parked in general-purpose products someone else built.
+
+Now, for a team like ours, making the software fit the company is finally within reach.
+
+The Zolplay site we're rebuilding right now keeps walking in the same direction.
+
+The new site won't just be a shelf for work and services.
+
+We're planning to let visitors talk directly with an AI agent on the site: what Zolplay does, roughly which budget range a project lands in, whether it makes sense to keep talking. The agent does the initial sorting and sends promising leads to Slack, **where I review them**, before they're recorded in Control and enter follow-up.
+
+```mermaid caption="The agent organizes and qualifies. The team keeps the real decision."
+flowchart TB
+  V["Visitor"] --> W["Website agent"] --> U["Services, pricing, and requirements"] --> Q["Initial qualification"] --> H{"Internal review<br/>Human judgment"} --> C["Control CRM"] --> F["Follow-up"]
+```
+
+The site catches the opportunity. The agent organizes it. <InlineProductName product="Slack" /> pulls a person into the decision. Control keeps the relationship and its status.
+
+**At that point, software stops being just a tool in an employee's hands. It's become a load-bearing part of the company.**
+
+But once building gets cheap, the new bottleneck shows up fast.
+
+**→ The hard part is no longer writing the software. It's deciding which ways of working deserve to be written into software.**
+
+## Code Is Getting Cheaper. Judgment Is Getting More Expensive.
+
+There's a popular take on AI-native talent:
+
+> **Learning Rate &gt; Experience.**
+
+**I don't fully agree.**
+
+Learning speed matters, obviously. Models, tools, and workflows keep changing. Rely only on old answers and you fall behind fast.
+
+But when you're actually building product, experience is often what decides whether the details hold up.
+
+Someone can pick up SwiftUI quickly, have an agent write the business logic, the unit tests, the UI tests, and still not know why a product that runs fine doesn't feel right.
+
+In the baby companion app I'm about to ship, diaper logging, nursing timers, and bottle feeds are the highest-frequency actions.
+
+The first version spread them across the home screen as big cards. Two per row, so a handful of tools ate most of the screen.
+
+I switched to three columns. Better density, narrower touch targets, more accidental taps.
+
+So I folded the tools into a quick-action menu. The entry point started on the right side of the tab bar, and some users asked for it on the left, because they mostly hold the phone in their left hand. But with the SwiftUI system tab bar I was using, you can't customize that far. Fully honoring the request meant building my own tab bar and giving up a lot of native behavior, along with the Liquid Glass effects.
+
+Every option was buildable. Every option had a defensible argument.
+
+AI could implement any of them quickly. It couldn't tell me which tradeoff to accept.
+
+In the end I went back to the native tab bar and put the quick-action entry in the middle. I also swapped the fixed feature list for a tool collection, a bit like the <InlineProductName product="App Store" />: each family adds or removes what they need.
+
+Left hand, right hand, native behavior intact, and the product doesn't bloat as features pile up.
+
+A rough breakdown of where the development time actually went:
+
+<TimeAllocationChart />
+
+None of these calls came from memorizing a design formula.
+
+They came from using a lot of apps, deliberately downloading the competition to compare, and following small, careful teams and good design engineers for years.
+
+**Having seen a lot doesn't mean having collected a lot of pretty screenshots.**
+
+It means knowing when a small detail will actually make something feel effortless. It means remembering the exact feeling of using a product and noticing that someone got an interaction right on purpose.
+
+I want my products to give people that same feeling.
+
+## Let the System Inherit Experience. Keep the Decisions with People.
+
+**Experience didn't lose value when AI showed up.**
+
+It's just starting to change where it lives.
+
+```mermaid caption="People curate experience before it enters a system that can run repeatedly."
+flowchart TB
+  E1["Failure · comparison · long-term use"] --> H{"Human selection<br/>and curation"}
+  E2["User feedback · project tradeoffs"] --> H
+  H --> K["Principles · counterexamples · review standards<br/>Boundaries · examples"]
+  K --> S["Prompts · workflows · memory<br/>Skills · agents · internal software"]
+  S --> R["The company's everyday capability"]
+```
+
+Experience used to live in one person's head. Someone who's built products for ten years knows which problems deserve suspicion and which clever-looking ideas turn into burdens. The team could never fully inherit that judgment.
+
+Now part of it can be selected, organized, and turned into prompts, workflows, memory, review standards, examples, counterexamples, even skills an agent can call.
+
+The next person may not need another ten years to fall into every one of the same holes.
+
+But there's a precondition you can't skip.
+
+**Someone has to know which experience is worth keeping.**
+
+Without enough real practice, it's hard to tell a principle from a lucky outcome, or which details made the product work versus which were just personal habit.
+
+AI can shorten the time it takes experience to spread. It can't conjure experience out of nothing.
+
+The thing I'm still least willing to hand fully to agents is visual design.
+
+![A row of candidate options passes a review boundary into larger decision orbits](./figure-7-system-boundary.jpg#1600x900 "A system can generate options. A person still decides what is worth shipping.")
+
+Not because AI can't produce a good-looking frame. It can generate directions fast and keep homing in on a specified style.
+
+The problem is that visuals expose the edge of the system faster than anything else.
+
+**A solution can run, pass its tests, even do fine in the data, and still not deserve to exist in that form.**
+
+Beautiful, useful, durable, with just the right amount of surprise, and motion that exists without stealing attention. You can describe these requirements. You can settle them into a design system, examples, and review standards. You can't quite write them down as a complete formula.
+
+AI can keep getting closer to the shape we want.
+
+**Someone still has to call it: is this what we're willing to ship?**
+
+Data can tell you whether a product works. It can't tell the company what to want. Code can prove something runs. It can't decide what deserves to be built.
+
+Repetitive work can go to agents. Experience can settle into systems. Human attention goes back to judgment, taste, and the decisions you can't measure by completion alone.
+
+So I increasingly think AI-native isn't a new label for talent.
+
+It's a redistribution, first of all.
+
+- **Experience** moves from individual memory into systems that can run
+- **Repetitive work** moves from people to agents
+- **Human time** returns to the places that still need choice and responsibility
+
+We'll keep buying plenty of SaaS. Mature, general-purpose capability belongs with the people best suited to maintain it.
+
+But the parts that carry how Zolplay hires, understands clients, keeps knowledge, and makes tradeoffs: we don't want to leave those parked in someone else's software anymore.
+
+What we decided to stop buying was never SaaS.
+
+**It's software that asks us to give up the way we work just so we can make do with it.**

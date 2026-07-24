@@ -8,6 +8,26 @@ are promotional artwork from Apple Music, publishers, authors, or retailers.
 | File | Source |
 | --- | --- |
 | `public/images/codex.svg` | User-supplied Codex product mark |
+| `public/images/products/ats.svg` | User-supplied ZATS product source mark |
+| `public/images/products/control.svg` | User-supplied Control product source mark |
+| `public/images/products/dex.svg` | User-supplied Dex brand source mark |
+| `public/images/products/slack.svg` | Slack’s official site-navigation [standalone SVG](https://a.slack-edge.com/38f0e7c/marketing/img/nav/logo.svg) |
+| `public/images/products/app-store.svg` | [SVG Logos](https://github.com/gilbarbara/logos) CC0 vector for the App Store mark |
+
+### External mark review
+
+_First-party sources reviewed 2026-07-22. These are sourcing decisions, not a
+general license to reuse the marks._
+
+The Slack mark keeps the colors and geometry from Slack’s own navigation asset.
+See the [Slack media kit](https://slack.com/media-kit) and
+[brand terms](https://slack.com/terms-of-service/slack-brand) for usage rules.
+
+Apple does not provide a general-purpose inline App Store SVG. The vector used
+here comes from the CC0 SVG Logos collection and is used as a small editorial
+reference, not as Apple marketing artwork. Apple retains its trademark rights;
+see the [App Store identity guidelines](https://developer.apple.com/app-store/marketing/guidelines/)
+and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html).
 
 ## Album covers
 

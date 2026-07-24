@@ -1261,6 +1261,35 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.prose .inline-product-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2em;
+  color: var(--gray-12, var(--foreground));
+  font-weight: var(--font-weight-medium);
+  vertical-align: -0.08em;
+  white-space: nowrap;
+}
+
+.prose .inline-product-logo {
+  width: 0.875em;
+  height: 0.875em;
+  flex: none;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dark .prose .inline-product-logo-ats,
+.dark .prose .inline-product-logo-control,
+.dark .prose .inline-product-logo-dex {
+  filter: brightness(1.45) contrast(0.9);
+}
+
+.dark .prose .inline-product-logo-codex {
+  filter: invert(1);
+}
+
 .post-title-card h1 {
   color: var(--gray-12, var(--foreground));
   font-size: clamp(1.75rem, 4vw, 2rem);
@@ -1791,6 +1820,84 @@
   content: '图 ' counter(prose-figure, decimal-leading-zero) ' — ' / '';
 }
 
+/* A contact sheet for lived-in photo sequences: one anchoring scene with
+   smaller observations tucked along its edge. Each print remains independently
+   zoomable, while the group carries one editorial caption. */
+.photo-stack__frames {
+  display: grid;
+  grid-template-columns: minmax(0, 1.62fr) minmax(8rem, 1fr);
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: 0.375rem 0;
+  align-items: stretch;
+  aspect-ratio: 1.25;
+  isolation: isolate;
+}
+
+.photo-stack__frames > p {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+
+.photo-stack__frames > p:first-child {
+  z-index: 1;
+  grid-row: 1 / 4;
+  padding-block: 0.25rem;
+  padding-inline-end: 0.125rem;
+}
+
+.photo-stack__frames > p:not(:first-child) {
+  z-index: 2;
+  margin-inline-start: -0.75rem;
+}
+
+.photo-stack__frames .zoom-trigger {
+  height: 100%;
+}
+
+.prose .photo-stack__frames .zoom-trigger img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  box-shadow:
+    0 0 0 var(--border-hairline) var(--border),
+    0 2px 4px -1px rgb(0 0 0 / 0.18);
+}
+
+.photo-stack__frames > p:nth-child(2) img {
+  object-position: center 42%;
+}
+
+.photo-stack__frames > p:nth-child(3) img {
+  object-position: center 48%;
+}
+
+.photo-stack__frames > p:nth-child(4) img {
+  object-position: center 55%;
+}
+
+@media (max-width: 31.999rem) {
+  .photo-stack__frames {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto;
+    gap: 0.375rem;
+    aspect-ratio: auto;
+  }
+
+  .photo-stack__frames > p:first-child {
+    grid-row: auto;
+    grid-column: 1 / -1;
+    aspect-ratio: 3 / 4;
+    padding: 0 0.25rem 0.25rem;
+  }
+
+  .photo-stack__frames > p:not(:first-child) {
+    aspect-ratio: 1;
+    margin-block-start: -0.875rem;
+    margin-inline-start: 0;
+  }
+}
+
 .prose code:not(pre code) {
   background: var(--muted);
   border-radius: 2px;
@@ -1953,6 +2060,103 @@ figure[data-rehype-pretty-code-figure] {
   .scroll-area-y-fade {
     transition: none;
   }
+}
+
+/* ── Editorial data figures ──────────────────────────────────────── */
+
+.time-allocation-chart {
+  padding: clamp(1rem, 4vw, 1.5rem);
+  border: var(--border-hairline) solid var(--border);
+  border-radius: 2px;
+  background: var(--surface-1);
+}
+
+.time-allocation-chart__header {
+  padding-bottom: 1rem;
+  border-bottom: var(--border-hairline) solid
+    color-mix(in oklab, var(--border) 72%, transparent);
+}
+
+.time-allocation-chart__eyebrow {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-family: var(--font-geist-mono), var(--font-frex-gb), ui-monospace,
+    monospace;
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.time-allocation-chart__title {
+  margin: 0.375rem 0 0;
+  color: var(--gray-12, var(--foreground));
+  font-size: clamp(1rem, 3.5vw, 1.125rem);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.time-allocation-chart__rows {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.time-allocation-chart__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.375rem;
+  color: var(--gray-11, var(--foreground));
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.time-allocation-chart__value {
+  flex: none;
+  color: var(--gray-12, var(--foreground));
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+.time-allocation-chart__track {
+  height: 0.6875rem;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--muted-foreground) 8%, transparent);
+  box-shadow: inset 0 0 0 var(--border-hairline)
+    color-mix(in oklab, var(--border) 78%, transparent);
+}
+
+.time-allocation-chart__bar {
+  display: block;
+  width: var(--allocation);
+  min-width: var(--border-hairline);
+  height: 100%;
+}
+
+.time-allocation-chart__bar[data-tone='context'] {
+  background: color-mix(in oklab, var(--muted-foreground) 54%, transparent);
+}
+
+.time-allocation-chart__bar[data-tone='primary'] {
+  background: var(--gray-12, var(--foreground));
+}
+
+.time-allocation-chart__bar[data-tone='secondary'] {
+  background: repeating-linear-gradient(
+    -45deg,
+    color-mix(in oklab, var(--gray-11, var(--foreground)) 76%, transparent) 0,
+    color-mix(in oklab, var(--gray-11, var(--foreground)) 76%, transparent) 1px,
+    transparent 1px,
+    transparent 3.5px
+  );
+  box-shadow: inset 0 0 0 var(--border-hairline)
+    color-mix(in oklab, var(--gray-11, var(--foreground)) 55%, transparent);
 }
 
 /* ── Mermaid diagrams (beautiful-mermaid, server-rendered svg) ────── */

@@ -1,0 +1,38 @@
+<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- The Dex mark — brand source of truth. Same artwork as apps/web/app/icon.svg (the served favicon) and the DexMark component. -->
+  <g fill="none">
+    <path d="M23 12C23 14.2091 18.0751 16 12 16C5.92487 16 1 14.2091 1 12C1 9.79086 5.92487 8 12 8C18.0751 8 23 9.79086 23 12Z" fill="url(#dex-favicon-core)" mask="url(#dex-favicon-mask)"/>
+    <path d="M23 12C23 14.2091 18.0751 16 12 16C5.92487 16 1 14.2091 1 12C1 9.79086 5.92487 8 12 8C18.0751 8 23 9.79086 23 12Z" fill="url(#dex-favicon-core)" filter="url(#dex-favicon-blur)" clip-path="url(#dex-favicon-clip)"/>
+    <path d="M1 12C1 14.2091 5.92487 16 12 16C18.0751 16 23 14.2091 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12Z" fill="url(#dex-favicon-base)"/>
+    <path d="M12 1C18.0751 1 23 5.92487 23 12L22.9854 12.2061C22.6904 14.3194 17.8851 16 12 16C5.92487 16 1 14.2091 1 12C1 5.92487 5.92487 1 12 1Z" fill="url(#dex-favicon-glass)"/>
+    <path d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12L22.9854 12.2061C22.6904 14.3194 17.8851 16 12 16V15.25C14.8797 15.25 17.4664 14.8374 19.3438 14.1865C20.2841 13.8605 21.0136 13.4857 21.5107 13.0986C22.0092 12.7104 22.2 12.3688 22.2393 12.1113L22.249 11.9814C22.239 6.32906 17.6547 1.75 12 1.75C6.33908 1.75 1.75 6.33908 1.75 12C1.75 12.2515 1.88794 12.588 2.35352 12.9883C2.81666 13.3864 3.53101 13.7795 4.47852 14.124C6.36745 14.8108 9.02662 15.25 12 15.25V16C5.92487 16 1 14.2091 1 12Z" fill="url(#dex-favicon-rim)"/>
+    <defs>
+      <linearGradient id="dex-favicon-core" x1="12" y1="8" x2="12" y2="16" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#575757"/>
+        <stop offset="1" stop-color="#151515"/>
+      </linearGradient>
+      <linearGradient id="dex-favicon-base" x1="12" y1="12" x2="12" y2="23" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#575757"/>
+        <stop offset="1" stop-color="#151515"/>
+      </linearGradient>
+      <linearGradient id="dex-favicon-glass" x1="12" y1="1" x2="12" y2="16" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#E3E3E5" stop-opacity="0.6"/>
+        <stop offset="1" stop-color="#BBBBC0" stop-opacity="0.6"/>
+      </linearGradient>
+      <linearGradient id="dex-favicon-rim" x1="12" y1="1" x2="12" y2="9.687" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#FFFFFF"/>
+        <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+      </linearGradient>
+      <filter id="dex-favicon-blur" x="-100%" y="-100%" width="400%" height="400%" filterUnits="objectBoundingBox" primitiveUnits="userSpaceOnUse">
+        <feGaussianBlur stdDeviation="2" in="SourceGraphic" edgeMode="none" result="blur"/>
+      </filter>
+      <clipPath id="dex-favicon-clip">
+        <path d="M12 1C18.0751 1 23 5.92487 23 12L22.9854 12.2061C22.6904 14.3194 17.8851 16 12 16C5.92487 16 1 14.2091 1 12C1 5.92487 5.92487 1 12 1Z"/>
+      </clipPath>
+      <mask id="dex-favicon-mask">
+        <rect width="100%" height="100%" fill="#FFF"/>
+        <path d="M12 1C18.0751 1 23 5.92487 23 12L22.9854 12.2061C22.6904 14.3194 17.8851 16 12 16C5.92487 16 1 14.2091 1 12C1 5.92487 5.92487 1 12 1Z" fill="#000"/>
+      </mask>
+    </defs>
+  </g>
+</svg>
