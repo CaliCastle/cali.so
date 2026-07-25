@@ -1840,14 +1840,12 @@
 }
 
 .photo-stack__frames > p:first-child {
-  z-index: 1;
   grid-row: 1 / 4;
   padding-block: 0.25rem;
   padding-inline-end: 0.125rem;
 }
 
 .photo-stack__frames > p:not(:first-child) {
-  z-index: 2;
   margin-inline-start: -0.75rem;
 }
 
