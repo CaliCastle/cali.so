@@ -40,11 +40,14 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   vi.restoreAllMocks()
   vi.unstubAllGlobals()
 })
 
-function stubLoadedImage() {
+function stubLoadedImage(
+  decode: () => Promise<void> = () => Promise.resolve(),
+) {
   const originals = {
     complete: Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'complete'),
     naturalWidth: Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'naturalWidth'),
@@ -60,7 +63,7 @@ function stubLoadedImage() {
   })
   Object.defineProperty(HTMLImageElement.prototype, 'decode', {
     configurable: true,
-    value: () => Promise.resolve(),
+    value: decode,
   })
   return () => {
     for (const [key, desc] of Object.entries(originals)) {
@@ -70,8 +73,14 @@ function stubLoadedImage() {
   }
 }
 
-function mockVeilContext(alpha: number) {
+function mockVeilContext(alpha: number | (() => number)) {
   const fillRect = vi.fn()
+  const getImageData = vi.fn((_x: number, _y: number, w: number, h: number) => {
+    const data = new Uint8ClampedArray(w * h * 4)
+    const sampleAlpha = typeof alpha === 'function' ? alpha() : alpha
+    for (let i = 3; i < data.length; i += 4) data[i] = sampleAlpha
+    return { data }
+  })
   const ctx = {
     setTransform: vi.fn(),
     clearRect: vi.fn(),
@@ -81,11 +90,7 @@ function mockVeilContext(alpha: number) {
     fillStyle: '',
     font: '',
     textBaseline: 'top',
-    getImageData: (_x: number, _y: number, w: number, h: number) => {
-      const data = new Uint8ClampedArray(w * h * 4)
-      for (let i = 3; i < data.length; i += 4) data[i] = alpha
-      return { data }
-    },
+    getImageData,
   }
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
     ctx as unknown as CanvasRenderingContext2D,
@@ -101,7 +106,7 @@ function mockVeilContext(alpha: number) {
     y: 0,
     toJSON: () => ({}),
   } as DOMRect)
-  return fillRect
+  return { fillRect, getImageData }
 }
 
 describe('DitheredImage', () => {
@@ -127,7 +132,7 @@ describe('DitheredImage', () => {
   // cell to solid ink (the "black grid" mobile bug)
   it('does not print ink when the image samples blank', async () => {
     const restoreImage = stubLoadedImage()
-    const fillRect = mockVeilContext(0)
+    const { fillRect } = mockVeilContext(0)
     try {
       render(<DitheredImage src="/cover.png" alt="" width={64} height={44} />)
       await vi.waitFor(() => {
@@ -142,12 +147,54 @@ describe('DitheredImage', () => {
 
   it('prints the dither once the image has decodable pixels', async () => {
     const restoreImage = stubLoadedImage()
-    const fillRect = mockVeilContext(255)
+    const { fillRect } = mockVeilContext(255)
     try {
       render(<DitheredImage src="/cover.png" alt="" width={64} height={44} />)
       await vi.waitFor(() => {
         expect(fillRect).toHaveBeenCalled()
       })
+    } finally {
+      restoreImage()
+    }
+  })
+
+  it('retries a blank sample when image decoding completes', async () => {
+    let resolveDecode: (() => void) | undefined
+    const decode = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveDecode = resolve
+        }),
+    )
+    const restoreImage = stubLoadedImage(decode)
+    let alpha = 0
+    const { fillRect, getImageData } = mockVeilContext(() => alpha)
+    try {
+      render(<DitheredImage src="/cover.png" alt="" width={64} height={44} />)
+      await vi.waitFor(() => expect(getImageData).toHaveBeenCalled())
+
+      alpha = 255
+      resolveDecode?.()
+
+      await vi.waitFor(() => expect(fillRect).toHaveBeenCalled())
+      expect(decode).toHaveBeenCalledOnce()
+    } finally {
+      restoreImage()
+    }
+  })
+
+  it('bounds blank-sample backoff to four retries', async () => {
+    vi.useFakeTimers()
+    const restoreImage = stubLoadedImage(() => new Promise<void>(() => {}))
+    const { getImageData } = mockVeilContext(0)
+    try {
+      render(<DitheredImage src="/cover.png" alt="" width={64} height={44} />)
+
+      await vi.runAllTimersAsync()
+
+      expect(getImageData).toHaveBeenCalledTimes(5)
+      await vi.runAllTimersAsync()
+      expect(getImageData).toHaveBeenCalledTimes(5)
     } finally {
       restoreImage()
     }
