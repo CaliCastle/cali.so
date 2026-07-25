@@ -10,8 +10,7 @@ import {
   PreferencesIcon,
   SiteReturnIcon,
 } from '~/components/dock-icons'
-import { DockItem } from '~/components/dock'
-import { LiquidGlass } from '~/components/liquid-glass'
+import { DockGlass, DockItem } from '~/components/dock'
 import { Preferences } from '~/components/preferences'
 import { useDockActiveIndicator } from '~/hooks/use-dock-active-indicator'
 import { adminGoKeyFor, useAdminGoShortcuts } from '~/hooks/use-dock-go-shortcuts'
@@ -34,7 +33,7 @@ export function AdminDockFallback() {
       aria-label={localize('zh', '管理导航', 'Admin navigation')}
       aria-busy="true"
     >
-      <LiquidGlass />
+      <DockGlass />
       <DockItem
         href="/admin"
         locale="zh"
@@ -107,7 +106,7 @@ export function AdminDock() {
       className="dock"
       aria-label={localize(locale, '管理导航', 'Admin navigation')}
     >
-      <LiquidGlass />
+      <DockGlass />
       <span ref={indicatorRef} className="dock-active-indicator" aria-hidden />
       <DockItem
         href="/admin"

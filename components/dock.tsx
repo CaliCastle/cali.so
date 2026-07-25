@@ -12,7 +12,6 @@ import {
   ProjectsIcon,
   WritingIcon,
 } from '~/components/dock-icons'
-import { LiquidGlass } from '~/components/liquid-glass'
 import { Preferences } from '~/components/preferences'
 import { useDockActiveIndicator } from '~/hooks/use-dock-active-indicator'
 import { dockGoKeyFor, useDockGoShortcuts } from '~/hooks/use-dock-go-shortcuts'
@@ -31,6 +30,23 @@ const ITEMS = [
   { href: '/projects', zh: '项目', en: 'Projects', icon: ProjectsIcon },
   { href: '/ama', zh: '咨询', en: 'AMA', icon: AmaIcon },
 ] as const
+
+const DOCK_VIEW_TRANSITION_STYLE = {
+  viewTransitionName: 'site-dock',
+} as React.CSSProperties
+
+// The frosted pane behind the dock: plain translucency over the pill's 68%
+// background, no refraction. The backdrop-filter must stay inline — never in
+// the stylesheet — because LightningCSS strips raw backdrop-filter
+// declarations.
+const DOCK_GLASS_STYLE = {
+  backdropFilter: 'blur(12px) saturate(1.25)',
+  WebkitBackdropFilter: 'blur(12px) saturate(1.25)',
+} as React.CSSProperties
+
+export function DockGlass() {
+  return <span className="dock-glass" aria-hidden style={DOCK_GLASS_STYLE} />
+}
 
 export function DockTip({
   zh,
@@ -111,10 +127,11 @@ export function DockFallback({ locale }: { locale: Locale }) {
   return (
     <nav
       className="dock"
+      style={DOCK_VIEW_TRANSITION_STYLE}
       aria-label={localize(locale, '主导航', 'Main navigation')}
       aria-busy="true"
     >
-      <LiquidGlass />
+      <DockGlass />
       <DockItem
         href={localePath(locale, '/')}
         locale={locale}
@@ -184,8 +201,13 @@ export function Dock() {
   }, [])
 
   return (
-    <nav ref={dockRef} className="dock" aria-label={localize(locale, '主导航', 'Main navigation')}>
-      <LiquidGlass />
+    <nav
+      ref={dockRef}
+      className="dock"
+      style={DOCK_VIEW_TRANSITION_STYLE}
+      aria-label={localize(locale, '主导航', 'Main navigation')}
+    >
+      <DockGlass />
       <span ref={indicatorRef} className="dock-active-indicator" aria-hidden />
       <DockItem
         href={localePath(locale, '/')}

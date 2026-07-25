@@ -11,10 +11,6 @@ vi.mock('next/image', () => ({
     <img {...props} />
   ),
 }))
-vi.mock('~/components/liquid-glass', () => ({
-  LiquidGlass: () => <span aria-hidden />,
-}))
-
 afterEach(cleanup)
 
 describe('DockFallback', () => {
@@ -38,6 +34,7 @@ describe('DockFallback', () => {
 
     const navigation = screen.getByRole('navigation', { name: entry.label })
     expect(navigation.getAttribute('aria-busy')).toBe('true')
+    expect(navigation.style.viewTransitionName).toBe('site-dock')
     expect(screen.getByRole('link', { name: /首页|Home/ }).getAttribute('href')).toBe(
       entry.home,
     )

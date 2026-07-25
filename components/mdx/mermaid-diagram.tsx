@@ -25,6 +25,7 @@ export function MermaidDiagram({
       bg: 'var(--surface-1)',
       fg: 'var(--foreground)',
       muted: 'var(--muted-foreground)',
+      accent: 'var(--gray-9)',
       transparent: true,
       padding: 24,
     })

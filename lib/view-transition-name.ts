@@ -20,6 +20,8 @@ function postTransitionId(slug: string) {
       return 'p08'
     case 'react-or-vue-my-take-on-web-dev':
       return 'p09'
+    case 'we-decided-to-stop-buying-saas':
+      return 'p10'
     default:
       throw new Error('Unknown post view-transition slug')
   }

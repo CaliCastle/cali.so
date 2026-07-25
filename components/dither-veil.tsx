@@ -119,6 +119,18 @@ function DitherVeil({
       if (!octx) return null
       octx.drawImage(img, 0, 0, cols, rows)
       const data = octx.getImageData(0, 0, cols, rows).data
+      // iOS Safari can report the image loaded before its pixels are
+      // decodable (or after evicting them under memory pressure) — the
+      // draw then lands fully transparent, which would dither to solid
+      // ink. Report failure so the caller retries instead of printing it.
+      let sampled = false
+      for (let i = 3; i < data.length; i += 4) {
+        if (data[i] > 0) {
+          sampled = true
+          break
+        }
+      }
+      if (!sampled) return null
       const lums = new Float32Array(cols * rows)
       for (let i = 0; i < lums.length; i++) {
         const j = i * 4
@@ -139,11 +151,11 @@ function DitherVeil({
       ctx.clearRect(0, 0, rect.width, rect.height)
     }
 
-    function drawDitherFull(rect: DOMRect) {
+    function drawDitherFull(rect: DOMRect): boolean {
       const cols = Math.max(1, Math.round(rect.width / PIXEL))
       const rows = Math.max(1, Math.round(rect.height / PIXEL))
       const sample = levels(cols, rows)
-      if (!sample) return
+      if (!sample) return false
       const cw = rect.width / cols
       const ch = rect.height / rows
       ctx.fillStyle = PAPER
@@ -155,6 +167,7 @@ function DitherVeil({
           if (1 - lum > BAYER[r % 4][c % 4]) ctx.fillRect(c * cw, r * ch, cw, ch)
         }
       }
+      return true
     }
 
     // — collage glitch machinery —
@@ -356,18 +369,20 @@ function DitherVeil({
       if (!stepTimer) tick()
     }
 
-    function render() {
+    function render(): boolean {
       const rect = canvas.getBoundingClientRect()
-      if (rect.width < 4) return
+      if (rect.width < 4) return true
       if (mode === 'dither') {
         sizeCanvas(rect)
-        drawDitherFull(rect)
-        return
+        // a failed sample leaves the canvas clear — the plain photo is
+        // the graceful fallback while the retries chase the decode
+        return drawDitherFull(rect)
       }
       // collage glitch: prepare grids, play the entry rhythm once
       const first = !prepared
       sizeCanvas(rect)
       prepare(rect)
+      if (!prepared) return false
       if (first) play()
       // resize: the canvas was cleared, so snap to wherever the walker
       // was headed
@@ -377,13 +392,35 @@ function DitherVeil({
       } else {
         level = 0
       }
+      return true
     }
 
-    if (img.complete && img.naturalWidth > 0) render()
-    else img.addEventListener('load', render, { once: true })
+    let cancelled = false
+    let retries = 0
+
+    function attemptRender() {
+      if (cancelled) return
+      if (!render() && retries < 4) {
+        retries += 1
+        timers.push(setTimeout(attemptRender, 150 * retries))
+      }
+    }
+
+    // load/complete only promise the bytes, not decoded pixels — iOS
+    // Safari samples blank in that gap. Render right away (a blank
+    // sample retries instead of printing), and treat decode() purely as
+    // an extra retry signal: it can stay pending forever in hidden
+    // documents, so it must never gate the print.
+    const startRender = () => {
+      attemptRender()
+      if (typeof img.decode === 'function') img.decode().then(attemptRender, () => {})
+    }
+
+    if (img.complete && img.naturalWidth > 0) startRender()
+    else img.addEventListener('load', startRender, { once: true })
 
     const ro = new ResizeObserver(() => {
-      if (img.complete && img.naturalWidth > 0) render()
+      if (img.complete && img.naturalWidth > 0) attemptRender()
     })
     ro.observe(canvas)
 
@@ -394,7 +431,8 @@ function DitherVeil({
     }
 
     return () => {
-      img.removeEventListener('load', render)
+      cancelled = true
+      img.removeEventListener('load', startRender)
       ro.disconnect()
       if (host) {
         host.removeEventListener('click', onToggle)
