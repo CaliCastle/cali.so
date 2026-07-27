@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildEnglishFeedXml } from './feed.en.xml/route'
-import robots from './robots'
-import sitemap from './sitemap'
+import { buildEnglishFeedXml } from '~/lib/feeds'
 import { getAllPosts } from '~/lib/content'
 import { archivedNewsletterIds } from '~/lib/newsletters'
 import { seo } from '~/lib/seo'
+
+import robots from './robots'
+import sitemap from './sitemap'
 
 describe('localized discovery routes', () => {
   it('publishes an explicit crawler policy for public and private surfaces', () => {
