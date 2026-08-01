@@ -1,0 +1,6 @@
+services:
+  web:
+    command: 'pnpm dev --hostname 0.0.0.0 --port "$PORT"'
+    portal:
+      title: cali.so
+      description: Local development server with non-secret orb defaults.
