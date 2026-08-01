@@ -248,6 +248,8 @@ describe('BookingFlow', () => {
   })
 
   it('starts checkout from the hold stage and hands off to Stripe', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(BASE_TIME)
     holdCreationImplementation()
     render(<BookingFlow />)
     await flush()

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PATH="$HOME/.local/bin:$PATH"
+
+node_version="$(node --version)"
+pnpm_version="$(pnpm --version)"
+
+[[ "$node_version" == v24.* ]] || {
+  echo "Expected Node.js 24 after orb setup, found ${node_version}" >&2
+  exit 1
+}
+[[ "$pnpm_version" == "10.12.1" ]] || {
+  echo "Expected pnpm 10.12.1 after orb setup, found ${pnpm_version}" >&2
+  exit 1
+}
+[[ -d "$repo_root/node_modules" ]] || {
+  echo "Dependencies are missing; rerun .agents/setup" >&2
+  exit 1
+}
+
+echo "Orb ready (${node_version}, pnpm ${pnpm_version})"

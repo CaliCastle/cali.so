@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+node_version="24.18.1"
+pnpm_version="10.12.1"
+node_dist="node-v${node_version}-linux-x64"
+node_home="$HOME/.local/share/nodejs/$node_dist"
+local_bin="$HOME/.local/bin"
+
+echo "==> Preparing Node.js ${node_version}"
+if [[ ! -x "$node_home/bin/node" ]]; then
+  archive="$(mktemp --suffix=.tar.xz)"
+  checksums="$(mktemp)"
+  cleanup() {
+    rm -f -- "$archive" "$checksums"
+  }
+  trap cleanup EXIT
+
+  curl --fail --location --silent --show-error \
+    --output "$archive" \
+    "https://nodejs.org/dist/v${node_version}/${node_dist}.tar.xz"
+  curl --fail --location --silent --show-error \
+    --output "$checksums" \
+    "https://nodejs.org/dist/v${node_version}/SHASUMS256.txt"
+  expected_checksum="$(awk -v archive="${node_dist}.tar.xz" '$2 == archive { print $1 }' "$checksums")"
+  [[ -n "$expected_checksum" ]]
+  printf '%s  %s\n' "$expected_checksum" "$archive" | sha256sum --check --status
+
+  mkdir -p -- "$(dirname "$node_home")"
+  tar --extract --file "$archive" --directory "$(dirname "$node_home")"
+  cleanup
+  trap - EXIT
+fi
+
+mkdir -p -- "$local_bin"
+for command in node npm npx corepack; do
+  ln -sfn -- "$node_home/bin/$command" "$local_bin/$command"
+done
+export PATH="$local_bin:$PATH"
+hash -r
+
+echo "==> Activating pnpm ${pnpm_version}"
+corepack enable --install-directory "$local_bin"
+corepack install --global "pnpm@${pnpm_version}"
+
+echo "==> Installing locked dependencies"
+pnpm --dir "$repo_root" install --frozen-lockfile
+
+if [[ ! -f "$repo_root/.env.local" ]]; then
+  echo "==> Creating .env.local with non-secret development defaults"
+  cp -- "$repo_root/.env.example" "$repo_root/.env.local"
+
+  set_local_default() {
+    local name="$1"
+    local value="$2"
+    sed -i "s|^${name}=.*$|${name}=${value}|" "$repo_root/.env.local"
+  }
+
+  set_local_default DATABASE_URL postgresql://runtime:runtime@127.0.0.1:5432/cali
+  set_local_default NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY pk_live_Y2xlcmsuY2FsaS5zbyQ
+  set_local_default CLERK_SECRET_KEY sk_live_ci_secret_not_real
+  set_local_default ADMIN_EMAIL owner@example.com
+  set_local_default AMA_ENCRYPTION_KEY AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  set_local_default RATE_LIMIT_HASH_KEY AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=
+  set_local_default PUBLIC_SITE_URL http://127.0.0.1:3000
+  set_local_default SITE_URL http://127.0.0.1:3000
+  set_local_default BUNNY_MEDIA_ZONE ci-media
+  set_local_default BUNNY_MEDIA_PASSWORD ci-media-password
+  set_local_default BUNNY_MEDIA_CDN_URL https://media-ci.example.com
+  set_local_default BUNNY_CDN_API_KEY ci-cdn-api-key
+  set_local_default MEDIA_ENCRYPTION_KEY BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU=
+else
+  echo "==> Keeping existing .env.local"
+fi
+
+echo "==> Installing Playwright browsers and system dependencies"
+pnpm --dir "$repo_root" exec playwright install --with-deps chromium webkit
+
+echo "==> Orb setup complete"
+node --version
+pnpm --version
