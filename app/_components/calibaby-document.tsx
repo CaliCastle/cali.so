@@ -12,9 +12,26 @@ import styles from '../_views/calibaby-pages.module.css'
 
 export const caliBabyRootMetadata: Metadata = {
   metadataBase: seo.url,
+  applicationName: 'Cali Baby',
   title: {
     default: 'Cali Baby',
     template: '%s',
+  },
+  icons: {
+    icon: [
+      {
+        url: '/images/calibaby-app-icon.png',
+        type: 'image/png',
+        sizes: '1024x1024',
+      },
+    ],
+    apple: [
+      {
+        url: '/images/calibaby-app-icon.png',
+        type: 'image/png',
+        sizes: '1024x1024',
+      },
+    ],
   },
 }
 

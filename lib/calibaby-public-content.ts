@@ -95,7 +95,13 @@ export function caliBabyPageMetadata(
   const unlocalizedPath = kind === 'support' ? '/calibaby' : `/calibaby/${kind}`
   const pair = localeRoutePair(unlocalizedPath)
   const canonical = locale === 'en' ? pair.en : pair.zh
-  const image = new URL('/images/calibaby-app-icon.png', canonical)
+  const image = new URL('/og', canonical)
+  image.searchParams.set('locale', locale)
+  image.searchParams.set('path', unlocalizedPath)
+  const imageAlt =
+    locale === 'en'
+      ? 'Cali Baby app icon and wordmark'
+      : 'Cali 宝宝助手应用图标与名称'
 
   return {
     title: content.metadataTitle,
@@ -118,18 +124,18 @@ export function caliBabyPageMetadata(
       images: [
         {
           url: image,
-          width: 1024,
-          height: 1024,
-          alt: locale === 'en' ? 'Cali Baby app icon' : 'Cali 宝宝助手应用图标',
+          width: 1200,
+          height: 630,
+          alt: imageAlt,
           type: 'image/png',
         },
       ],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: content.metadataTitle,
       description: content.metadataDescription,
-      images: [image],
+      images: [{ url: image, alt: imageAlt }],
     },
   }
 }

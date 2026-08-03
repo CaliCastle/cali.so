@@ -7,6 +7,7 @@ import {
   getCaliBabyPublicContent,
   type CaliBabyPageKind,
 } from './calibaby-public-content'
+import { seo } from './seo'
 
 const expected = [
   ['zh', 'support', '/calibaby', 'Cali 宝宝助手'],
@@ -41,25 +42,42 @@ describe('Cali Baby public content', () => {
       const canonical = metadata.alternates?.canonical
       const languages = metadata.alternates?.languages
 
-      expect(canonical?.toString()).toBe(new URL(route, 'http://localhost:3199').href)
+      expect(canonical?.toString()).toBe(new URL(route, seo.url).href)
       expect(languages).toEqual({
         'zh-CN': new URL(
           kind === 'support' ? '/calibaby' : `/calibaby/${kind}`,
-          'http://localhost:3199',
+          seo.url,
         ).href,
         en: new URL(
           kind === 'support' ? '/en/calibaby' : `/en/calibaby/${kind}`,
-          'http://localhost:3199',
+          seo.url,
         ).href,
         'x-default': new URL(
           kind === 'support' ? '/calibaby' : `/calibaby/${kind}`,
-          'http://localhost:3199',
+          seo.url,
         ).href,
       })
       expect(metadata.robots).toEqual({ index: false, follow: true })
       expect(metadata.openGraph?.siteName).toBe('Cali Baby')
-      expect(JSON.stringify(metadata.openGraph?.images)).toContain(
-        '/images/calibaby-app-icon.png',
+      expect(metadata.openGraph?.images).toEqual([
+        expect.objectContaining({
+          url: new URL(
+            `/og?locale=${locale}&path=${encodeURIComponent(
+              kind === 'support' ? '/calibaby' : `/calibaby/${kind}`,
+            )}`,
+            seo.url,
+          ),
+          width: 1200,
+          height: 630,
+          type: 'image/png',
+        }),
+      ])
+      expect(metadata.twitter).toEqual(
+        expect.objectContaining({
+          card: 'summary_large_image',
+          title: metadata.title,
+          description: metadata.description,
+        }),
       )
     },
   )
