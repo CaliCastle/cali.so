@@ -110,6 +110,96 @@ export async function createHomeOgImage(locale: Locale) {
   })
 }
 
+async function renderCaliBabyOgImage() {
+  'use cache'
+  cacheLife('max')
+
+  const icon = await publicImageDataUri('/images/calibaby-app-icon.png')
+
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#f3f4f5',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 64,
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={icon}
+            alt=""
+            width={240}
+            height={240}
+            style={{
+              width: 240,
+              height: 240,
+              borderRadius: 56,
+            }}
+          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                color: '#242529',
+                fontSize: 76,
+                fontWeight: 600,
+                letterSpacing: '-0.035em',
+              }}
+            >
+              Cali Baby
+            </div>
+            <div
+              style={{
+                display: 'flex',
+                gap: 14,
+                marginTop: 30,
+              }}
+            >
+              {['#a88bd4', '#82aee2', '#69bd91', '#d99a64'].map((color) => (
+                <div
+                  key={color}
+                  style={{
+                    width: 11,
+                    height: 11,
+                    borderRadius: 999,
+                    backgroundColor: color,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    {
+      ...IMAGE_SIZE,
+      fonts: await ogRuntimeFonts(),
+    },
+  ).arrayBuffer()
+}
+
+export async function createCaliBabyOgImage() {
+  return new Response(await renderCaliBabyOgImage(), {
+    headers: { 'content-type': 'image/png' },
+  })
+}
+
 function OgSectionMark({ section }: { section: PublicSection }) {
   const stroke = ogColors.paperInk
   const faint = ogColors.border
