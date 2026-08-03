@@ -66,6 +66,7 @@ const nextConfig: NextConfig = {
     authInterrupts: true,
     viewTransition: true,
     globalNotFound: true,
+    useTypeScriptCli: true,
     sri: { algorithm: 'sha256' },
   },
 

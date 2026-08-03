@@ -1,5 +1,6 @@
 import { getPost, isPostSlug } from '~/lib/content'
 import {
+  createCaliBabyOgImage,
   createHomeOgImage,
   createNewsletterOgImage,
   createPostOgImage,
@@ -13,6 +14,11 @@ import {
 import type { PublicSection } from '~/lib/public-page-metadata'
 
 const PUBLIC_SECTIONS = new Set<PublicSection>(['ama', 'blog', 'photos', 'projects'])
+const CALIBABY_PATHS = new Set([
+  'calibaby',
+  'calibaby/privacy',
+  'calibaby/terms',
+])
 
 function isLocale(value: string | null): value is Locale {
   return value === 'zh' || value === 'en'
@@ -39,6 +45,10 @@ export async function GET(request: Request) {
 
   const segments = path.split('/').filter(Boolean)
   const section = segments[0]
+
+  if (CALIBABY_PATHS.has(segments.join('/'))) {
+    return cachedImage(await createCaliBabyOgImage())
+  }
 
   if (section === 'blog' && segments.length === 2 && isPostSlug(segments[1])) {
     return cachedImage(await createPostOgImage(getPost(segments[1]), locale))
