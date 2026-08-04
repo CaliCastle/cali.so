@@ -79,11 +79,20 @@
   text-align: center;
 }
 
+.heroAppIcon {
+  display: block;
+  width: 5rem;
+  height: 5rem;
+  margin: 0 auto 1.75rem;
+  border-radius: 1.25rem;
+  object-fit: contain;
+}
+
 .hero h1 {
   color: var(--cb-text);
   font-size: clamp(1.9rem, 4.2vw, 3.85rem);
   font-weight: 400;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.035em;
   line-height: 0.98;
   text-wrap: balance;
 }
@@ -317,9 +326,16 @@
     padding-bottom: 4rem;
   }
 
+  .heroAppIcon {
+    width: 4.5rem;
+    height: 4.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 1.125rem;
+  }
+
   .hero h1 {
     font-size: clamp(1.85rem, 8vw, 2.45rem);
-    letter-spacing: -0.052em;
+    letter-spacing: -0.03em;
     line-height: 1;
   }
 

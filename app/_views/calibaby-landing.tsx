@@ -93,6 +93,13 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
 
       <main>
         <section className={styles.hero}>
+          <Image
+            src="/images/calibaby-app-icon.png"
+            alt=""
+            width={96}
+            height={96}
+            className={styles.heroAppIcon}
+          />
           <h1>
             {copy.headline.split('\n').map((line) => (
               <span key={line}>{line}</span>
