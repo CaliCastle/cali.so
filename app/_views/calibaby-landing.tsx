@@ -22,9 +22,9 @@ const APP_STORE_BADGES = {
 const LANDING_COPY = {
   zh: {
     productName: 'Cali 宝宝助手',
-    headline: '宝宝的事很多。\n记下来，可以很简单。',
+    headline: '小小一个宝宝，\n事情可不少。',
     description:
-      '从胎动到喂奶、睡眠和尿布，点几下就记好。家人看到同一份近况，少一点「刚刚是谁喂的？」。',
+      '胎动、喂奶、睡眠、尿布，点几下就记好，全家看到同一份近况。「等等，宝宝上次什么时候喝奶的？」这次不用猜。',
     appStore: '前往 App Store 下载',
     help: '帮助与支持',
     privacy: '隐私政策',
@@ -35,9 +35,9 @@ const LANDING_COPY = {
   },
   en: {
     productName: 'Cali Baby',
-    headline: 'Baby care is a lot.\nTracking it shouldn’t be.',
+    headline: 'Tiny human.\nA lot to remember.',
     description:
-      'From kicks to feeds, sleep, and diapers, log it in a few taps and keep the whole Family on the same page. Fewer “wait, who fed the baby?” moments.',
+      'Kicks, feeds, sleep, diapers. Log it in a few taps and keep the whole family on the same timeline. “Wait, when did we last feed the baby?” This time, you’ll know.',
     appStore: 'Download on the App Store',
     help: 'Help and support',
     privacy: 'Privacy Policy',

@@ -81,7 +81,7 @@
 
 .hero h1 {
   color: var(--cb-text);
-  font-size: clamp(2.75rem, 6vw, 5.5rem);
+  font-size: clamp(1.9rem, 4.2vw, 3.85rem);
   font-weight: 400;
   letter-spacing: -0.055em;
   line-height: 0.98;
@@ -318,7 +318,7 @@
   }
 
   .hero h1 {
-    font-size: clamp(2.65rem, 11.5vw, 3.5rem);
+    font-size: clamp(1.85rem, 8vw, 2.45rem);
     letter-spacing: -0.052em;
     line-height: 1;
   }
