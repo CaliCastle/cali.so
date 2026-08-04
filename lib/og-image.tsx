@@ -36,6 +36,10 @@ const CALIBABY_APP_STORE_BADGES = {
     width: 215,
   },
 } as const
+const CALIBABY_PRODUCT_NAMES: Record<Locale, string> = {
+  zh: 'Cali 宝宝助手',
+  en: 'Cali Baby',
+}
 
 async function renderHomeOgImage(locale: Locale) {
   'use cache'
@@ -176,7 +180,7 @@ async function renderCaliBabyOgImage(locale: Locale) {
                 letterSpacing: '-0.035em',
               }}
             >
-              Cali Baby
+              {CALIBABY_PRODUCT_NAMES[locale]}
             </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
