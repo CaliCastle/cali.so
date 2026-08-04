@@ -30,6 +30,23 @@ describe('server output tracing', () => {
 })
 
 describe('route security headers', () => {
+  it('limits the Fontshare font origin to Cali Baby routes', async () => {
+    const rules = await nextConfig.headers!()
+    const globalPolicy = rules
+      .find(({ source }) => source === '/:path*')
+      ?.headers.find(({ key }) => key === 'Content-Security-Policy')?.value
+
+    for (const source of ['/calibaby/:path*', '/en/calibaby/:path*']) {
+      const policy = rules
+        .find((rule) => rule.source === source)
+        ?.headers.find(({ key }) => key === 'Content-Security-Policy')?.value
+
+      expect(policy).toContain('https://cdn.fontshare.com')
+    }
+
+    expect(globalPolicy).not.toContain('fontshare.com')
+  })
+
   it('allows the Google OAuth form redirect only from AMA settings', async () => {
     const rules = await nextConfig.headers!()
     const globalPolicy = rules

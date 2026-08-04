@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { securityHeaders } from './headers'
+import { caliBabySecurityHeader, securityHeaders } from './headers'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -21,6 +21,7 @@ describe('site security headers', () => {
     expect(headers['content-security-policy']).toContain("script-src 'self' 'unsafe-inline'")
     expect(headers['content-security-policy']).toContain('https://og.zolplay.com')
     expect(headers['content-security-policy']).not.toContain('https://www.google.com')
+    expect(headers['content-security-policy']).not.toContain('fontshare.com')
     expect(headers['content-security-policy']).not.toContain("'unsafe-eval'")
     expect(headers['strict-transport-security']).toBe(
       'max-age=63072000; includeSubDomains; preload',
@@ -31,6 +32,15 @@ describe('site security headers', () => {
     expect(headers['permissions-policy']).toContain('camera=()')
     expect(headers['permissions-policy']).toContain('microphone=()')
     expect(headers['permissions-policy']).toContain('payment=()')
+  })
+
+  it('allows the Fontshare font origin only for Cali Baby pages', () => {
+    expect(caliBabySecurityHeader.value).toContain(
+      "font-src 'self' data: https://cdn.fontshare.com",
+    )
+    expect(caliBabySecurityHeader.value).not.toContain(
+      'https://api.fontshare.com',
+    )
   })
 
   it('allows the Clerk instance origins only on the admin policies', async () => {

@@ -29,8 +29,12 @@ const frexSansGB = localFont({
 
 const latinFontVariables = [geist.variable, geistMono.variable].join(' ')
 
+export function cjkFontVariableForLocale(locale: Locale) {
+  return locale === 'zh' ? frexSansGB.variable : ''
+}
+
 export function fontVariablesForLocale(locale: Locale) {
-  return [latinFontVariables, locale === 'zh' ? frexSansGB.variable : null]
+  return [latinFontVariables, cjkFontVariableForLocale(locale)]
     .filter(Boolean)
     .join(' ')
 }

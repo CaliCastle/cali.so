@@ -31,6 +31,15 @@ reference, not as Apple marketing artwork. Apple retains its trademark rights;
 see the [App Store identity guidelines](https://developer.apple.com/app-store/marketing/guidelines/)
 and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html).
 
+## Product typefaces
+
+| Surface | Typeface | Source and license |
+| --- | --- | --- |
+| Cali Baby public pages | Pally Variable | [Fontshare](https://fontshare.com/fonts/pally), served from Fontshare's official CDN under the [ITF Free Font License](https://fontshare.com/licenses/itf-ffl) |
+
+Pally covers Latin text. Simplified Chinese continues to use the existing Frex
+Sans GB fallback so both locale families keep complete glyph coverage.
+
 ## Album covers
 
 | File | Source |

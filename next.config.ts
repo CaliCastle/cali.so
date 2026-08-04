@@ -3,6 +3,7 @@ import type { NextConfig } from 'next'
 import legacyUrlManifest from './content/legacy-url-manifest.json'
 import {
   adminSecurityHeader,
+  caliBabySecurityHeader,
   googleOAuthFormSecurityHeader,
   securityHeaders,
 } from './lib/security/headers'
@@ -84,6 +85,16 @@ const nextConfig: NextConfig = {
     {
       source: '/:path*',
       headers: [...securityHeaders],
+    },
+    {
+      // Pally is licensed for web use through Fontshare's hosted CDN. Keep
+      // that font origin limited to the Cali Baby route family.
+      source: '/calibaby/:path*',
+      headers: [caliBabySecurityHeader],
+    },
+    {
+      source: '/en/calibaby/:path*',
+      headers: [caliBabySecurityHeader],
     },
     {
       // The global policy is intentionally useful for public navigation, but
