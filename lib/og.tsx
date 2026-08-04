@@ -2,28 +2,36 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { cacheLife } from 'next/cache'
 
-// ── Sharp SVG unblock ──────────────────────────────────────────────
+// ── Sharp SVG-buffer unblock ───────────────────────────────────────
 //
-// Next.js 16.3's Image Optimization API security fix (CVE-2026-64644)
-// calls sharp.block({ operation: ['VipsForeignLoad'] }) then unblocks
-// only HEIF/JPEG/GIF/PNG/TIFF/WebP. SVG is left blocked — and because
-// sharp.block/unblock modifies the *global* libvips operation set, every
-// sharp instance in the process is affected, including @vercel/og's
-// satori→SVG→PNG conversion. The OG route renders its own SVG from
-// trusted satori output (never user-uploaded images), so re-enabling the
-// SVG loader here is safe and restores @vercel/og's normal operation.
+// Next.js 16.3's Image Optimization API defense-in-depth change
+// (CVE-2026-64644) calls sharp.block({ operation: ['VipsForeignLoad'] })
+// then unblocks only HEIF/JPEG/GIF/PNG/TIFF/WebP. SVG is left blocked,
+// and because sharp.block/unblock modifies the *global* libvips operation
+// set, every sharp instance in the process is affected — including
+// @vercel/og's satori→SVG→PNG conversion, which passes an in-memory SVG
+// buffer to sharp.
+//
+// We re-enable only the SVG *buffer* loader (the specific operation
+// @vercel/og uses), not SVG file/source loading. The OG route generates
+// its own SVG from trusted satori output, and the project has no
+// images.remotePatterns, so the CVE's remote-image attack path is
+// absent. The unblock is still process-global, which is an upstream
+// Next.js issue (next/image mutates shared libvips policy); this is the
+// narrowest application-side workaround until it is fixed there.
 
 let _sharp: typeof import('sharp').default | undefined
 
 async function ensureSharpSvgLoad() {
-  try {
-    if (!_sharp) {
+  if (!_sharp) {
+    try {
       _sharp = (await import('sharp')).default
+    } catch {
+      // sharp not installed — @vercel/og falls back to resvg (WASM)
+      return
     }
-    _sharp.unblock({ operation: ['VipsForeignLoadSvg'] })
-  } catch {
-    // sharp not installed — @vercel/og falls back to resvg (WASM)
   }
+  _sharp.unblock({ operation: ['VipsForeignLoadSvgBuffer'] })
 }
 
 // Design-language tokens resolved to sRGB for satori (no oklch support).
