@@ -48,7 +48,7 @@ export async function GET(request: Request) {
   const section = segments[0]
 
   if (CALIBABY_PATHS.has(segments.join('/'))) {
-    return cachedImage(await createCaliBabyOgImage())
+    return cachedImage(await createCaliBabyOgImage(locale))
   }
 
   if (section === 'blog' && segments.length === 2 && isPostSlug(segments[1])) {

@@ -26,6 +26,16 @@ const HOME_INTRODUCTIONS: Record<Locale, string> = {
 }
 
 const IMAGE_SIZE = { width: 1200, height: 630 } as const
+const CALIBABY_APP_STORE_BADGES = {
+  zh: {
+    src: '/images/calibaby/app-store-badge-zh-cn.svg',
+    width: 196,
+  },
+  en: {
+    src: '/images/calibaby/app-store-badge-en-us.svg',
+    width: 215,
+  },
+} as const
 
 async function renderHomeOgImage(locale: Locale) {
   'use cache'
@@ -110,11 +120,15 @@ export async function createHomeOgImage(locale: Locale) {
   })
 }
 
-async function renderCaliBabyOgImage() {
+async function renderCaliBabyOgImage(locale: Locale) {
   'use cache'
   cacheLife('max')
 
-  const icon = await publicImageDataUri('/images/calibaby-app-icon.png')
+  const appStoreBadge = CALIBABY_APP_STORE_BADGES[locale]
+  const [icon, badge] = await Promise.all([
+    publicImageDataUri('/images/calibaby-app-icon.png'),
+    publicImageDataUri(appStoreBadge.src),
+  ])
 
   return new ImageResponse(
     (
@@ -164,25 +178,19 @@ async function renderCaliBabyOgImage() {
             >
               Cali Baby
             </div>
-            <div
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={badge}
+              alt=""
+              width={appStoreBadge.width}
+              height={72}
               style={{
-                display: 'flex',
-                gap: 14,
+                display: 'block',
+                width: appStoreBadge.width,
+                height: 72,
                 marginTop: 30,
               }}
-            >
-              {['#a88bd4', '#82aee2', '#69bd91', '#d99a64'].map((color) => (
-                <div
-                  key={color}
-                  style={{
-                    width: 11,
-                    height: 11,
-                    borderRadius: 999,
-                    backgroundColor: color,
-                  }}
-                />
-              ))}
-            </div>
+            />
           </div>
         </div>
       </div>
@@ -194,8 +202,8 @@ async function renderCaliBabyOgImage() {
   ).arrayBuffer()
 }
 
-export async function createCaliBabyOgImage() {
-  return new Response(await renderCaliBabyOgImage(), {
+export async function createCaliBabyOgImage(locale: Locale) {
+  return new Response(await renderCaliBabyOgImage(locale), {
     headers: { 'content-type': 'image/png' },
   })
 }
