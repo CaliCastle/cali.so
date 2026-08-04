@@ -13,6 +13,8 @@ are promotional artwork from Apple Music, publishers, authors, or retailers.
 | `public/images/products/dex.svg` | User-supplied Dex brand source mark |
 | `public/images/products/slack.svg` | Slack’s official site-navigation [standalone SVG](https://a.slack-edge.com/38f0e7c/marketing/img/nav/logo.svg) |
 | `public/images/products/app-store.svg` | [SVG Logos](https://github.com/gilbarbara/logos) CC0 vector for the App Store mark |
+| `public/images/calibaby/app-store-badge-en-us.svg` | Apple’s official English [Download on the App Store badge](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83) |
+| `public/images/calibaby/app-store-badge-zh-cn.svg` | Apple’s official Simplified Chinese [App Store download badge](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/zh-cn?size=250x83) |
 
 ### External mark review
 
@@ -28,6 +30,16 @@ here comes from the CC0 SVG Logos collection and is used as a small editorial
 reference, not as Apple marketing artwork. Apple retains its trademark rights;
 see the [App Store identity guidelines](https://developer.apple.com/app-store/marketing/guidelines/)
 and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html).
+
+## Product typefaces
+
+| Surface | Typeface | Source and license |
+| --- | --- | --- |
+| Cali Baby public pages | National Park Variable | [Google Fonts](https://fonts.google.com/specimen/National+Park), self-hosted at build time by `next/font` under the [SIL Open Font License 1.1](https://github.com/google/fonts/blob/main/ofl/nationalpark/OFL.txt) |
+
+National Park covers Latin text. Simplified Chinese continues to use the
+existing Frex Sans GB fallback so both locale families keep complete glyph
+coverage.
 
 ## Album covers
 

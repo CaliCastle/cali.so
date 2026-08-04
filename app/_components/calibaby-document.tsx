@@ -7,7 +7,7 @@ import { PREPAINT_SCRIPT } from '~/lib/security/inline-scripts'
 import { seo } from '~/lib/seo'
 import { cn } from '~/lib/utils'
 
-import { fontVariablesForLocale } from '../fonts'
+import { caliBabyFontVariablesForLocale } from '../fonts'
 import styles from '../_views/calibaby-pages.module.css'
 
 export const caliBabyRootMetadata: Metadata = {
@@ -50,8 +50,7 @@ export function CaliBabyDocument({
       data-locale={locale}
       suppressHydrationWarning
       className={cn(
-        'font-sans',
-        fontVariablesForLocale(locale),
+        caliBabyFontVariablesForLocale(locale),
         styles.document,
       )}
     >

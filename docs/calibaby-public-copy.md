@@ -34,7 +34,7 @@ Do not publish these pages until all of the following are true:
 
 ## 中文产品与支持页
 
-Route: `/calibaby`
+Route: `/calibaby/help`
 
 Metadata title: `Cali 宝宝助手｜帮助与支持`
 
@@ -109,7 +109,7 @@ Cali 宝宝助手用于记录和整理日常观察，不提供诊断、治疗建
 
 ## English product and support page
 
-Route: `/en/calibaby`
+Route: `/en/calibaby/help`
 
 Metadata title: `Cali Baby | Help and Support`
 

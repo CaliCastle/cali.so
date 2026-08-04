@@ -26,7 +26,7 @@ Current as of July 2026.
 
 ## Current architecture
 
-- Next.js 16.3 preview, React 19, TypeScript, Tailwind CSS v4, Base UI, and the
+- Next.js 16.3, React 19, TypeScript, Tailwind CSS v4, Base UI, and the
   `@fluid` component registry. The Next.js version is exact-pinned.
 - Posts are MDX under `content/blog/<slug>/`; assets are colocated and served
   through the owned content route. Projects and personal registries are typed

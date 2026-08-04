@@ -1,4 +1,3 @@
-import { cacheLife } from 'next/cache'
 import { ImageResponse } from 'next/og'
 
 import type { Post } from './content'
@@ -26,11 +25,22 @@ const HOME_INTRODUCTIONS: Record<Locale, string> = {
 }
 
 const IMAGE_SIZE = { width: 1200, height: 630 } as const
+const CALIBABY_APP_STORE_BADGES = {
+  zh: {
+    src: '/images/calibaby/app-store-badge-zh-cn.svg',
+    width: 196,
+  },
+  en: {
+    src: '/images/calibaby/app-store-badge-en-us.svg',
+    width: 215,
+  },
+} as const
+const CALIBABY_PRODUCT_NAMES: Record<Locale, string> = {
+  zh: 'Cali 宝宝助手',
+  en: 'Cali Baby',
+}
 
 async function renderHomeOgImage(locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const introduction = HOME_INTRODUCTIONS[locale]
   const portrait = await publicImageDataUri('/images/headshot.jpg')
 
@@ -101,20 +111,19 @@ async function renderHomeOgImage(locale: Locale) {
       </OgSheet>
     ),
     { ...IMAGE_SIZE, fonts: await ogRuntimeFonts() },
-  ).arrayBuffer()
+  )
 }
 
 export async function createHomeOgImage(locale: Locale) {
-  return new Response(await renderHomeOgImage(locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderHomeOgImage(locale)
 }
 
-async function renderCaliBabyOgImage() {
-  'use cache'
-  cacheLife('max')
-
-  const icon = await publicImageDataUri('/images/calibaby-app-icon.png')
+async function renderCaliBabyOgImage(locale: Locale) {
+  const appStoreBadge = CALIBABY_APP_STORE_BADGES[locale]
+  const [icon, badge] = await Promise.all([
+    publicImageDataUri('/images/calibaby-app-icon.png'),
+    publicImageDataUri(appStoreBadge.src),
+  ])
 
   return new ImageResponse(
     (
@@ -162,27 +171,21 @@ async function renderCaliBabyOgImage() {
                 letterSpacing: '-0.035em',
               }}
             >
-              Cali Baby
+              {CALIBABY_PRODUCT_NAMES[locale]}
             </div>
-            <div
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={badge}
+              alt=""
+              width={appStoreBadge.width}
+              height={72}
               style={{
-                display: 'flex',
-                gap: 14,
+                display: 'block',
+                width: appStoreBadge.width,
+                height: 72,
                 marginTop: 30,
               }}
-            >
-              {['#a88bd4', '#82aee2', '#69bd91', '#d99a64'].map((color) => (
-                <div
-                  key={color}
-                  style={{
-                    width: 11,
-                    height: 11,
-                    borderRadius: 999,
-                    backgroundColor: color,
-                  }}
-                />
-              ))}
-            </div>
+            />
           </div>
         </div>
       </div>
@@ -191,13 +194,11 @@ async function renderCaliBabyOgImage() {
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
-export async function createCaliBabyOgImage() {
-  return new Response(await renderCaliBabyOgImage(), {
-    headers: { 'content-type': 'image/png' },
-  })
+export async function createCaliBabyOgImage(locale: Locale) {
+  return renderCaliBabyOgImage(locale)
 }
 
 function OgSectionMark({ section }: { section: PublicSection }) {
@@ -366,9 +367,6 @@ function OgSectionMark({ section }: { section: PublicSection }) {
 }
 
 async function renderSectionOgImage(section: PublicSection, locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const copy = publicPageMetadata[section][locale]
   const signature = 'Cali Castle'
 
@@ -435,13 +433,11 @@ async function renderSectionOgImage(section: PublicSection, locale: Locale) {
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createSectionOgImage(section: PublicSection, locale: Locale) {
-  return new Response(await renderSectionOgImage(section, locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderSectionOgImage(section, locale)
 }
 
 type NewsletterOgInput = Pick<
@@ -450,9 +446,6 @@ type NewsletterOgInput = Pick<
 >
 
 async function renderNewsletterOgImage(newsletter: NewsletterOgInput, locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const title = locale === 'en' ? newsletter.titleEn : newsletter.title
   const description =
     locale === 'en' ? newsletter.descriptionEn : newsletter.description
@@ -526,7 +519,7 @@ async function renderNewsletterOgImage(newsletter: NewsletterOgInput, locale: Lo
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createNewsletterOgImage(
@@ -541,17 +534,12 @@ export async function createNewsletterOgImage(
     descriptionEn: newsletter.descriptionEn,
   }
 
-  return new Response(await renderNewsletterOgImage(input, locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderNewsletterOgImage(input, locale)
 }
 
 type PostOgInput = Pick<Post, 'slug' | 'title' | 'titleEn' | 'publishedAt' | 'cover'>
 
 async function renderPostOgImage(post: PostOgInput, locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const title = locale === 'en' ? post.titleEn : post.title
   const date = locale === 'en' ? formatDateEn(post.publishedAt) : formatDate(post.publishedAt)
 
@@ -620,7 +608,7 @@ async function renderPostOgImage(post: PostOgInput, locale: Locale) {
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createPostOgImage(post: Post, locale: Locale) {
@@ -632,7 +620,5 @@ export async function createPostOgImage(post: Post, locale: Locale) {
     cover: post.cover,
   }
 
-  return new Response(await renderPostOgImage(input, locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderPostOgImage(input, locale)
 }

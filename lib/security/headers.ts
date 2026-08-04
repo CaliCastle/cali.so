@@ -34,7 +34,10 @@ function contentSecurityPolicy(
   {
     formActionSources = "'self'",
     connectSources = '',
-  }: { formActionSources?: string; connectSources?: string } = {},
+  }: {
+    formActionSources?: string
+    connectSources?: string
+  } = {},
 ) {
   return [
     "default-src 'self'",

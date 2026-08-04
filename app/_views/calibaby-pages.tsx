@@ -229,7 +229,7 @@ function PageFooter({ locale, kind }: { locale: Locale; kind: CaliBabyPageKind }
   return (
     <footer className={styles.footer}>
       {kind !== 'support' && (
-        <Link href={localePath(locale, '/calibaby')} className={styles.footerLink}>
+        <Link href={localePath(locale, '/calibaby/help')} className={styles.footerLink}>
           {copy.back}
         </Link>
       )}
@@ -264,7 +264,7 @@ function SupportPage({ locale }: { locale: Locale }) {
 
   return (
     <>
-      <ProductHeader locale={locale} path="/calibaby" />
+      <ProductHeader locale={locale} path="/calibaby/help" />
       <main>
         <header className={styles.introduction}>
           <h1>{copy.pageTitle}</h1>

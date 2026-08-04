@@ -12,6 +12,9 @@
   --cb-amber: oklch(0.77 0.135 55);
   color-scheme: light;
   background: var(--cb-page);
+  font-family:
+    var(--font-national-park, ui-sans-serif),
+    var(--font-frex-gb, ui-sans-serif), system-ui, sans-serif;
 }
 
 :global(.dark).document {

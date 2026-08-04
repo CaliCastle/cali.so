@@ -1,4 +1,5 @@
 import '../globals.css'
+import '@blossom-carousel/react/style.css'
 
 import {
   CaliBabyDocument,

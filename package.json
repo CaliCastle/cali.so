@@ -9,7 +9,7 @@
   },
   "pnpm": {
     "overrides": {
-      "next>postcss": "8.5.22",
+      "next>postcss": "8.5.25",
       "next>sharp": "0.35.3"
     }
   },
@@ -52,6 +52,7 @@
     "@ai-sdk/gateway": "^4.0.28",
     "@aws-sdk/client-s3": "^3.1095.0",
     "@base-ui/react": "^1.6.0",
+    "@blossom-carousel/react": "^1.5.2",
     "@clerk/nextjs": "^7.6.1",
     "@js-temporal/polyfill": "^0.5.1",
     "@upstash/ratelimit": "^2.0.8",
@@ -73,7 +74,7 @@
     "heic-decode": "^2.1.0",
     "lucide-react": "^1.27.0",
     "motion": "^12.42.2",
-    "next": "16.3.0-preview.9",
+    "next": "16.3.0",
     "next-mdx-remote": "^6.0.0",
     "pg": "^8.22.0",
     "react": "^19.2.8",
@@ -94,7 +95,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.4",
-    "@next/playwright": "16.3.0-preview.9",
+    "@next/playwright": "16.3.0",
     "@playwright/test": "1.62.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.2",
