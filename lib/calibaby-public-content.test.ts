@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import {
+  caliBabyLandingMetadata,
   caliBabyPageMetadata,
   getCaliBabyPublicContent,
   type CaliBabyPageKind,
@@ -10,8 +11,8 @@ import {
 import { seo } from './seo'
 
 const expected = [
-  ['zh', 'support', '/calibaby', 'Cali 宝宝助手'],
-  ['en', 'support', '/en/calibaby', 'Cali Baby'],
+  ['zh', 'support', '/calibaby/help', 'Cali 宝宝助手'],
+  ['en', 'support', '/en/calibaby/help', 'Cali Baby'],
   ['zh', 'privacy', '/calibaby/privacy', 'Cali 宝宝助手隐私政策'],
   ['en', 'privacy', '/en/calibaby/privacy', 'Cali Baby Privacy Policy'],
   ['zh', 'terms', '/calibaby/terms', 'Cali 宝宝助手使用条款'],
@@ -45,15 +46,15 @@ describe('Cali Baby public content', () => {
       expect(canonical?.toString()).toBe(new URL(route, seo.url).href)
       expect(languages).toEqual({
         'zh-CN': new URL(
-          kind === 'support' ? '/calibaby' : `/calibaby/${kind}`,
+          kind === 'support' ? '/calibaby/help' : `/calibaby/${kind}`,
           seo.url,
         ).href,
         en: new URL(
-          kind === 'support' ? '/en/calibaby' : `/en/calibaby/${kind}`,
+          kind === 'support' ? '/en/calibaby/help' : `/en/calibaby/${kind}`,
           seo.url,
         ).href,
         'x-default': new URL(
-          kind === 'support' ? '/calibaby' : `/calibaby/${kind}`,
+          kind === 'support' ? '/calibaby/help' : `/calibaby/${kind}`,
           seo.url,
         ).href,
       })
@@ -63,7 +64,7 @@ describe('Cali Baby public content', () => {
         expect.objectContaining({
           url: new URL(
             `/og?locale=${locale}&path=${encodeURIComponent(
-              kind === 'support' ? '/calibaby' : `/calibaby/${kind}`,
+              kind === 'support' ? '/calibaby/help' : `/calibaby/${kind}`,
             )}`,
             seo.url,
           ),
@@ -81,4 +82,23 @@ describe('Cali Baby public content', () => {
       )
     },
   )
+
+  it.each([
+    ['zh', '/calibaby'],
+    ['en', '/en/calibaby'],
+  ] as const)('publishes paired landing metadata for %s', (locale, route) => {
+    const metadata = caliBabyLandingMetadata(locale)
+
+    expect(metadata.alternates?.canonical?.toString()).toBe(
+      new URL(route, seo.url).href,
+    )
+    expect(metadata.alternates?.languages).toEqual({
+      'zh-CN': new URL('/calibaby', seo.url).href,
+      en: new URL('/en/calibaby', seo.url).href,
+      'x-default': new URL('/calibaby', seo.url).href,
+    })
+    expect(metadata.title).toContain(locale === 'en' ? 'Cali Baby' : 'Cali 宝宝助手')
+    expect(metadata.description?.length).toBeGreaterThan(20)
+    expect(metadata.robots).toEqual({ index: false, follow: true })
+  })
 })

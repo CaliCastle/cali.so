@@ -9,6 +9,22 @@ import type { Locale } from './locale-route'
 
 export type CaliBabyPageKind = 'support' | 'privacy' | 'terms'
 
+const LANDING_METADATA: Record<
+  Locale,
+  { title: string; description: string }
+> = {
+  zh: {
+    title: 'Cali 宝宝助手｜小小一个宝宝，事情可不少',
+    description:
+      '胎动、喂奶、睡眠、尿布，点几下就记好，全家看到同一份近况。「等等，宝宝上次什么时候喝奶的？」这次不用猜。',
+  },
+  en: {
+    title: 'Cali Baby | Tiny human. A lot to remember.',
+    description:
+      'Kicks, feeds, sleep, diapers. Log it in a few taps and keep the whole family on the same timeline. “Wait, when did we last feed the baby?” This time, you’ll know.',
+  },
+}
+
 type CaliBabyPublicContent = {
   route: string
   metadataTitle: string
@@ -92,7 +108,26 @@ export function caliBabyPageMetadata(
   kind: CaliBabyPageKind,
 ): Metadata {
   const content = getCaliBabyPublicContent(locale, kind)
-  const unlocalizedPath = kind === 'support' ? '/calibaby' : `/calibaby/${kind}`
+  const unlocalizedPath = kind === 'support' ? '/calibaby/help' : `/calibaby/${kind}`
+  return caliBabyMetadata(
+    locale,
+    unlocalizedPath,
+    content.metadataTitle,
+    content.metadataDescription,
+  )
+}
+
+export function caliBabyLandingMetadata(locale: Locale): Metadata {
+  const copy = LANDING_METADATA[locale]
+  return caliBabyMetadata(locale, '/calibaby', copy.title, copy.description)
+}
+
+function caliBabyMetadata(
+  locale: Locale,
+  unlocalizedPath: string,
+  title: string,
+  description: string,
+): Metadata {
   const pair = localeRoutePair(unlocalizedPath)
   const canonical = locale === 'en' ? pair.en : pair.zh
   const image = new URL('/og', canonical)
@@ -104,8 +139,8 @@ export function caliBabyPageMetadata(
       : 'Cali 宝宝助手应用图标与名称'
 
   return {
-    title: content.metadataTitle,
-    description: content.metadataDescription,
+    title,
+    description,
     alternates: {
       canonical,
       languages: pair.languages,
@@ -115,8 +150,8 @@ export function caliBabyPageMetadata(
     // results until that checklist is explicitly cleared.
     robots: { index: false, follow: true },
     openGraph: {
-      title: content.metadataTitle,
-      description: content.metadataDescription,
+      title,
+      description,
       type: 'website',
       locale: locale === 'en' ? 'en_US' : 'zh_CN',
       siteName: 'Cali Baby',
@@ -133,8 +168,8 @@ export function caliBabyPageMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title: content.metadataTitle,
-      description: content.metadataDescription,
+      title,
+      description,
       images: [{ url: image, alt: imageAlt }],
     },
   }

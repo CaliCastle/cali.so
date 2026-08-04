@@ -9,7 +9,7 @@
   },
   "pnpm": {
     "overrides": {
-      "next>postcss": "8.5.22",
+      "next>postcss": "8.5.25",
       "next>sharp": "0.35.3"
     }
   },
@@ -52,6 +52,7 @@
     "@ai-sdk/gateway": "^4.0.28",
     "@aws-sdk/client-s3": "^3.1095.0",
     "@base-ui/react": "^1.6.0",
+    "@blossom-carousel/react": "^1.5.2",
     "@clerk/nextjs": "^7.6.1",
     "@js-temporal/polyfill": "^0.5.1",
     "@upstash/ratelimit": "^2.0.8",

@@ -30,6 +30,21 @@ describe('server output tracing', () => {
 })
 
 describe('route security headers', () => {
+  it('keeps public fonts self-hosted across every route', async () => {
+    const rules = await nextConfig.headers!()
+    const globalPolicy = rules
+      .find(({ source }) => source === '/:path*')
+      ?.headers.find(({ key }) => key === 'Content-Security-Policy')?.value
+
+    expect(globalPolicy).toContain("font-src 'self' data:")
+    expect(rules).not.toContainEqual(
+      expect.objectContaining({ source: '/calibaby/:path*' }),
+    )
+    expect(rules).not.toContainEqual(
+      expect.objectContaining({ source: '/en/calibaby/:path*' }),
+    )
+  })
+
   it('allows the Google OAuth form redirect only from AMA settings', async () => {
     const rules = await nextConfig.headers!()
     const globalPolicy = rules

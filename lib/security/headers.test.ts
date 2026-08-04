@@ -21,6 +21,7 @@ describe('site security headers', () => {
     expect(headers['content-security-policy']).toContain("script-src 'self' 'unsafe-inline'")
     expect(headers['content-security-policy']).toContain('https://og.zolplay.com')
     expect(headers['content-security-policy']).not.toContain('https://www.google.com')
+    expect(headers['content-security-policy']).not.toContain('fontshare.com')
     expect(headers['content-security-policy']).not.toContain("'unsafe-eval'")
     expect(headers['strict-transport-security']).toBe(
       'max-age=63072000; includeSubDomains; preload',
