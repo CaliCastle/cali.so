@@ -64,7 +64,6 @@ const nextConfig: NextConfig = {
   // without the View Transitions API just navigate instantly.
   experimental: {
     authInterrupts: true,
-    viewTransition: true,
     globalNotFound: true,
     useTypeScriptCli: true,
     sri: { algorithm: 'sha256' },

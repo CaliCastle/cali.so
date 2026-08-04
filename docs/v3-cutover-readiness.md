@@ -51,7 +51,7 @@ remained open at that snapshot. Unknown hosted state was not counted as passed.
 | Production deployment | `dpl_A29CV…`, created 2026-07-11, status Ready at inventory time |
 | Release issue | [#98](https://github.com/CaliCastle/cali.so/issues/98) |
 | Readiness issue | [#107](https://github.com/CaliCastle/cali.so/issues/107) |
-| Framework pin | `next@16.3.0-preview.6` |
+| Framework pin | `next@16.3.0` |
 | Install boundary | `pnpm install --frozen-lockfile` |
 | Production site observed | `https://cali.so`, HTTP 200 from Vercel, still serving `main` |
 

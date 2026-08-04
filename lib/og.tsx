@@ -2,6 +2,30 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { cacheLife } from 'next/cache'
 
+// ── Sharp SVG unblock ──────────────────────────────────────────────
+//
+// Next.js 16.3's Image Optimization API security fix (CVE-2026-64644)
+// calls sharp.block({ operation: ['VipsForeignLoad'] }) then unblocks
+// only HEIF/JPEG/GIF/PNG/TIFF/WebP. SVG is left blocked — and because
+// sharp.block/unblock modifies the *global* libvips operation set, every
+// sharp instance in the process is affected, including @vercel/og's
+// satori→SVG→PNG conversion. The OG route renders its own SVG from
+// trusted satori output (never user-uploaded images), so re-enabling the
+// SVG loader here is safe and restores @vercel/og's normal operation.
+
+let _sharp: typeof import('sharp').default | undefined
+
+async function ensureSharpSvgLoad() {
+  try {
+    if (!_sharp) {
+      _sharp = (await import('sharp')).default
+    }
+    _sharp.unblock({ operation: ['VipsForeignLoadSvg'] })
+  } catch {
+    // sharp not installed — @vercel/og falls back to resvg (WASM)
+  }
+}
+
 // Design-language tokens resolved to sRGB for satori (no oklch support).
 // Sources: --paper / --paper-ink / --foreground / --muted-foreground /
 // --border in app/globals.css.
@@ -15,10 +39,11 @@ export const ogColors = {
 
 const FONTS_DIR = path.join(process.cwd(), 'app/_fonts')
 
+// Fonts are read per render (not cached) to keep font ArrayBuffer data
+// intact for satori. This also ensures ensureSharpSvgLoad() runs before
+// each ImageResponse creation.
 export async function ogRuntimeFonts() {
-  'use cache'
-  cacheLife('max')
-
+  await ensureSharpSvgLoad()
   const [regular, semibold] = await Promise.all(
     ['Regular', 'SemiBold'].map((weight) =>
       readFile(path.join(FONTS_DIR, `FrexSansGB-OG-${weight}.ttf`)).then(
