@@ -1,9 +1,9 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 
-const { cjkFontVariableForLocale } = vi.hoisted(() => ({
-  cjkFontVariableForLocale: vi.fn((locale: 'zh' | 'en') =>
-    locale === 'zh' ? 'cjk-font' : '',
+const { caliBabyFontVariablesForLocale } = vi.hoisted(() => ({
+  caliBabyFontVariablesForLocale: vi.fn((locale: 'zh' | 'en') =>
+    locale === 'zh' ? 'national-park-font cjk-font' : 'national-park-font',
   ),
 }))
 
@@ -20,13 +20,13 @@ vi.mock('~/lib/security/inline-scripts', () => ({
 }))
 
 vi.mock('./fonts', () => ({
-  cjkFontVariableForLocale,
+  caliBabyFontVariablesForLocale,
 }))
 
 import { CaliBabyDocument } from './_components/calibaby-document'
 
 describe('CaliBabyDocument typography', () => {
-  it('uses Pally without inheriting the Geist utility class', () => {
+  it('uses National Park without inheriting the Geist utility class', () => {
     const chinese = renderToStaticMarkup(
       <CaliBabyDocument locale="zh">
         <p>中文页面</p>
@@ -38,23 +38,13 @@ describe('CaliBabyDocument typography', () => {
       </CaliBabyDocument>,
     )
 
+    expect(chinese).toContain('national-park-font')
+    expect(english).toContain('national-park-font')
     expect(chinese).toContain('cjk-font')
     expect(english).not.toContain('cjk-font')
     expect(chinese).not.toMatch(/class="[^"]*\bfont-sans\b/)
     expect(english).not.toMatch(/class="[^"]*\bfont-sans\b/)
-    expect(cjkFontVariableForLocale).toHaveBeenCalledWith('zh')
-    expect(cjkFontVariableForLocale).toHaveBeenCalledWith('en')
-  })
-
-  it('warms the Fontshare connection before Pally loads', () => {
-    const html = renderToStaticMarkup(
-      <CaliBabyDocument locale="en">
-        <p>English page</p>
-      </CaliBabyDocument>,
-    )
-
-    expect(html).toContain(
-      '<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin=""/>',
-    )
+    expect(caliBabyFontVariablesForLocale).toHaveBeenCalledWith('zh')
+    expect(caliBabyFontVariablesForLocale).toHaveBeenCalledWith('en')
   })
 })

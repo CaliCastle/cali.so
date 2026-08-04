@@ -34,11 +34,9 @@ function contentSecurityPolicy(
   {
     formActionSources = "'self'",
     connectSources = '',
-    fontSources = "'self' data:",
   }: {
     formActionSources?: string
     connectSources?: string
-    fontSources?: string
   } = {},
 ) {
   return [
@@ -51,7 +49,7 @@ function contentSecurityPolicy(
     "script-src-attr 'none'",
     `style-src ${styleSources}`,
     `img-src 'self' data: blob: https://og.zolplay.com${optionalMediaImageSource()}`,
-    `font-src ${fontSources}`,
+    "font-src 'self' data:",
     `connect-src 'self'${connectSources}`,
     "media-src 'self' blob:",
     "worker-src 'self' blob:",
@@ -67,15 +65,6 @@ const publicContentSecurityPolicy = contentSecurityPolicy(
   `'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''}`,
   "'self' 'unsafe-inline'",
 )
-
-export const caliBabySecurityHeader = {
-  key: 'Content-Security-Policy',
-  value: contentSecurityPolicy(
-    `'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ''}`,
-    "'self' 'unsafe-inline'",
-    { fontSources: "'self' data: https://cdn.fontshare.com" },
-  ),
-} as const
 
 // Admin pages ship clerk-js so the 60-second Clerk session token keeps
 // refreshing in the background (July 2026). The script and Frontend API

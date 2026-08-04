@@ -7,10 +7,8 @@ import { PREPAINT_SCRIPT } from '~/lib/security/inline-scripts'
 import { seo } from '~/lib/seo'
 import { cn } from '~/lib/utils'
 
-import { cjkFontVariableForLocale } from '../fonts'
+import { caliBabyFontVariablesForLocale } from '../fonts'
 import styles from '../_views/calibaby-pages.module.css'
-
-const PALLY_FONT_ORIGIN = 'https://cdn.fontshare.com'
 
 export const caliBabyRootMetadata: Metadata = {
   metadataBase: seo.url,
@@ -52,12 +50,11 @@ export function CaliBabyDocument({
       data-locale={locale}
       suppressHydrationWarning
       className={cn(
-        cjkFontVariableForLocale(locale),
+        caliBabyFontVariablesForLocale(locale),
         styles.document,
       )}
     >
       <head>
-        <link rel="preconnect" href={PALLY_FONT_ORIGIN} crossOrigin="" />
         <script dangerouslySetInnerHTML={{ __html: PREPAINT_SCRIPT }} />
       </head>
       <body className={cn('antialiased', styles.documentBody)}>

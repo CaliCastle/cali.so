@@ -35,10 +35,11 @@ and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-proper
 
 | Surface | Typeface | Source and license |
 | --- | --- | --- |
-| Cali Baby public pages | Pally Variable | [Fontshare](https://fontshare.com/fonts/pally), served from Fontshare's official CDN under the [ITF Free Font License](https://fontshare.com/licenses/itf-ffl) |
+| Cali Baby public pages | National Park Variable | [Google Fonts](https://fonts.google.com/specimen/National+Park), self-hosted at build time by `next/font` under the [SIL Open Font License 1.1](https://github.com/google/fonts/blob/main/ofl/nationalpark/OFL.txt) |
 
-Pally covers Latin text. Simplified Chinese continues to use the existing Frex
-Sans GB fallback so both locale families keep complete glyph coverage.
+National Park covers Latin text. Simplified Chinese continues to use the
+existing Frex Sans GB fallback so both locale families keep complete glyph
+coverage.
 
 ## Album covers
 

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { caliBabySecurityHeader, securityHeaders } from './headers'
+import { securityHeaders } from './headers'
 
 afterEach(() => {
   vi.unstubAllEnvs()
@@ -32,15 +32,6 @@ describe('site security headers', () => {
     expect(headers['permissions-policy']).toContain('camera=()')
     expect(headers['permissions-policy']).toContain('microphone=()')
     expect(headers['permissions-policy']).toContain('payment=()')
-  })
-
-  it('allows the Fontshare font origin only for Cali Baby pages', () => {
-    expect(caliBabySecurityHeader.value).toContain(
-      "font-src 'self' data: https://cdn.fontshare.com",
-    )
-    expect(caliBabySecurityHeader.value).not.toContain(
-      'https://api.fontshare.com',
-    )
   })
 
   it('allows the Clerk instance origins only on the admin policies', async () => {

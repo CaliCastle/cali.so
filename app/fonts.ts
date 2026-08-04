@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, National_Park } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import type { Locale } from '~/lib/locale-route'
@@ -15,7 +15,16 @@ const geistMono = Geist_Mono({
   display: 'swap',
 })
 
-// CJK fallback — Latin stays in Geist via stack order (see @theme in globals.css)
+const nationalPark = National_Park({
+  weight: 'variable',
+  subsets: ['latin'],
+  variable: '--font-national-park',
+  display: 'swap',
+  adjustFontFallback: false,
+})
+
+// Shared CJK fallback: the public site keeps Geist, while Cali Baby uses
+// National Park for Latin glyphs.
 const frexSansGB = localFont({
   src: [
     { path: './_fonts/FrexSansGB-Regular.woff2', weight: '400' },
@@ -35,6 +44,12 @@ export function cjkFontVariableForLocale(locale: Locale) {
 
 export function fontVariablesForLocale(locale: Locale) {
   return [latinFontVariables, cjkFontVariableForLocale(locale)]
+    .filter(Boolean)
+    .join(' ')
+}
+
+export function caliBabyFontVariablesForLocale(locale: Locale) {
+  return [nationalPark.variable, cjkFontVariableForLocale(locale)]
     .filter(Boolean)
     .join(' ')
 }
