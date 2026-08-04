@@ -22,8 +22,8 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/daily-care.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手今日照顾总览',
-      en: 'Cali Baby daily care overview',
+      zh: 'Cali Baby 应用界面，展示最近的喂奶、睡眠与尿布记录',
+      en: 'Cali Baby showing recent feeds, sleep, and diaper changes',
     },
   },
   {

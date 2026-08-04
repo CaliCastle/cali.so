@@ -84,21 +84,40 @@ describe('Cali Baby public content', () => {
   )
 
   it.each([
-    ['zh', '/calibaby'],
-    ['en', '/en/calibaby'],
-  ] as const)('publishes paired landing metadata for %s', (locale, route) => {
-    const metadata = caliBabyLandingMetadata(locale)
+    [
+      'zh',
+      '/calibaby',
+      'Cali 宝宝助手｜宝宝的事很多，不必都靠脑子记',
+      '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
+    ],
+    [
+      'en',
+      '/en/calibaby',
+      'Cali Baby | You don’t have to remember every feed.',
+      'Log kicks, feeds, sleep, and diapers as they happen. Everyone caring for the baby can see what happened and when, so whoever takes over doesn’t have to start with a round of questions.',
+    ],
+  ] as const)(
+    'publishes paired landing metadata for %s',
+    (locale, route, title, description) => {
+      const metadata = caliBabyLandingMetadata(locale)
 
-    expect(metadata.alternates?.canonical?.toString()).toBe(
-      new URL(route, seo.url).href,
-    )
-    expect(metadata.alternates?.languages).toEqual({
-      'zh-CN': new URL('/calibaby', seo.url).href,
-      en: new URL('/en/calibaby', seo.url).href,
-      'x-default': new URL('/calibaby', seo.url).href,
-    })
-    expect(metadata.title).toContain(locale === 'en' ? 'Cali Baby' : 'Cali 宝宝助手')
-    expect(metadata.description?.length).toBeGreaterThan(20)
-    expect(metadata.robots).toEqual({ index: false, follow: true })
-  })
+      expect(metadata.alternates?.canonical?.toString()).toBe(
+        new URL(route, seo.url).href,
+      )
+      expect(metadata.alternates?.languages).toEqual({
+        'zh-CN': new URL('/calibaby', seo.url).href,
+        en: new URL('/en/calibaby', seo.url).href,
+        'x-default': new URL('/calibaby', seo.url).href,
+      })
+      expect(metadata.title).toBe(title)
+      expect(metadata.description).toBe(description)
+      expect(metadata.openGraph).toEqual(
+        expect.objectContaining({ title, description }),
+      )
+      expect(metadata.twitter).toEqual(
+        expect.objectContaining({ title, description }),
+      )
+      expect(metadata.robots).toEqual({ index: false, follow: true })
+    },
+  )
 })
