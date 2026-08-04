@@ -1,8 +1,8 @@
-import { CaliBabyPage } from '../../../_views/calibaby-pages'
-import { caliBabyPageMetadata } from '~/lib/calibaby-public-content'
+import { CaliBabyLandingPage } from '../../../_views/calibaby-landing'
+import { caliBabyLandingMetadata } from '~/lib/calibaby-public-content'
 
-export const metadata = caliBabyPageMetadata('en', 'support')
+export const metadata = caliBabyLandingMetadata('en')
 
-export default function EnglishCaliBabySupportPage() {
-  return <CaliBabyPage locale="en" kind="support" />
+export default function EnglishCaliBabyLandingPage() {
+  return <CaliBabyLandingPage locale="en" />
 }

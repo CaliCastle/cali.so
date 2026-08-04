@@ -16,6 +16,7 @@ import type { PublicSection } from '~/lib/public-page-metadata'
 const PUBLIC_SECTIONS = new Set<PublicSection>(['ama', 'blog', 'photos', 'projects'])
 const CALIBABY_PATHS = new Set([
   'calibaby',
+  'calibaby/help',
   'calibaby/privacy',
   'calibaby/terms',
 ])
