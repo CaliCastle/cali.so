@@ -17,49 +17,70 @@ const CAROUSEL_ID = 'calibaby-screenshots'
 
 const SCREENSHOTS = [
   {
-    src: '/images/calibaby/screenshots/daily-care.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/daily-care.webp',
+      en: '/images/calibaby/screenshots/en/daily-care.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手今日照顾总览',
       en: 'Cali Baby daily care overview',
     },
   },
   {
-    src: '/images/calibaby/screenshots/care-timeline.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/care-timeline.webp',
+      en: '/images/calibaby/screenshots/en/care-timeline.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手连续照顾时间线',
       en: 'Cali Baby continuous care timeline',
     },
   },
   {
-    src: '/images/calibaby/screenshots/pregnancy.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/pregnancy.webp',
+      en: '/images/calibaby/screenshots/en/pregnancy.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手孕期首页',
       en: 'Cali Baby pregnancy home screen',
     },
   },
   {
-    src: '/images/calibaby/screenshots/live-activity.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/live-activity.webp',
+      en: '/images/calibaby/screenshots/en/live-activity.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手锁定画面实时记录',
       en: 'Cali Baby Lock Screen live recording',
     },
   },
   {
-    src: '/images/calibaby/screenshots/voice-record.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/voice-record.webp',
+      en: '/images/calibaby/screenshots/en/voice-record.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手语音快速记录',
       en: 'Cali Baby voice quick record',
     },
   },
   {
-    src: '/images/calibaby/screenshots/family-sync.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/family-sync.webp',
+      en: '/images/calibaby/screenshots/en/family-sync.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手家庭照顾自动同步',
       en: 'Cali Baby automatic family care sync',
     },
   },
   {
-    src: '/images/calibaby/screenshots/trends.webp',
+    src: {
+      zh: '/images/calibaby/screenshots/trends.webp',
+      en: '/images/calibaby/screenshots/en/trends.webp',
+    },
     alt: {
       zh: 'Cali 宝宝助手照顾趋势',
       en: 'Cali Baby care trends',
@@ -105,13 +126,13 @@ export function CaliBabyScreenshotCarousel({ locale }: { locale: Locale }) {
       >
         {SCREENSHOTS.map((screenshot, index) => (
           <li
-            key={screenshot.src}
+            key={screenshot.src.zh}
             data-blossom-slide
             className={styles.slide}
             aria-label={`${index + 1} / ${SCREENSHOTS.length}`}
           >
             <Image
-              src={screenshot.src}
+              src={screenshot.src[locale]}
               alt={screenshot.alt[locale]}
               width={1284}
               height={2778}

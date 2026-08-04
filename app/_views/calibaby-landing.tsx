@@ -6,12 +6,15 @@ import { localePath, type Locale } from '~/lib/locale-route'
 
 import styles from './calibaby-landing.module.css'
 
+const APP_STORE_URL = 'https://apps.apple.com/app/id6769728441'
+
 const LANDING_COPY = {
   zh: {
     productName: 'Cali 宝宝助手',
-    headline: '从孕期到育儿，\n一起照顾每一天。',
+    headline: '宝宝的事很多。\n记下来，可以很简单。',
     description:
-      '安静、快速地记录每一次喂养、睡眠、尿布与成长，让家人始终在同一页。',
+      '从胎动到喂奶、睡眠和尿布，点几下就记好。家人看到同一份近况，少一点「刚刚是谁喂的？」。',
+    appStore: '前往 App Store 下载',
     help: '帮助与支持',
     privacy: '隐私政策',
     terms: '使用条款',
@@ -21,9 +24,10 @@ const LANDING_COPY = {
   },
   en: {
     productName: 'Cali Baby',
-    headline: 'Care together,\nfrom pregnancy onward.',
+    headline: 'Baby care is a lot.\nTracking it shouldn’t be.',
     description:
-      'Quiet, fast tracking for feeding, sleep, diapers, and growth, with everyone in the Family on the same page.',
+      'From kicks to feeds, sleep, and diapers, log it in a few taps and keep the whole Family on the same page. Fewer “wait, who fed the baby?” moments.',
+    appStore: 'Download on the App Store',
     help: 'Help and support',
     privacy: 'Privacy Policy',
     terms: 'Terms of Use',
@@ -83,6 +87,23 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
             ))}
           </h1>
           <p>{copy.description}</p>
+          <div className={styles.heroActions}>
+            <a
+              href={APP_STORE_URL}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.appStoreButton}
+            >
+              <Image
+                src="/images/products/app-store.svg"
+                alt=""
+                width={24}
+                height={24}
+                className={styles.appStoreIcon}
+              />
+              <span>{copy.appStore}</span>
+            </a>
+          </div>
         </section>
 
         <section className={styles.gallery} aria-labelledby="calibaby-gallery-title">

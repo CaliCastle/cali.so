@@ -14,14 +14,14 @@ const LANDING_METADATA: Record<
   { title: string; description: string }
 > = {
   zh: {
-    title: 'Cali 宝宝助手｜从孕期到育儿，一起照顾每一天',
+    title: 'Cali 宝宝助手｜宝宝的事很多，记录可以很简单',
     description:
-      '安静、快速地记录孕期与宝宝照顾，让家人随时同步每一次喂养、睡眠、尿布和成长。',
+      '从胎动到喂奶、睡眠和尿布，几下就记好，也让家人随时看到同一份近况。',
   },
   en: {
-    title: 'Cali Baby | Care together, from pregnancy onward',
+    title: 'Cali Baby | Baby care is a lot. Tracking it shouldn’t be.',
     description:
-      'A quiet, fast pregnancy and baby care companion that keeps feeding, sleep, diapers, growth, and family in sync.',
+      'Track kicks, feeds, sleep, diapers, and more in a few taps, with the whole Family on the same page.',
   },
 }
 

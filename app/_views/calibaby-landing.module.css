@@ -23,6 +23,7 @@
 .brandLink,
 .headerLink,
 .footerLinks a,
+.appStoreButton,
 .carouselButton,
 .carouselDot {
   touch-action: manipulation;
@@ -74,16 +75,16 @@
 .hero {
   width: min(100%, 82rem);
   margin-inline: auto;
-  padding: clamp(4.5rem, 11vw, 9.5rem) clamp(1rem, 4vw, 3rem) clamp(4rem, 8vw, 7rem);
+  padding: clamp(3.5rem, 8vw, 7rem) clamp(1rem, 4vw, 3rem) clamp(4rem, 8vw, 7rem);
   text-align: center;
 }
 
 .hero h1 {
   color: var(--cb-text);
-  font-size: clamp(3.4rem, 9vw, 8rem);
+  font-size: clamp(2.75rem, 6vw, 5.5rem);
   font-weight: 600;
-  letter-spacing: -0.067em;
-  line-height: 0.94;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
   text-wrap: balance;
 }
 
@@ -99,6 +100,35 @@
   letter-spacing: -0.018em;
   line-height: 1.7;
   text-wrap: balance;
+}
+
+.heroActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.appStoreButton {
+  display: inline-flex;
+  min-height: 3.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.625rem 1.125rem 0.625rem 0.75rem;
+  border-radius: 0.875rem;
+  background: var(--cb-text);
+  color: var(--cb-page);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  text-decoration: none;
+  transition: opacity 150ms ease;
+}
+
+.appStoreIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.375rem;
 }
 
 .gallery {
@@ -247,6 +277,7 @@
 .brandLink:focus-visible,
 .headerLink:focus-visible,
 .footerLinks a:focus-visible,
+.appStoreButton:focus-visible,
 .carouselButton:focus-visible,
 .carouselDot:focus-visible {
   outline: 2px solid var(--cb-text);
@@ -263,6 +294,14 @@
   .footerLinks a:hover {
     color: var(--cb-text);
   }
+
+  .appStoreButton:hover {
+    opacity: 0.82;
+  }
+}
+
+.appStoreButton:active {
+  transform: scale(0.98);
 }
 
 @media (max-width: 40rem) {
@@ -291,9 +330,9 @@
   }
 
   .hero h1 {
-    font-size: clamp(3.15rem, 15vw, 4.75rem);
-    letter-spacing: -0.062em;
-    line-height: 0.96;
+    font-size: clamp(2.65rem, 11.5vw, 3.5rem);
+    letter-spacing: -0.052em;
+    line-height: 1;
   }
 
   .carouselFrame {
@@ -326,6 +365,7 @@
 @media (prefers-reduced-motion: reduce) {
   .headerLink,
   .footerLinks a,
+  .appStoreButton,
   .carouselButton,
   .carouselDotMark {
     transition: none;
