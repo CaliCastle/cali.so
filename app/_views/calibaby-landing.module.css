@@ -23,7 +23,7 @@
 .brandLink,
 .headerLink,
 .footerLinks a,
-.appStoreButton,
+.appStoreLink,
 .carouselButton,
 .carouselDot {
   touch-action: manipulation;
@@ -82,7 +82,7 @@
 .hero h1 {
   color: var(--cb-text);
   font-size: clamp(2.75rem, 6vw, 5.5rem);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.055em;
   line-height: 0.98;
   text-wrap: balance;
@@ -108,27 +108,19 @@
   margin-top: 2rem;
 }
 
-.appStoreButton {
+.appStoreLink {
   display: inline-flex;
-  min-height: 3.25rem;
+  min-height: 3rem;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  padding: 0.625rem 1.125rem 0.625rem 0.75rem;
-  border-radius: 0.875rem;
-  background: var(--cb-text);
-  color: var(--cb-page);
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.012em;
   text-decoration: none;
   transition: opacity 150ms ease;
 }
 
-.appStoreIcon {
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 0.375rem;
+.appStoreBadge {
+  display: block;
+  width: auto;
+  height: 3rem;
 }
 
 .gallery {
@@ -277,7 +269,7 @@
 .brandLink:focus-visible,
 .headerLink:focus-visible,
 .footerLinks a:focus-visible,
-.appStoreButton:focus-visible,
+.appStoreLink:focus-visible,
 .carouselButton:focus-visible,
 .carouselDot:focus-visible {
   outline: 2px solid var(--cb-text);
@@ -295,13 +287,9 @@
     color: var(--cb-text);
   }
 
-  .appStoreButton:hover {
+  .appStoreLink:hover {
     opacity: 0.82;
   }
-}
-
-.appStoreButton:active {
-  transform: scale(0.98);
 }
 
 @media (max-width: 40rem) {
@@ -365,7 +353,7 @@
 @media (prefers-reduced-motion: reduce) {
   .headerLink,
   .footerLinks a,
-  .appStoreButton,
+  .appStoreLink,
   .carouselButton,
   .carouselDotMark {
     transition: none;

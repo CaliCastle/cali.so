@@ -8,6 +8,17 @@ import styles from './calibaby-landing.module.css'
 
 const APP_STORE_URL = 'https://apps.apple.com/app/id6769728441'
 
+const APP_STORE_BADGES = {
+  zh: {
+    src: '/images/calibaby/app-store-badge-zh-cn.svg',
+    width: 108.85157,
+  },
+  en: {
+    src: '/images/calibaby/app-store-badge-en-us.svg',
+    width: 119.66407,
+  },
+} as const
+
 const LANDING_COPY = {
   zh: {
     productName: 'Cali 宝宝助手',
@@ -74,6 +85,7 @@ function LandingHeader({ locale }: { locale: Locale }) {
 
 export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
   const copy = LANDING_COPY[locale]
+  const appStoreBadge = APP_STORE_BADGES[locale]
 
   return (
     <div className={styles.landingPage}>
@@ -92,16 +104,16 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
               href={APP_STORE_URL}
               target="_blank"
               rel="noreferrer"
-              className={styles.appStoreButton}
+              className={styles.appStoreLink}
             >
               <Image
-                src="/images/products/app-store.svg"
-                alt=""
-                width={24}
-                height={24}
-                className={styles.appStoreIcon}
+                src={appStoreBadge.src}
+                alt={copy.appStore}
+                width={appStoreBadge.width}
+                height={40}
+                unoptimized
+                className={styles.appStoreBadge}
               />
-              <span>{copy.appStore}</span>
             </a>
           </div>
         </section>

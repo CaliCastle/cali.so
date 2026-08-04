@@ -13,6 +13,8 @@ are promotional artwork from Apple Music, publishers, authors, or retailers.
 | `public/images/products/dex.svg` | User-supplied Dex brand source mark |
 | `public/images/products/slack.svg` | Slack’s official site-navigation [standalone SVG](https://a.slack-edge.com/38f0e7c/marketing/img/nav/logo.svg) |
 | `public/images/products/app-store.svg` | [SVG Logos](https://github.com/gilbarbara/logos) CC0 vector for the App Store mark |
+| `public/images/calibaby/app-store-badge-en-us.svg` | Apple’s official English [Download on the App Store badge](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us?size=250x83) |
+| `public/images/calibaby/app-store-badge-zh-cn.svg` | Apple’s official Simplified Chinese [App Store download badge](https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/zh-cn?size=250x83) |
 
 ### External mark review
 
