@@ -1,7 +1,5 @@
 import type { Metadata } from 'next'
 import { Analytics } from '@vercel/analytics/next'
-// Experimental React channel export — available because next.config.ts sets
-// experimental.viewTransition (see docs/design-language.md, page transitions)
 import { Suspense } from 'react'
 
 import { AmbientBackground } from '~/components/ambient-background'

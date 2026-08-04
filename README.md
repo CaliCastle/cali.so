@@ -10,7 +10,7 @@ general-purpose blog template.
 
 ## Architecture
 
-- Next.js 16.3 preview, React 19, TypeScript, and Tailwind CSS v4
+- Next.js 16.3, React 19, TypeScript, and Tailwind CSS v4
 - Base UI primitives with the `@fluid` component registry
 - MDX posts and colocated media under `content/blog/`
 - Release routing keeps Chinese at its existing unprefixed URLs and gives

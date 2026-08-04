@@ -1,4 +1,3 @@
-import { cacheLife } from 'next/cache'
 import { ImageResponse } from 'next/og'
 
 import type { Post } from './content'
@@ -42,9 +41,6 @@ const CALIBABY_PRODUCT_NAMES: Record<Locale, string> = {
 }
 
 async function renderHomeOgImage(locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const introduction = HOME_INTRODUCTIONS[locale]
   const portrait = await publicImageDataUri('/images/headshot.jpg')
 
@@ -115,19 +111,14 @@ async function renderHomeOgImage(locale: Locale) {
       </OgSheet>
     ),
     { ...IMAGE_SIZE, fonts: await ogRuntimeFonts() },
-  ).arrayBuffer()
+  )
 }
 
 export async function createHomeOgImage(locale: Locale) {
-  return new Response(await renderHomeOgImage(locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderHomeOgImage(locale)
 }
 
 async function renderCaliBabyOgImage(locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const appStoreBadge = CALIBABY_APP_STORE_BADGES[locale]
   const [icon, badge] = await Promise.all([
     publicImageDataUri('/images/calibaby-app-icon.png'),
@@ -203,13 +194,11 @@ async function renderCaliBabyOgImage(locale: Locale) {
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createCaliBabyOgImage(locale: Locale) {
-  return new Response(await renderCaliBabyOgImage(locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderCaliBabyOgImage(locale)
 }
 
 function OgSectionMark({ section }: { section: PublicSection }) {
@@ -378,9 +367,6 @@ function OgSectionMark({ section }: { section: PublicSection }) {
 }
 
 async function renderSectionOgImage(section: PublicSection, locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const copy = publicPageMetadata[section][locale]
   const signature = 'Cali Castle'
 
@@ -447,13 +433,11 @@ async function renderSectionOgImage(section: PublicSection, locale: Locale) {
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createSectionOgImage(section: PublicSection, locale: Locale) {
-  return new Response(await renderSectionOgImage(section, locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderSectionOgImage(section, locale)
 }
 
 type NewsletterOgInput = Pick<
@@ -462,9 +446,6 @@ type NewsletterOgInput = Pick<
 >
 
 async function renderNewsletterOgImage(newsletter: NewsletterOgInput, locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const title = locale === 'en' ? newsletter.titleEn : newsletter.title
   const description =
     locale === 'en' ? newsletter.descriptionEn : newsletter.description
@@ -538,7 +519,7 @@ async function renderNewsletterOgImage(newsletter: NewsletterOgInput, locale: Lo
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createNewsletterOgImage(
@@ -553,17 +534,12 @@ export async function createNewsletterOgImage(
     descriptionEn: newsletter.descriptionEn,
   }
 
-  return new Response(await renderNewsletterOgImage(input, locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderNewsletterOgImage(input, locale)
 }
 
 type PostOgInput = Pick<Post, 'slug' | 'title' | 'titleEn' | 'publishedAt' | 'cover'>
 
 async function renderPostOgImage(post: PostOgInput, locale: Locale) {
-  'use cache'
-  cacheLife('max')
-
   const title = locale === 'en' ? post.titleEn : post.title
   const date = locale === 'en' ? formatDateEn(post.publishedAt) : formatDate(post.publishedAt)
 
@@ -632,7 +608,7 @@ async function renderPostOgImage(post: PostOgInput, locale: Locale) {
       ...IMAGE_SIZE,
       fonts: await ogRuntimeFonts(),
     },
-  ).arrayBuffer()
+  )
 }
 
 export async function createPostOgImage(post: Post, locale: Locale) {
@@ -644,7 +620,5 @@ export async function createPostOgImage(post: Post, locale: Locale) {
     cover: post.cover,
   }
 
-  return new Response(await renderPostOgImage(input, locale), {
-    headers: { 'content-type': 'image/png' },
-  })
+  return renderPostOgImage(input, locale)
 }
