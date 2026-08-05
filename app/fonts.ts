@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono, National_Park } from 'next/font/google'
+import { Geist, Geist_Mono } from 'next/font/google'
 import localFont from 'next/font/local'
 
 import type { Locale } from '~/lib/locale-route'
@@ -15,16 +15,20 @@ const geistMono = Geist_Mono({
   display: 'swap',
 })
 
-const nationalPark = National_Park({
-  weight: 'variable',
-  subsets: ['latin'],
-  variable: '--font-national-park',
+const openRunde = localFont({
+  src: [
+    { path: './_fonts/OpenRunde-Regular.woff2', weight: '400' },
+    { path: './_fonts/OpenRunde-Medium.woff2', weight: '500' },
+    { path: './_fonts/OpenRunde-Semibold.woff2', weight: '600' },
+    { path: './_fonts/OpenRunde-Bold.woff2', weight: '700' },
+  ],
+  variable: '--font-open-runde',
   display: 'swap',
   adjustFontFallback: false,
 })
 
 // Shared CJK fallback: the public site keeps Geist, while Cali Baby uses
-// National Park for Latin glyphs.
+// Open Runde for Latin glyphs.
 const frexSansGB = localFont({
   src: [
     { path: './_fonts/FrexSansGB-Regular.woff2', weight: '400' },
@@ -49,7 +53,7 @@ export function fontVariablesForLocale(locale: Locale) {
 }
 
 export function caliBabyFontVariablesForLocale(locale: Locale) {
-  return [nationalPark.variable, cjkFontVariableForLocale(locale)]
+  return [openRunde.variable, cjkFontVariableForLocale(locale)]
     .filter(Boolean)
     .join(' ')
 }

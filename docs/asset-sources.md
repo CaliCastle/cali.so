@@ -35,9 +35,9 @@ and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-proper
 
 | Surface | Typeface | Source and license |
 | --- | --- | --- |
-| Cali Baby public pages | National Park Variable | [Google Fonts](https://fonts.google.com/specimen/National+Park), self-hosted at build time by `next/font` under the [SIL Open Font License 1.1](https://github.com/google/fonts/blob/main/ofl/nationalpark/OFL.txt) |
+| Cali Baby public pages | Open Runde | [Open Runde v1.0.1](https://github.com/lauridskern/open-runde/releases/tag/v1.0.1), self-hosted with `next/font` under the [SIL Open Font License 1.1](https://github.com/lauridskern/open-runde/blob/v1.0.1/LICENSE.txt) |
 
-National Park covers Latin text. Simplified Chinese continues to use the
+Open Runde covers Latin text. Simplified Chinese continues to use the
 existing Frex Sans GB fallback so both locale families keep complete glyph
 coverage.
 
