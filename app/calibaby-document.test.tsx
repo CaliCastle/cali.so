@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 const { caliBabyFontVariablesForLocale } = vi.hoisted(() => ({
   caliBabyFontVariablesForLocale: vi.fn((locale: 'zh' | 'en') =>
-    locale === 'zh' ? 'national-park-font cjk-font' : 'national-park-font',
+    locale === 'zh' ? 'open-runde-font cjk-font' : 'open-runde-font',
   ),
 }))
 
@@ -26,7 +26,7 @@ vi.mock('./fonts', () => ({
 import { CaliBabyDocument } from './_components/calibaby-document'
 
 describe('CaliBabyDocument typography', () => {
-  it('uses National Park without inheriting the Geist utility class', () => {
+  it('uses Open Runde without inheriting the Geist utility class', () => {
     const chinese = renderToStaticMarkup(
       <CaliBabyDocument locale="zh">
         <p>中文页面</p>
@@ -38,8 +38,8 @@ describe('CaliBabyDocument typography', () => {
       </CaliBabyDocument>,
     )
 
-    expect(chinese).toContain('national-park-font')
-    expect(english).toContain('national-park-font')
+    expect(chinese).toContain('open-runde-font')
+    expect(english).toContain('open-runde-font')
     expect(chinese).toContain('cjk-font')
     expect(english).not.toContain('cjk-font')
     expect(chinese).not.toMatch(/class="[^"]*\bfont-sans\b/)
