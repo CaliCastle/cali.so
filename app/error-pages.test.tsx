@@ -16,7 +16,6 @@ vi.mock('geist/font/pixel', () => ({
 vi.mock('next/font/google', () => ({
   Geist: () => ({ variable: 'font-geist' }),
   Geist_Mono: () => ({ variable: 'font-geist-mono' }),
-  National_Park: () => ({ variable: 'font-national-park' }),
 }))
 vi.mock('next/font/local', () => ({
   default: () => ({ variable: 'font-frex-gb' }),

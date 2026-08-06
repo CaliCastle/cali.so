@@ -13,7 +13,7 @@
   color-scheme: light;
   background: var(--cb-page);
   font-family:
-    var(--font-national-park, ui-sans-serif),
+    var(--font-open-runde, ui-sans-serif),
     var(--font-frex-gb, ui-sans-serif), system-ui, sans-serif;
 }
 
