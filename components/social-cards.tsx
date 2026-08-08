@@ -183,7 +183,7 @@ export function XiaohongshuCardBody() {
         </span>
       </span>
       <span className="service-card-bio xiaohongshu-card-bio">
-        <span>设计工程师，Cali 宝宝助手 app 开发者设计师</span>
+        <span>设计工程师，Cali 宝宝 app 开发者设计师</span>
         <span>@佐玩 Zolplay 创始人 CEO</span>
       </span>
       <span className="service-card-stat">

@@ -9,7 +9,8 @@
   },
   "pnpm": {
     "overrides": {
-      "next>postcss": "8.5.25",
+      "gray-matter>js-yaml": "3.15.1",
+      "next>postcss": "8.5.26",
       "next>sharp": "0.35.3"
     }
   },

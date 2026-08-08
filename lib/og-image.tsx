@@ -36,7 +36,7 @@ const CALIBABY_APP_STORE_BADGES = {
   },
 } as const
 const CALIBABY_PRODUCT_NAMES: Record<Locale, string> = {
-  zh: 'Cali 宝宝助手',
+  zh: 'Cali 宝宝',
   en: 'Cali Baby',
 }
 

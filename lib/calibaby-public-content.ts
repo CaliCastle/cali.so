@@ -14,7 +14,7 @@ const LANDING_METADATA: Record<
   { title: string; description: string }
 > = {
   zh: {
-    title: 'Cali 宝宝助手｜宝宝的事很多，不必都靠脑子记',
+    title: 'Cali 宝宝｜宝宝的事很多，不必都靠脑子记',
     description:
       '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
   },
@@ -136,7 +136,7 @@ function caliBabyMetadata(
   const imageAlt =
     locale === 'en'
       ? 'Cali Baby app icon and wordmark'
-      : 'Cali 宝宝助手应用图标与名称'
+      : 'Cali 宝宝应用图标与名称'
 
   return {
     title,
