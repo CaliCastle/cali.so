@@ -28,7 +28,7 @@ function initializeResponse(headers?: Record<string, string>): Response {
   return jsonRpcResponse(
     1,
     {
-      protocolVersion: '2025-06-18',
+      protocolVersion: '2025-03-26',
       capabilities: {},
       serverInfo: { name: 'tencent-meeting-mcp', version: '1.0.0' },
     },
@@ -55,6 +55,19 @@ const ISO_SCHEMA_TOOL = {
   inputSchema: {
     type: 'object',
     properties: {
+      subject: { type: 'string' },
+      start_time: { type: 'string', format: 'date-time' },
+      end_time: { type: 'string', format: 'date-time' },
+    },
+  },
+}
+
+const OFFICIAL_SKILL_TOOL = {
+  name: 'schedule_meeting',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      _client_info: { type: 'object' },
       subject: { type: 'string' },
       start_time: { type: 'string', format: 'date-time' },
       end_time: { type: 'string', format: 'date-time' },
@@ -155,7 +168,8 @@ describe('Tencent Meeting adapter', () => {
         'Content-Type': 'application/json',
         Accept: 'application/json, text/event-stream',
         'X-Tencent-Meeting-Token': TOKEN,
-        'MCP-Protocol-Version': '2025-06-18',
+        'X-Skill-Version': 'v1.0.11',
+        'MCP-Protocol-Version': '2025-03-26',
       })
     }
     expect(requestBody(fetchMock, 0)).toMatchObject({
@@ -163,7 +177,7 @@ describe('Tencent Meeting adapter', () => {
       id: 1,
       method: 'initialize',
       params: {
-        protocolVersion: '2025-06-18',
+        protocolVersion: '2025-03-26',
         capabilities: {},
         clientInfo: { name: 'cali.so', version: '3.0.0' },
       },
@@ -183,45 +197,94 @@ describe('Tencent Meeting adapter', () => {
       params: {
         name: 'create_meeting',
         arguments: {
+          _client_info: { os: 'server', agent: 'cali.so', model: 'server' },
           subject: 'AMA Session with Ada Lovelace',
-          start_time: '2026-07-20T10:00:00.000Z',
-          end_time: '2026-07-20T11:00:00.000Z',
+          start_time: '2026-07-20T18:00:00+08:00',
+          end_time: '2026-07-20T19:00:00+08:00',
         },
       },
     })
   })
 
-  it('sends epoch seconds when the schema declares integer start and end times', async () => {
+  it('uses the official Tencent skill contract for schedule_meeting', async () => {
     const { adapter, fetchMock } = adapterWithResponses(
       initializeResponse(),
       notificationAck(),
-      toolsListResponse([
-        {
-          name: 'create_meeting_room',
-          inputSchema: {
-            type: 'object',
-            properties: {
-              topic: { type: 'string' },
-              start_time: { type: 'integer' },
-              end_time: { type: 'integer' },
-            },
-          },
-        },
-      ]),
-      createToolResponse({ join_url: 'https://meeting.tencent.com/dm/epoch' }),
+      toolsListResponse([OFFICIAL_SKILL_TOOL]),
+      createToolResponse({
+        meeting_id: 'tm-official',
+        join_url: 'https://meeting.tencent.com/dm/official',
+      }),
     )
 
-    await adapter.createMeeting(CREATE_INPUT)
+    await expect(adapter.createMeeting(CREATE_INPUT)).resolves.toEqual({
+      meetingUrl: 'https://meeting.tencent.com/dm/official',
+      providerMeetingId: 'tm-official',
+    })
 
-    const call = requestBody(fetchMock, 3) as {
-      params: { arguments: Record<string, unknown> }
+    for (const [, init] of fetchMock.mock.calls as unknown as Array<
+      [string, RequestInit]
+    >) {
+      expect(init.headers).toMatchObject({
+        'MCP-Protocol-Version': '2025-03-26',
+        'X-Skill-Version': 'v1.0.11',
+      })
     }
-    expect(call.params.arguments).toEqual({
-      topic: 'AMA Session with Ada Lovelace',
-      start_time: Math.floor(CREATE_INPUT.startsAt.getTime() / 1000),
-      end_time: Math.floor(CREATE_INPUT.endsAt.getTime() / 1000),
+    expect(requestBody(fetchMock, 0)).toMatchObject({
+      method: 'initialize',
+      params: { protocolVersion: '2025-03-26' },
+    })
+    expect(requestBody(fetchMock, 3)).toEqual({
+      jsonrpc: '2.0',
+      id: 3,
+      method: 'tools/call',
+      params: {
+        name: 'schedule_meeting',
+        arguments: {
+          _client_info: { os: 'server', agent: 'cali.so', model: 'server' },
+          subject: 'AMA Session with Ada Lovelace',
+          start_time: '2026-07-20T18:00:00+08:00',
+          end_time: '2026-07-20T19:00:00+08:00',
+        },
+      },
     })
   })
+
+  it.each(['integer', 'number'] as const)(
+    'sends epoch seconds when the schema declares %s start and end times',
+    async (timeType) => {
+      const { adapter, fetchMock } = adapterWithResponses(
+        initializeResponse(),
+        notificationAck(),
+        toolsListResponse([
+          {
+            name: 'create_meeting_room',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                topic: { type: 'string' },
+                start_time: { type: timeType },
+                end_time: { type: timeType },
+              },
+            },
+          },
+        ]),
+        createToolResponse({ join_url: 'https://meeting.tencent.com/dm/epoch' }),
+      )
+
+      await adapter.createMeeting(CREATE_INPUT)
+
+      const call = requestBody(fetchMock, 3) as {
+        params: { arguments: Record<string, unknown> }
+      }
+      expect(call.params.arguments).toEqual({
+        _client_info: { os: 'server', agent: 'cali.so', model: 'server' },
+        topic: 'AMA Session with Ada Lovelace',
+        start_time: Math.floor(CREATE_INPUT.startsAt.getTime() / 1000),
+        end_time: Math.floor(CREATE_INPUT.endsAt.getTime() / 1000),
+      })
+    },
+  )
 
   it('sends duration minutes when the schema has no end-time property', async () => {
     const { adapter, fetchMock } = adapterWithResponses(
@@ -251,8 +314,9 @@ describe('Tencent Meeting adapter', () => {
       params: { arguments: Record<string, unknown> }
     }
     expect(call.params.arguments).toEqual({
+      _client_info: { os: 'server', agent: 'cali.so', model: 'server' },
       subject: 'AMA Session with Ada Lovelace',
-      start_time: '2026-07-20T10:00:00.000Z',
+      start_time: '2026-07-20T18:00:00+08:00',
       duration: 60,
     })
   })
@@ -335,6 +399,28 @@ describe('Tencent Meeting adapter', () => {
     })
   })
 
+  it('prefers structuredContent from the official Tencent skill', async () => {
+    const { adapter } = adapterWithResponses(
+      initializeResponse(),
+      notificationAck(),
+      toolsListResponse([OFFICIAL_SKILL_TOOL]),
+      jsonRpcResponse(3, {
+        structuredContent: {
+          meeting: {
+            join_url: 'https://meeting.tencent.com/dm/structured',
+            meeting_id: 'tm-structured',
+          },
+        },
+        content: [],
+      }),
+    )
+
+    await expect(adapter.createMeeting(CREATE_INPUT)).resolves.toEqual({
+      meetingUrl: 'https://meeting.tencent.com/dm/structured',
+      providerMeetingId: 'tm-structured',
+    })
+  })
+
   it('falls back to a plain-text URL scan when the result is not JSON', async () => {
     const { adapter } = adapterWithResponses(
       initializeResponse(),
@@ -378,6 +464,26 @@ describe('Tencent Meeting adapter', () => {
       initializeResponse(),
       notificationAck(),
       toolsListResponse([{ name: 'list_rooms' }, { name: 'create_user' }]),
+    )
+
+    await expect(adapter.createMeeting(CREATE_INPUT)).rejects.toMatchObject({
+      code: 'unsupported',
+    })
+  })
+
+  it('rejects a meeting tool with required arguments it cannot construct', async () => {
+    const { adapter } = adapterWithResponses(
+      initializeResponse(),
+      notificationAck(),
+      toolsListResponse([
+        {
+          ...OFFICIAL_SKILL_TOOL,
+          inputSchema: {
+            ...OFFICIAL_SKILL_TOOL.inputSchema,
+            required: ['subject', 'tenant_secret'],
+          },
+        },
+      ]),
     )
 
     await expect(adapter.createMeeting(CREATE_INPUT)).rejects.toMatchObject({
@@ -457,7 +563,13 @@ describe('Tencent Meeting adapter', () => {
     await expect(adapter.cancelMeeting('tm-123')).resolves.toBe('cancelled')
     expect(requestBody(fetchMock, 3)).toMatchObject({
       method: 'tools/call',
-      params: { name: 'cancel_meeting', arguments: { meeting_id: 'tm-123' } },
+      params: {
+        name: 'cancel_meeting',
+        arguments: {
+          _client_info: { os: 'server', agent: 'cali.so', model: 'server' },
+          meeting_id: 'tm-123',
+        },
+      },
     })
   })
 

@@ -7,10 +7,12 @@ import {
   type MeetingProviderAdapter,
 } from './types'
 
-const MCP_PROTOCOL_VERSION = '2025-06-18'
+const MCP_PROTOCOL_VERSION = '2025-03-26'
+const TENCENT_SKILL_VERSION = 'v1.0.11'
 const DEFAULT_TIMEOUT_MS = 8000
 const MAX_SEARCH_DEPTH = 4
 
+const SCHEDULE_TOOL_PATTERN = /^schedule[-_]?meeting$/i
 const CREATE_TOOL_PATTERN = /create/i
 const CANCEL_TOOL_PATTERN = /cancel|delete|dismiss/i
 const MEETING_TOOL_PATTERN = /meeting|room/i
@@ -29,7 +31,10 @@ type TencentMeetingAdapterDependencies = {
 type DiscoveredTool = {
   name: string
   properties: Record<string, unknown>
+  required: string[]
 }
+
+const CLIENT_INFO = { os: 'server', agent: 'cali.so', model: 'server' } as const
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -115,15 +120,17 @@ function findMeetingId(value: unknown, depth: number): string | null {
 
 function formatTimeArgument(schema: unknown, value: Date): number | string {
   if (isRecord(schema)) {
-    if (schema.type === 'integer') return Math.floor(value.getTime() / 1000)
-    if (
-      typeof schema.format === 'string' &&
-      /timestamp|epoch/i.test(schema.format)
-    ) {
+    if (schema.type === 'integer' || schema.type === 'number') {
       return Math.floor(value.getTime() / 1000)
     }
   }
-  return value.toISOString()
+  const shifted = new Date(value.getTime() + 8 * 60 * 60 * 1000)
+  const pad = (part: number) => String(part).padStart(2, '0')
+  return (
+    `${shifted.getUTCFullYear()}-${pad(shifted.getUTCMonth() + 1)}-` +
+    `${pad(shifted.getUTCDate())}T${pad(shifted.getUTCHours())}:` +
+    `${pad(shifted.getUTCMinutes())}:${pad(shifted.getUTCSeconds())}+08:00`
+  )
 }
 
 function buildCreateArguments(
@@ -131,7 +138,7 @@ function buildCreateArguments(
   input: MeetingCreateInput,
 ): Record<string, unknown> {
   const keys = Object.keys(properties)
-  const args: Record<string, unknown> = {}
+  const args: Record<string, unknown> = { _client_info: CLIENT_INFO }
   const subjectKey = keys.find((key) => /subject|topic|title|name/i.test(key))
   if (subjectKey) args[subjectKey] = input.subject
   const startKey = keys.find((key) => /start/i.test(key))
@@ -151,6 +158,15 @@ function buildCreateArguments(
   return args
 }
 
+function hasSupportedRequiredArguments(tool: DiscoveredTool) {
+  return tool.required.every(
+    (key) =>
+      key === '_client_info' ||
+      /subject|topic|title|name/i.test(key) ||
+      /start|end|duration|length/i.test(key),
+  )
+}
+
 function buildCancelArguments(
   properties: Record<string, unknown>,
   providerMeetingId: string,
@@ -159,7 +175,7 @@ function buildCancelArguments(
     Object.keys(properties).find((key) =>
       /meeting_?id|meeting_?code|room_?id|^id$/i.test(key),
     ) ?? 'meeting_id'
-  return { [idKey]: providerMeetingId }
+  return { _client_info: CLIENT_INFO, [idKey]: providerMeetingId }
 }
 
 function parseSseMessage(body: string, id: number): Record<string, unknown> {
@@ -237,6 +253,7 @@ export function createTencentMeetingAdapter(
       'Content-Type': 'application/json',
       Accept: 'application/json, text/event-stream',
       'X-Tencent-Meeting-Token': dependencies.token,
+      'X-Skill-Version': TENCENT_SKILL_VERSION,
       'MCP-Protocol-Version': MCP_PROTOCOL_VERSION,
     }
     if (sessionId) headers['Mcp-Session-Id'] = sessionId
@@ -309,7 +326,12 @@ export function createTencentMeetingAdapter(
       const properties = isRecord(inputSchema.properties)
         ? inputSchema.properties
         : {}
-      return [{ name: tool.name, properties }]
+      const required = Array.isArray(inputSchema.required)
+        ? inputSchema.required.filter(
+            (entry): entry is string => typeof entry === 'string',
+          )
+        : []
+      return [{ name: tool.name, properties, required }]
     })
   }
 
@@ -338,9 +360,13 @@ export function createTencentMeetingAdapter(
         return []
       }
     })
+    const structured =
+      isRecord(result.structuredContent) || Array.isArray(result.structuredContent)
+        ? [result.structuredContent]
+        : []
     let meetingUrl: string | null = null
     let providerMeetingId: string | null = null
-    for (const parsed of parsedBlocks) {
+    for (const parsed of [...structured, ...parsedBlocks]) {
       meetingUrl ??= findMeetingUrl(parsed, 0)
       providerMeetingId ??= findMeetingId(parsed, 0)
     }
@@ -365,12 +391,14 @@ export function createTencentMeetingAdapter(
       input: MeetingCreateInput,
     ): Promise<MeetingCreateResult> {
       const tools = await discoverTools()
-      const createTool = tools.find(
-        (tool) =>
-          CREATE_TOOL_PATTERN.test(tool.name) &&
-          MEETING_TOOL_PATTERN.test(tool.name),
-      )
-      if (!createTool) {
+      const createTool =
+        tools.find((tool) => SCHEDULE_TOOL_PATTERN.test(tool.name)) ??
+        tools.find(
+          (tool) =>
+            CREATE_TOOL_PATTERN.test(tool.name) &&
+            MEETING_TOOL_PATTERN.test(tool.name),
+        )
+      if (!createTool || !hasSupportedRequiredArguments(createTool)) {
         throw new MeetingProviderError(
           'unsupported',
           'Tencent Meeting does not expose a meeting creation tool.',
