@@ -21,7 +21,7 @@ const APP_STORE_BADGES = {
 
 const LANDING_COPY = {
   zh: {
-    productName: 'Cali 宝宝助手',
+    productName: 'Cali 宝宝',
     headline: '宝宝的事很多，\n不必都靠脑子记。',
     description:
       '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
@@ -31,7 +31,7 @@ const LANDING_COPY = {
     terms: '使用条款',
     locale: 'English',
     localeAriaLabel: 'View Cali Baby in English',
-    galleryLabel: 'Cali 宝宝助手应用画面',
+    galleryLabel: 'Cali 宝宝应用画面',
   },
   en: {
     productName: 'Cali Baby',
@@ -43,7 +43,7 @@ const LANDING_COPY = {
     privacy: 'Privacy Policy',
     terms: 'Terms of Use',
     locale: '中文',
-    localeAriaLabel: '切换到 Cali 宝宝助手中文页面',
+    localeAriaLabel: '切换到 Cali 宝宝中文页面',
     galleryLabel: 'Cali Baby app screenshots',
   },
 } as const
@@ -66,7 +66,7 @@ function LandingHeader({ locale }: { locale: Locale }) {
         <span>{copy.productName}</span>
       </Link>
 
-      <nav aria-label={locale === 'en' ? 'Cali Baby' : 'Cali 宝宝助手'} className={styles.headerLinks}>
+      <nav aria-label={locale === 'en' ? 'Cali Baby' : 'Cali 宝宝'} className={styles.headerLinks}>
         <Link href={localePath(locale, '/calibaby/help')} className={styles.headerLink}>
           {copy.help}
         </Link>
@@ -135,7 +135,7 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
 
       <footer className={styles.footer}>
         <span>© Cali Baby</span>
-        <nav aria-label={locale === 'en' ? 'Cali Baby information' : 'Cali 宝宝助手信息'} className={styles.footerLinks}>
+        <nav aria-label={locale === 'en' ? 'Cali Baby information' : 'Cali 宝宝信息'} className={styles.footerLinks}>
           <Link href={localePath(locale, '/calibaby/help')}>{copy.help}</Link>
           <Link href={localePath(locale, '/calibaby/privacy')}>{copy.privacy}</Link>
           <Link href={localePath(locale, '/calibaby/terms')}>{copy.terms}</Link>

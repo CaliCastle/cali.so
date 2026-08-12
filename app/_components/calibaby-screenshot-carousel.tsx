@@ -32,7 +32,7 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/care-timeline.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手连续照顾时间线',
+      zh: 'Cali 宝宝连续照顾时间线',
       en: 'Cali Baby continuous care timeline',
     },
   },
@@ -42,7 +42,7 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/pregnancy.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手孕期首页',
+      zh: 'Cali 宝宝孕期首页',
       en: 'Cali Baby pregnancy home screen',
     },
   },
@@ -52,7 +52,7 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/live-activity.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手锁定画面实时记录',
+      zh: 'Cali 宝宝锁定画面实时记录',
       en: 'Cali Baby Lock Screen live recording',
     },
   },
@@ -62,7 +62,7 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/voice-record.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手语音快速记录',
+      zh: 'Cali 宝宝语音快速记录',
       en: 'Cali Baby voice quick record',
     },
   },
@@ -72,7 +72,7 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/family-sync.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手家庭照顾自动同步',
+      zh: 'Cali 宝宝家庭照顾自动同步',
       en: 'Cali Baby automatic family care sync',
     },
   },
@@ -82,7 +82,7 @@ const SCREENSHOTS = [
       en: '/images/calibaby/screenshots/en/trends.webp',
     },
     alt: {
-      zh: 'Cali 宝宝助手照顾趋势',
+      zh: 'Cali 宝宝照顾趋势',
       en: 'Cali Baby care trends',
     },
   },
@@ -90,7 +90,7 @@ const SCREENSHOTS = [
 
 const CONTROL_COPY = {
   zh: {
-    label: 'Cali 宝宝助手应用画面',
+    label: 'Cali 宝宝应用画面',
     previous: '上一张应用画面',
     next: '下一张应用画面',
     dots: '选择应用画面',

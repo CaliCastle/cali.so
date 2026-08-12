@@ -11,11 +11,11 @@ import {
 import { seo } from './seo'
 
 const expected = [
-  ['zh', 'support', '/calibaby/help', 'Cali 宝宝助手'],
+  ['zh', 'support', '/calibaby/help', 'Cali 宝宝'],
   ['en', 'support', '/en/calibaby/help', 'Cali Baby'],
-  ['zh', 'privacy', '/calibaby/privacy', 'Cali 宝宝助手隐私政策'],
+  ['zh', 'privacy', '/calibaby/privacy', 'Cali 宝宝隐私政策'],
   ['en', 'privacy', '/en/calibaby/privacy', 'Cali Baby Privacy Policy'],
-  ['zh', 'terms', '/calibaby/terms', 'Cali 宝宝助手使用条款'],
+  ['zh', 'terms', '/calibaby/terms', 'Cali 宝宝使用条款'],
   ['en', 'terms', '/en/calibaby/terms', 'Cali Baby Terms of Use'],
 ] as const satisfies ReadonlyArray<
   readonly ['zh' | 'en', CaliBabyPageKind, string, string]
@@ -29,7 +29,7 @@ describe('Cali Baby public content', () => {
 
       expect(content.route).toBe(route)
       expect(content.title).toBe(title)
-      expect(content.metadataTitle).toContain(locale === 'en' ? 'Cali Baby' : 'Cali 宝宝助手')
+      expect(content.metadataTitle).toContain(locale === 'en' ? 'Cali Baby' : 'Cali 宝宝')
       expect(content.metadataDescription.length).toBeGreaterThan(20)
       expect(content.body).not.toContain('Metadata title:')
       expect(content.body).not.toContain('\n---')
@@ -87,7 +87,7 @@ describe('Cali Baby public content', () => {
     [
       'zh',
       '/calibaby',
-      'Cali 宝宝助手｜宝宝的事很多，不必都靠脑子记',
+      'Cali 宝宝｜宝宝的事很多，不必都靠脑子记',
       '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
     ],
     [
