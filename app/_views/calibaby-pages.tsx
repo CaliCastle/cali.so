@@ -125,7 +125,7 @@ function Markdown({ source, className }: { source: string; className?: string })
 
 function ProductHeader({ locale, path }: { locale: Locale; path: string }) {
   const copy = SUPPORT_COPY[locale]
-  const productName = locale === 'en' ? 'Cali Baby' : 'Cali 宝宝助手'
+  const productName = locale === 'en' ? 'Cali Baby' : 'Cali 宝宝'
 
   return (
     <header className={styles.productHeader}>
