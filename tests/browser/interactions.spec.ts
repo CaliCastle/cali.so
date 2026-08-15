@@ -55,6 +55,7 @@ test('keyboard lightbox opens and closes immediately with focus restoration', as
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
   await expect(dialog).toHaveAttribute('data-state', 'open')
+  await expect(dialog).toHaveAttribute('data-motion', 'instant')
   expect(
     await dialog.evaluate(
       (element) =>

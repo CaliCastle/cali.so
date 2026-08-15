@@ -2512,6 +2512,12 @@ img.tweet-card-avatar {
   transition: opacity 200ms ease 140ms;
 }
 
+.zoom-overlay[data-motion='instant'] .zoom-overlay-backdrop,
+.zoom-overlay[data-motion='instant'] img,
+.zoom-overlay[data-motion='instant'] .zoom-overlay-marks {
+  transition: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .zoom-overlay-backdrop,
   .zoom-overlay img,
@@ -5667,6 +5673,11 @@ html[data-locale='en'] [data-en-block] {
 .zoom-overlay[data-state='open'] .zoom-detail-frame {
   opacity: 1;
   transition: opacity 200ms ease 120ms;
+}
+
+.zoom-overlay[data-motion='instant'] .zoom-detail-item,
+.zoom-overlay[data-motion='instant'] .zoom-detail-frame {
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

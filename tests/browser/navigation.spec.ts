@@ -55,6 +55,22 @@ test('@hosted prefetched dock navigation renders instantly and preserves history
   expect(browserErrors).toEqual([])
 })
 
+test('Cali Baby project navigates internally in the current locale', async ({ page }) => {
+  await prepareBrowserPage(page)
+  const browserErrors = watchBrowserErrors(page)
+  await page.goto('/en/projects')
+
+  const project = page.locator('[data-list-stage-id="Cali 宝宝"]')
+  await expect(project).toHaveAttribute('href', '/en/calibaby')
+  await expect(project).not.toHaveAttribute('target', '_blank')
+  await expect(project.locator('.external-mark')).toHaveCount(0)
+
+  await project.click()
+  await expect(page).toHaveURL(/\/en\/calibaby$/)
+  await expect(page.locator('h1')).toContainText('You don’t have to')
+  expect(browserErrors).toEqual([])
+})
+
 test('Preferences applies theme from the keyboard and restores trigger focus', async ({
   page,
 }) => {

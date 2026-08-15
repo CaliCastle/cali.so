@@ -11,6 +11,15 @@ export interface Project {
 
 export const projects: Project[] = [
   {
+    name: 'Cali 宝宝',
+    nameEn: 'Cali Baby',
+    description: '宝宝的事很多，不必都靠脑子记。',
+    descriptionEn: 'You don’t have to remember every feed.',
+    url: '/calibaby',
+    icon: '/images/calibaby-app-icon.png',
+    domain: 'cali.so',
+  },
+  {
     name: '佐玩官网',
     nameEn: 'Zolplay Website',
     description: '为自己的公司佐玩设计开发的官网，简约的设计结合噪点材质感。',

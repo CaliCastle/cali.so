@@ -84,6 +84,7 @@ export function ZoomImage({
     expandedSrc: string
     target: { left: number; top: number; width: number; height: number }
     from: string
+    motion: 'animated' | 'instant'
   } | null>(null)
   const [state, setState] = useState<'opening' | 'open' | 'closing'>('opening')
   const stateRef = useRef(state)
@@ -144,13 +145,15 @@ export function ZoomImage({
     const s = rect.width / w
     const tx = rect.left + rect.width / 2 - (target.left + w / 2)
     const ty = rect.top + rect.height / 2 - (target.top + h / 2)
+    const reduced = prefersReducedMotion()
+    const instant = event.detail === 0 || reduced
     setZoom({
       expandedSrc,
       target,
       from: `translate(${tx}px, ${ty}px) scale(${s})`,
+      motion: instant ? 'instant' : 'animated',
     })
-    const reduced = prefersReducedMotion()
-    setState(event.detail === 0 || reduced ? 'open' : 'opening')
+    setState(instant ? 'open' : 'opening')
   }, [expandedSrc, width, height, expandedContent])
 
   const unmount = useCallback(() => {
@@ -161,9 +164,14 @@ export function ZoomImage({
 
   const close = useCallback((reason: CloseReason) => {
     // Nothing to reverse if the enter transition never started, and
-    // reduced motion never fires transitionend — unmount directly.
+    // instant motion never fires transitionend — unmount directly.
     const reduced = prefersReducedMotion()
-    if (reason === 'escape' || reduced || stateRef.current === 'opening') {
+    if (
+      reason === 'escape' ||
+      reduced ||
+      zoom?.motion === 'instant' ||
+      stateRef.current === 'opening'
+    ) {
       unmount()
       return
     }
@@ -182,7 +190,7 @@ export function ZoomImage({
       })
     }
     setState('closing')
-  }, [unmount])
+  }, [unmount, zoom?.motion])
 
   // Promote opening -> open one frame later so the transform transition runs
   useEffect(() => {
@@ -219,18 +227,28 @@ export function ZoomImage({
     }
     // Scrolls that bypass wheel/touch (keyboard, scrollbar drag) still close;
     // close() re-measures the landing spot, so the flight stays correct.
-    const onViewportChange = () => close('viewport')
+    const scrollPosition = { x: window.scrollX, y: window.scrollY }
+    const onScroll = () => {
+      if (
+        window.scrollX === scrollPosition.x &&
+        window.scrollY === scrollPosition.y
+      ) {
+        return
+      }
+      close('viewport')
+    }
+    const onResize = () => close('viewport')
     window.addEventListener('keydown', onKey)
     window.addEventListener('wheel', onGesture, { passive: false })
     window.addEventListener('touchmove', onGesture, { passive: false })
-    window.addEventListener('scroll', onViewportChange)
-    window.addEventListener('resize', onViewportChange)
+    window.addEventListener('scroll', onScroll)
+    window.addEventListener('resize', onResize)
     return () => {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('wheel', onGesture)
       window.removeEventListener('touchmove', onGesture)
-      window.removeEventListener('scroll', onViewportChange)
-      window.removeEventListener('resize', onViewportChange)
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onResize)
     }
   }, [zoom, close])
 
@@ -274,6 +292,7 @@ export function ZoomImage({
             tabIndex={-1}
             className="zoom-overlay"
             data-state={floating ? 'open' : state}
+            data-motion={zoom.motion}
             role="dialog"
             aria-modal="true"
             aria-label={alt || localize(locale, '图片', 'Image')}

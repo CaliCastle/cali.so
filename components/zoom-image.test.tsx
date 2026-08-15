@@ -39,6 +39,8 @@ beforeEach(() => {
 
   Object.defineProperty(window, 'innerWidth', { configurable: true, value: 1200 })
   Object.defineProperty(window, 'innerHeight', { configurable: true, value: 900 })
+  Object.defineProperty(window, 'scrollX', { configurable: true, value: 0 })
+  Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
   document.documentElement.style.fontSize = ''
   vi.spyOn(HTMLImageElement.prototype, 'getBoundingClientRect').mockReturnValue({
     bottom: 300,
@@ -117,10 +119,26 @@ describe('ZoomImage', () => {
       detail: 0,
     })
 
-    expect(
-      screen.getByRole('dialog', { name: 'Taipei' }).getAttribute('data-state'),
-    ).toBe('open')
+    const dialog = screen.getByRole('dialog', { name: 'Taipei' })
+    expect(dialog.getAttribute('data-state')).toBe('open')
+    expect(dialog.getAttribute('data-motion')).toBe('instant')
     expect(requestAnimationFrame).not.toHaveBeenCalled()
+  })
+
+  it('ignores stale scroll events until the viewport position changes', () => {
+    Object.defineProperty(window, 'scrollX', { configurable: true, value: 0 })
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 100 })
+    render(<ZoomImage src="/photo.jpg" alt="Taipei" width={800} height={600} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Zoom image: Taipei' }), {
+      detail: 0,
+    })
+
+    fireEvent.scroll(window)
+    expect(screen.getByRole('dialog', { name: 'Taipei' })).not.toBeNull()
+
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 101 })
+    fireEvent.scroll(window)
+    expect(screen.queryByRole('dialog', { name: 'Taipei' })).toBeNull()
   })
 
   it('closes on Escape immediately and restores trigger focus', () => {
@@ -160,6 +178,7 @@ describe('ZoomImage', () => {
 
     const dialog = screen.getByRole('dialog', { name: 'Taipei' })
     expect(dialog.getAttribute('data-state')).toBe('opening')
+    expect(dialog.getAttribute('data-motion')).toBe('animated')
     expect(frames).toHaveLength(1)
 
     act(() => frames.shift()?.(0))

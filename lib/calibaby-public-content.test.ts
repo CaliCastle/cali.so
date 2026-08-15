@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import {
+  CALI_BABY_APP_STORE_ID,
+  CALI_BABY_APP_STORE_URL,
   caliBabyLandingMetadata,
+  caliBabyLandingStructuredData,
   caliBabyPageMetadata,
   getCaliBabyPublicContent,
   type CaliBabyPageKind,
@@ -37,7 +40,7 @@ describe('Cali Baby public content', () => {
   )
 
   it.each(expected)(
-    'publishes paired metadata for %s %s while publication gates remain closed',
+    'keeps publication-gated paired metadata for %s %s',
     (locale, kind, route) => {
       const metadata = caliBabyPageMetadata(locale, kind)
       const canonical = metadata.alternates?.canonical
@@ -58,6 +61,7 @@ describe('Cali Baby public content', () => {
           seo.url,
         ).href,
       })
+      expect(metadata.itunes).toEqual({ appId: CALI_BABY_APP_STORE_ID })
       expect(metadata.robots).toEqual({ index: false, follow: true })
       expect(metadata.openGraph?.siteName).toBe('Cali Baby')
       expect(metadata.openGraph?.images).toEqual([
@@ -117,7 +121,39 @@ describe('Cali Baby public content', () => {
       expect(metadata.twitter).toEqual(
         expect.objectContaining({ title, description }),
       )
-      expect(metadata.robots).toEqual({ index: false, follow: true })
+      expect(metadata.robots).toBeUndefined()
+      expect(metadata.itunes).toEqual({ appId: CALI_BABY_APP_STORE_ID })
     },
   )
+
+  it.each([
+    ['zh', '/calibaby', 'Cali 宝宝'],
+    ['en', '/en/calibaby', 'Cali Baby: Baby Tracker'],
+  ] as const)('publishes verified MobileApplication data for %s', (locale, path, name) => {
+    const structuredData = caliBabyLandingStructuredData(locale)
+
+    expect(structuredData).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'MobileApplication',
+      '@id': `${new URL(path, seo.url).href}#app`,
+      name,
+      url: new URL(path, seo.url).href,
+      sameAs: CALI_BABY_APP_STORE_URL,
+      downloadUrl: CALI_BABY_APP_STORE_URL,
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'iOS 18.0 or later; watchOS 11.0 or later',
+      isAccessibleForFree: true,
+      offers: {
+        '@type': 'Offer',
+        price: 0,
+        priceCurrency: 'USD',
+        url: CALI_BABY_APP_STORE_URL,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Zolplay',
+      },
+    })
+    expect(structuredData.featureList).toHaveLength(4)
+  })
 })
