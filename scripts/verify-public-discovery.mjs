@@ -32,7 +32,7 @@ function localizedPages(pathname, zh, en, imageAlt) {
   ]
 }
 
-function localizedCaliBabyPages(pathname, zh, en) {
+function localizedCaliBabyPages(pathname, zh, en, indexable) {
   const enPath = `/en${pathname}`
   return [
     {
@@ -43,6 +43,7 @@ function localizedCaliBabyPages(pathname, zh, en) {
       description: zh.description,
       imageAlt: 'Cali 宝宝应用图标与名称',
       smartAppBanner: true,
+      indexable,
     },
     {
       path: enPath,
@@ -52,6 +53,7 @@ function localizedCaliBabyPages(pathname, zh, en) {
       description: en.description,
       imageAlt: 'Cali Baby app icon and wordmark',
       smartAppBanner: true,
+      indexable,
     },
   ]
 }
@@ -146,6 +148,7 @@ const publicPages = [
       description:
         'Track kicks, contractions, feeding, sleep, diapers, growth, and more. Keep authorized caregivers in sync with Cali Baby for iPhone and Apple Watch.',
     },
+    true,
   ),
   ...localizedCaliBabyPages(
     '/calibaby/help',
@@ -158,6 +161,7 @@ const publicPages = [
       description:
         'Get help with Family Sync, backups, voice records, and deletion, learn about Cali Baby, or contact support.',
     },
+    false,
   ),
   ...localizedCaliBabyPages(
     '/calibaby/privacy',
@@ -170,6 +174,7 @@ const publicPages = [
       description:
         'Learn how Cali Baby handles device records, Family Sync, voice processing, analytics, diagnostics, and deletion requests.',
     },
+    false,
   ),
   ...localizedCaliBabyPages(
     '/calibaby/terms',
@@ -182,6 +187,7 @@ const publicPages = [
       description:
         "Read Cali Baby's terms for accounts, Family sharing, Cali Baby Pro, health boundaries, and service regions.",
     },
+    false,
   ),
 ]
 
@@ -236,11 +242,14 @@ async function verifyMetadata(baseUrl, page) {
   const { document } = dom.window
 
   assert.equal(document.documentElement.lang, page.locale, `${page.path} lang`)
-  assert.doesNotMatch(
-    document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '',
-    /noindex|nofollow/,
-    `${page.path} indexing`,
-  )
+  const robots =
+    document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? ''
+  if (page.indexable === false) {
+    assert.match(robots, /noindex/, `${page.path} indexing`)
+    assert.doesNotMatch(robots, /nofollow/, `${page.path} links`)
+  } else {
+    assert.doesNotMatch(robots, /noindex|nofollow/, `${page.path} indexing`)
+  }
   assert.equal(document.title, page.documentTitle, `${page.path} title`)
   assert.equal(
     requiredElement(
@@ -361,10 +370,19 @@ async function verifyDiscoveryFiles(baseUrl) {
     /(?:application|text)\/xml/,
   )
   const sitemapXml = await sitemap.text()
-  for (const path of new Set(publicPages.map((page) => page.path))) {
+  const sitemapPaths = publicPages
+    .filter((page) => page.indexable !== false)
+    .map((page) => page.path)
+  for (const path of new Set(sitemapPaths)) {
     assert.ok(
       sitemapXml.includes(new URL(path, productionOrigin).href),
       `sitemap ${path}`,
+    )
+  }
+  for (const page of publicPages.filter((candidate) => candidate.indexable === false)) {
+    assert.ok(
+      !sitemapXml.includes(new URL(page.path, productionOrigin).href),
+      `sitemap excludes ${page.path}`,
     )
   }
 

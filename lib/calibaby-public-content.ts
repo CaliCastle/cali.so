@@ -172,12 +172,17 @@ export function caliBabyPageMetadata(
 ): Metadata {
   const content = getCaliBabyPublicContent(locale, kind)
   const unlocalizedPath = kind === 'support' ? '/calibaby/help' : `/calibaby/${kind}`
-  return caliBabyMetadata(
-    locale,
-    unlocalizedPath,
-    content.metadataTitle,
-    content.metadataDescription,
-  )
+  return {
+    ...caliBabyMetadata(
+      locale,
+      unlocalizedPath,
+      content.metadataTitle,
+      content.metadataDescription,
+    ),
+    // The product has launched, but this source copy remains subject to the
+    // publication gates in docs/calibaby-public-copy.md.
+    robots: { index: false, follow: true },
+  }
 }
 
 export function caliBabyLandingMetadata(locale: Locale): Metadata {

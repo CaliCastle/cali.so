@@ -40,7 +40,7 @@ describe('Cali Baby public content', () => {
   )
 
   it.each(expected)(
-    'publishes indexable paired metadata for %s %s',
+    'keeps publication-gated paired metadata for %s %s',
     (locale, kind, route) => {
       const metadata = caliBabyPageMetadata(locale, kind)
       const canonical = metadata.alternates?.canonical
@@ -62,7 +62,7 @@ describe('Cali Baby public content', () => {
         ).href,
       })
       expect(metadata.itunes).toEqual({ appId: CALI_BABY_APP_STORE_ID })
-      expect(metadata.robots).toBeUndefined()
+      expect(metadata.robots).toEqual({ index: false, follow: true })
       expect(metadata.openGraph?.siteName).toBe('Cali Baby')
       expect(metadata.openGraph?.images).toEqual([
         expect.objectContaining({
