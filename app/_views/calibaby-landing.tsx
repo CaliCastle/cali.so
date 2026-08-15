@@ -136,6 +136,13 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
           </div>
         </section>
 
+        <section className={styles.gallery} aria-labelledby="calibaby-gallery-title">
+          <h2 id="calibaby-gallery-title" className={styles.srOnly}>
+            {copy.galleryLabel}
+          </h2>
+          <CaliBabyScreenshotCarousel locale={locale} />
+        </section>
+
         <section
           className={styles.productDetails}
           aria-labelledby="calibaby-product-details-title"
@@ -156,13 +163,6 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
               </li>
             ))}
           </ul>
-        </section>
-
-        <section className={styles.gallery} aria-labelledby="calibaby-gallery-title">
-          <h2 id="calibaby-gallery-title" className={styles.srOnly}>
-            {copy.galleryLabel}
-          </h2>
-          <CaliBabyScreenshotCarousel locale={locale} />
         </section>
       </main>
 

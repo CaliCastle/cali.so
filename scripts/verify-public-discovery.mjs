@@ -139,14 +139,14 @@ const publicPages = [
   ...localizedCaliBabyPages(
     '/calibaby',
     {
-      title: 'Cali 宝宝｜喂奶、睡眠、尿布与胎动记录',
+      title: 'Cali 宝宝｜宝宝的事很多，不必都靠脑子记',
       description:
-        '从孕期到宝宝出生后，记录胎动、宫缩、喂奶、睡眠、尿布、成长等日常，并通过家庭同步与授权照顾者共享近况。现已上线 App Store。',
+        '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
     },
     {
-      title: 'Cali Baby: Baby Tracker for Feeding, Sleep & Diapers',
+      title: 'Cali Baby | You don’t have to remember every feed.',
       description:
-        'Track kicks, contractions, feeding, sleep, diapers, growth, and more. Keep authorized caregivers in sync with Cali Baby for iPhone and Apple Watch.',
+        'Log kicks, feeds, sleep, and diapers as they happen. Everyone caring for the baby can see what happened and when, so whoever takes over doesn’t have to start with a round of questions.',
     },
     true,
   ),
