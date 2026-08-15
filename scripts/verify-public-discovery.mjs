@@ -391,7 +391,10 @@ async function verifyDiscoveryFiles(baseUrl) {
   assert.match(llms.headers.get('content-type') ?? '', /^text\/markdown/)
   const llmsText = await llms.text()
   assert.match(llmsText, /^# Cali Castle and Cali Baby\n\n>/)
-  assert.match(llmsText, /https:\/\/apps\.apple\.com\/app\/id6769728441/)
+  assert.ok(
+    llmsText.includes('https://apps.apple.com/app/id6769728441'),
+    'llms.txt App Store listing',
+  )
   for (const path of new Set(publicPages.map((page) => page.path))) {
     assert.ok(
       llmsText.includes(new URL(path, productionOrigin).href),
