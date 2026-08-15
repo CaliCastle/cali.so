@@ -235,6 +235,19 @@ function requiredElement(document, selector, description) {
   return element
 }
 
+function markdownLinkTargets(markdown) {
+  const targets = new Set()
+  for (const line of markdown.split('\n')) {
+    if (!line.startsWith('- [')) continue
+    const targetStart = line.indexOf('](')
+    const targetEnd = line.indexOf('): ', targetStart + 2)
+    if (targetStart >= 0 && targetEnd > targetStart) {
+      targets.add(line.slice(targetStart + 2, targetEnd))
+    }
+  }
+  return targets
+}
+
 async function verifyMetadata(baseUrl, page) {
   const response = await fetch(new URL(page.path, baseUrl))
   assert.equal(response.status, 200, `${page.path} status`)
@@ -409,13 +422,14 @@ async function verifyDiscoveryFiles(baseUrl) {
   assert.match(llms.headers.get('content-type') ?? '', /^text\/markdown/)
   const llmsText = await llms.text()
   assert.match(llmsText, /^# Cali Castle and Cali Baby\n\n>/)
+  const llmsTargets = markdownLinkTargets(llmsText)
   assert.ok(
-    llmsText.includes('https://apps.apple.com/app/id6769728441'),
+    llmsTargets.has('https://apps.apple.com/app/id6769728441'),
     'llms.txt App Store listing',
   )
   for (const path of new Set(publicPages.map((page) => page.path))) {
     assert.ok(
-      llmsText.includes(new URL(path, productionOrigin).href),
+      llmsTargets.has(new URL(path, productionOrigin).href),
       `llms.txt ${path}`,
     )
   }
