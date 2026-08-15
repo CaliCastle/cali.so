@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from 'vitest'
 vi.mock('server-only', () => ({}))
 
 import {
+  CALI_BABY_APP_STORE_ID,
+  CALI_BABY_APP_STORE_URL,
   caliBabyLandingMetadata,
+  caliBabyLandingStructuredData,
   caliBabyPageMetadata,
   getCaliBabyPublicContent,
   type CaliBabyPageKind,
@@ -37,7 +40,7 @@ describe('Cali Baby public content', () => {
   )
 
   it.each(expected)(
-    'publishes paired metadata for %s %s while publication gates remain closed',
+    'publishes indexable paired metadata for %s %s',
     (locale, kind, route) => {
       const metadata = caliBabyPageMetadata(locale, kind)
       const canonical = metadata.alternates?.canonical
@@ -58,7 +61,8 @@ describe('Cali Baby public content', () => {
           seo.url,
         ).href,
       })
-      expect(metadata.robots).toEqual({ index: false, follow: true })
+      expect(metadata.itunes).toEqual({ appId: CALI_BABY_APP_STORE_ID })
+      expect(metadata.robots).toBeUndefined()
       expect(metadata.openGraph?.siteName).toBe('Cali Baby')
       expect(metadata.openGraph?.images).toEqual([
         expect.objectContaining({
@@ -87,14 +91,14 @@ describe('Cali Baby public content', () => {
     [
       'zh',
       '/calibaby',
-      'Cali 宝宝｜宝宝的事很多，不必都靠脑子记',
-      '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
+      'Cali 宝宝｜喂奶、睡眠、尿布与胎动记录',
+      '从孕期到宝宝出生后，记录胎动、宫缩、喂奶、睡眠、尿布、成长等日常，并通过家庭同步与授权照顾者共享近况。现已上线 App Store。',
     ],
     [
       'en',
       '/en/calibaby',
-      'Cali Baby | You don’t have to remember every feed.',
-      'Log kicks, feeds, sleep, and diapers as they happen. Everyone caring for the baby can see what happened and when, so whoever takes over doesn’t have to start with a round of questions.',
+      'Cali Baby: Baby Tracker for Feeding, Sleep & Diapers',
+      'Track kicks, contractions, feeding, sleep, diapers, growth, and more. Keep authorized caregivers in sync with Cali Baby for iPhone and Apple Watch.',
     ],
   ] as const)(
     'publishes paired landing metadata for %s',
@@ -117,7 +121,40 @@ describe('Cali Baby public content', () => {
       expect(metadata.twitter).toEqual(
         expect.objectContaining({ title, description }),
       )
-      expect(metadata.robots).toEqual({ index: false, follow: true })
+      expect(metadata.robots).toBeUndefined()
+      expect(metadata.category).toBe('Health & Fitness')
+      expect(metadata.itunes).toEqual({ appId: CALI_BABY_APP_STORE_ID })
     },
   )
+
+  it.each([
+    ['zh', '/calibaby', 'Cali 宝宝'],
+    ['en', '/en/calibaby', 'Cali Baby: Baby Tracker'],
+  ] as const)('publishes verified MobileApplication data for %s', (locale, path, name) => {
+    const structuredData = caliBabyLandingStructuredData(locale)
+
+    expect(structuredData).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'MobileApplication',
+      '@id': `${new URL(path, seo.url).href}#app`,
+      name,
+      url: new URL(path, seo.url).href,
+      sameAs: CALI_BABY_APP_STORE_URL,
+      downloadUrl: CALI_BABY_APP_STORE_URL,
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'iOS 18.0 or later; watchOS 11.0 or later',
+      isAccessibleForFree: true,
+      offers: {
+        '@type': 'Offer',
+        price: 0,
+        priceCurrency: 'USD',
+        url: CALI_BABY_APP_STORE_URL,
+      },
+      publisher: {
+        '@type': 'Organization',
+        name: 'Zolplay',
+      },
+    })
+    expect(structuredData.featureList).toHaveLength(4)
+  })
 })

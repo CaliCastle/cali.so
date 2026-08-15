@@ -13,6 +13,8 @@ import styles from '../_views/calibaby-pages.module.css'
 export const caliBabyRootMetadata: Metadata = {
   metadataBase: seo.url,
   applicationName: 'Cali Baby',
+  creator: 'Zolplay',
+  publisher: 'Zolplay',
   title: {
     default: 'Cali Baby',
     template: '%s',

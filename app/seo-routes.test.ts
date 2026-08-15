@@ -50,6 +50,10 @@ describe('localized discovery routes', () => {
       '/photos',
       '/projects',
       '/ama',
+      '/calibaby',
+      '/calibaby/help',
+      '/calibaby/privacy',
+      '/calibaby/terms',
       ...archivedNewsletterIds.map((id) => `/newsletters/${id}`),
       ...getAllPosts().map((post) => `/blog/${post.slug}`),
     ]

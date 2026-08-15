@@ -2,11 +2,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { CaliBabyScreenshotCarousel } from '../_components/calibaby-screenshot-carousel'
+import {
+  CALI_BABY_APP_STORE_URL,
+  CALI_BABY_PRODUCT_DETAILS,
+  caliBabyLandingStructuredData,
+} from '~/lib/calibaby-public-content'
 import { localePath, type Locale } from '~/lib/locale-route'
 
 import styles from './calibaby-landing.module.css'
-
-const APP_STORE_URL = 'https://apps.apple.com/app/id6769728441'
 
 const APP_STORE_BADGES = {
   zh: {
@@ -86,9 +89,17 @@ function LandingHeader({ locale }: { locale: Locale }) {
 export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
   const copy = LANDING_COPY[locale]
   const appStoreBadge = APP_STORE_BADGES[locale]
+  const productDetails = CALI_BABY_PRODUCT_DETAILS[locale]
+  const structuredData = caliBabyLandingStructuredData(locale)
 
   return (
     <div className={styles.landingPage}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData).replace(/</g, '\\u003c'),
+        }}
+      />
       <LandingHeader locale={locale} />
 
       <main>
@@ -108,7 +119,7 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
           <p>{copy.description}</p>
           <div className={styles.heroActions}>
             <a
-              href={APP_STORE_URL}
+              href={CALI_BABY_APP_STORE_URL}
               target="_blank"
               rel="noreferrer"
               className={styles.appStoreLink}
@@ -123,6 +134,28 @@ export function CaliBabyLandingPage({ locale }: { locale: Locale }) {
               />
             </a>
           </div>
+        </section>
+
+        <section
+          className={styles.productDetails}
+          aria-labelledby="calibaby-product-details-title"
+        >
+          <header className={styles.productDetailsHeader}>
+            <h2 id="calibaby-product-details-title">{productDetails.title}</h2>
+            <p className={styles.productIntroduction}>
+              {productDetails.introduction}
+            </p>
+            <p className={styles.productFacts}>{productDetails.facts}</p>
+          </header>
+
+          <ul className={styles.featureGrid}>
+            {productDetails.features.map((feature) => (
+              <li key={feature.title} className={styles.feature}>
+                <h3>{feature.title}</h3>
+                <p>{feature.description}</p>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className={styles.gallery} aria-labelledby="calibaby-gallery-title">

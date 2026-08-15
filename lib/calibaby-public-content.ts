@@ -9,21 +9,84 @@ import type { Locale } from './locale-route'
 
 export type CaliBabyPageKind = 'support' | 'privacy' | 'terms'
 
+export const CALI_BABY_APP_STORE_ID = '6769728441'
+export const CALI_BABY_APP_STORE_URL =
+  'https://apps.apple.com/app/id6769728441'
+
 const LANDING_METADATA: Record<
   Locale,
   { title: string; description: string }
 > = {
   zh: {
-    title: 'Cali 宝宝｜宝宝的事很多，不必都靠脑子记',
+    title: 'Cali 宝宝｜喂奶、睡眠、尿布与胎动记录',
     description:
-      '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
+      '从孕期到宝宝出生后，记录胎动、宫缩、喂奶、睡眠、尿布、成长等日常，并通过家庭同步与授权照顾者共享近况。现已上线 App Store。',
   },
   en: {
-    title: 'Cali Baby | You don’t have to remember every feed.',
+    title: 'Cali Baby: Baby Tracker for Feeding, Sleep & Diapers',
     description:
-      'Log kicks, feeds, sleep, and diapers as they happen. Everyone caring for the baby can see what happened and when, so whoever takes over doesn’t have to start with a round of questions.',
+      'Track kicks, contractions, feeding, sleep, diapers, growth, and more. Keep authorized caregivers in sync with Cali Baby for iPhone and Apple Watch.',
   },
 }
+
+export const CALI_BABY_PRODUCT_DETAILS = {
+  zh: {
+    title: '从孕期到宝宝出生后的每一天',
+    introduction:
+      'Cali 宝宝把胎动、宫缩、喂养、睡眠、尿布和成长记录放在一处。无需账号即可开始，常用记录也能从锁定画面、Siri 或 Apple Watch 随手完成。',
+    facts:
+      'Zolplay 出品 · 适用于 iPhone 与 Apple Watch · 需 iOS 18 与 watchOS 11 或更高版本 · 支持简体中文与英文 · 免费下载，可选 Cali Baby Pro',
+    features: [
+      {
+        title: '孕期记录',
+        description: '记录胎动、宫缩、孕期体重、产检和待产包，陪你走到宝宝出生。',
+      },
+      {
+        title: '日常照顾',
+        description: '记录母乳、奶瓶、吸奶、辅食、睡眠、尿布、洗澡、体温和成长。',
+      },
+      {
+        title: '随手记录',
+        description:
+          '通过小组件、实时活动、Siri、快捷指令和 Apple Watch，少几步完成常用记录。',
+      },
+      {
+        title: '一起照顾',
+        description:
+          '按需开启家庭同步，让获得授权的照顾者查看并记录同一个宝宝的近况。',
+      },
+    ],
+  },
+  en: {
+    title: 'From pregnancy through everyday care',
+    introduction:
+      'Cali Baby keeps kicks, contractions, feeding, sleep, diapers, and growth in one calm place. Start without an account, then log common care from the Lock Screen, Siri, or Apple Watch.',
+    facts:
+      'By Zolplay · For iPhone and Apple Watch · Requires iOS 18 and watchOS 11 or later · English and Simplified Chinese · Free with optional Cali Baby Pro',
+    features: [
+      {
+        title: 'Pregnancy',
+        description:
+          'Track kicks, contractions, pregnancy weight, prenatal checkups, and a hospital bag checklist.',
+      },
+      {
+        title: 'Daily care',
+        description:
+          'Log nursing, bottles, pumping, solids, sleep, diapers, baths, temperature, growth, and more.',
+      },
+      {
+        title: 'Quick entry',
+        description:
+          'Use widgets, Live Activities, Siri, Shortcuts, and Apple Watch to record common care with fewer steps.',
+      },
+      {
+        title: 'Care together',
+        description:
+          'Turn on Family Sync when needed so authorized caregivers can view and log care for the same baby.',
+      },
+    ],
+  },
+} as const
 
 type CaliBabyPublicContent = {
   route: string
@@ -119,7 +182,50 @@ export function caliBabyPageMetadata(
 
 export function caliBabyLandingMetadata(locale: Locale): Metadata {
   const copy = LANDING_METADATA[locale]
-  return caliBabyMetadata(locale, '/calibaby', copy.title, copy.description)
+  return {
+    ...caliBabyMetadata(locale, '/calibaby', copy.title, copy.description),
+    category: 'Health & Fitness',
+  }
+}
+
+export function caliBabyLandingStructuredData(locale: Locale) {
+  const copy = LANDING_METADATA[locale]
+  const details = CALI_BABY_PRODUCT_DETAILS[locale]
+  const canonical = localeRoutePair('/calibaby')[locale]
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MobileApplication',
+    '@id': `${canonical.href}#app`,
+    name: locale === 'en' ? 'Cali Baby: Baby Tracker' : 'Cali 宝宝',
+    alternateName: locale === 'en' ? 'Cali Baby' : 'Cali Baby: Baby Tracker',
+    description: copy.description,
+    url: canonical.href,
+    sameAs: CALI_BABY_APP_STORE_URL,
+    downloadUrl: CALI_BABY_APP_STORE_URL,
+    image: new URL('/images/calibaby-app-icon.png', canonical).href,
+    applicationCategory: 'HealthApplication',
+    applicationSubCategory: 'Health & Fitness',
+    operatingSystem: 'iOS 18.0 or later; watchOS 11.0 or later',
+    availableOnDevice: ['iPhone', 'Apple Watch'],
+    inLanguage: ['en', 'zh-CN'],
+    isAccessibleForFree: true,
+    featureList: details.features.map(
+      (feature) => `${feature.title}: ${feature.description}`,
+    ),
+    offers: {
+      '@type': 'Offer',
+      price: 0,
+      priceCurrency: 'USD',
+      url: CALI_BABY_APP_STORE_URL,
+      availability: 'https://schema.org/InStock',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Zolplay',
+      url: 'https://zolplay.com',
+    },
+  }
 }
 
 function caliBabyMetadata(
@@ -141,14 +247,11 @@ function caliBabyMetadata(
   return {
     title,
     description,
+    itunes: { appId: CALI_BABY_APP_STORE_ID },
     alternates: {
       canonical,
       languages: pair.languages,
     },
-    // The approved publication checklist still contains unresolved gates and
-    // effective-date placeholders. Keep previews reachable but out of search
-    // results until that checklist is explicitly cleared.
-    robots: { index: false, follow: true },
     openGraph: {
       title,
       description,
