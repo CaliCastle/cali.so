@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const router = vi.hoisted(() => ({
@@ -29,6 +29,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup()
+  vi.useRealTimers()
   fetchMock.mockReset()
   router.refresh.mockReset()
   delete document.documentElement.dataset.locale
@@ -153,6 +154,111 @@ describe('AMA booking detail', () => {
     expect(text).toContain('(America/New_York)')
     // Operations for this Booking render with the shared rows.
     expect(text).toContain('Send reminder')
+  })
+
+  it('hides stale meeting artifacts while finalizing', () => {
+    const { container } = renderDetail(
+      makeBooking({
+        status: 'finalizing',
+        meetingProvider: 'tencent-meeting',
+        meetingUrl: 'https://meeting.tencent.com/stale-room',
+        googleCalendarEventId: 'stale_calendar_event',
+        tencentMeetingId: 'stale_tencent_meeting',
+      }),
+    )
+
+    expect(container.textContent).toContain('Meeting details are being updated.')
+    expect(container.textContent).not.toContain('stale-room')
+    expect(container.textContent).not.toContain('stale_calendar_event')
+    expect(container.textContent).not.toContain('stale_tencent_meeting')
+  })
+
+  it('uses creation-oriented copy for initial finalization', () => {
+    const { container } = renderDetail(
+      makeBooking({
+        status: 'finalizing',
+        meetingUrl: null,
+        googleCalendarEventId: null,
+        tencentMeetingId: null,
+      }),
+    )
+
+    expect(container.textContent).toContain('Meeting details are being created.')
+    expect(container.textContent).not.toContain('Do not use a previous link.')
+  })
+
+  it('refreshes while finalizing and reveals only refreshed meeting artifacts', () => {
+    vi.useFakeTimers()
+    const staleBooking = makeBooking({
+      status: 'finalizing',
+      meetingUrl: 'https://meeting.tencent.com/stale-room',
+      googleCalendarEventId: 'stale_calendar_event',
+      tencentMeetingId: 'stale_tencent_meeting',
+    })
+    const { container, rerender } = renderDetail(staleBooking)
+
+    act(() => vi.advanceTimersByTime(10_000))
+    expect(router.refresh).toHaveBeenCalledTimes(1)
+
+    rerender(
+      <BookingDetail
+        booking={
+          makeBooking({
+            status: 'confirmed',
+            meetingUrl: 'https://meeting.tencent.com/new-room',
+            googleCalendarEventId: 'new_calendar_event',
+            tencentMeetingId: 'new_tencent_meeting',
+          })
+        }
+        events={events}
+        operations={operations}
+      />,
+    )
+
+    expect(container.textContent).toContain('new-room')
+    expect(container.textContent).toContain('new_calendar_event')
+    expect(container.textContent).toContain('new_tencent_meeting')
+    expect(container.textContent).not.toContain('stale-room')
+
+    act(() => vi.advanceTimersByTime(20_000))
+    expect(router.refresh).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not poll for fixture bookings', () => {
+    vi.useFakeTimers()
+    render(
+      <BookingDetail
+        booking={makeBooking({ status: 'finalizing' })}
+        events={events}
+        operations={operations}
+        fixtureMode
+      />,
+    )
+
+    act(() => vi.advanceTimersByTime(30_000))
+
+    expect(router.refresh).not.toHaveBeenCalled()
+  })
+
+  it('stops polling after the finalizing refresh window', () => {
+    vi.useFakeTimers()
+    renderDetail(makeBooking({ status: 'finalizing' }))
+
+    act(() => vi.advanceTimersByTime(10 * 60_000))
+
+    expect(router.refresh).toHaveBeenCalledTimes(30)
+  })
+
+  it('pauses finalizing refreshes during an admin mutation', () => {
+    vi.useFakeTimers()
+    fetchMock.mockReturnValue(new Promise<Response>(() => {}))
+    const { container } = renderDetail(makeBooking({ status: 'finalizing' }))
+
+    fireEvent.click(buttonWithText(container, 'Cancel Booking'))
+    fireEvent.click(buttonWithText(container, 'Confirm cancellation'))
+    act(() => vi.advanceTimersByTime(30_000))
+
+    expect(router.refresh).not.toHaveBeenCalled()
   })
 
   it('notes a purged Booking Brief instead of its content', () => {
