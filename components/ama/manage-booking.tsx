@@ -355,10 +355,17 @@ export function ManageBooking({ token }: { token: string }) {
               )}
               {isFinalizing && (
                 <span className="block leading-5 text-muted-foreground">
-                  <T
-                    zh="会议链接正在创建，准备好后会通过邮件送达。"
-                    en="The meeting link is being created and will arrive by email once ready."
-                  />
+                  {booking.meetingUrl ? (
+                    <T
+                      zh="会议资料正在更新。请勿使用之前的链接；新链接准备好后会通过邮件送达。"
+                      en="Meeting details are being updated. Do not use a previous link. The new link will arrive by email once ready."
+                    />
+                  ) : (
+                    <T
+                      zh="会议链接正在创建，准备好后会通过邮件送达。"
+                      en="The meeting link is being created and will arrive by email once ready."
+                    />
+                  )}
                 </span>
               )}
               {booking.refundStatus && booking.refundStatus !== 'none' && (
@@ -379,7 +386,7 @@ export function ManageBooking({ token }: { token: string }) {
             </dd>
           </div>
 
-          {booking.meetingUrl && !isCancelled && (
+          {booking.meetingUrl && !isCancelled && !isFinalizing && (
             <div>
               <dt>
                 <T zh="会议链接" en="Link" />

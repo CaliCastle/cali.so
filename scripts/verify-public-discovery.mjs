@@ -32,6 +32,32 @@ function localizedPages(pathname, zh, en, imageAlt) {
   ]
 }
 
+function localizedCaliBabyPages(pathname, zh, en, indexable) {
+  const enPath = `/en${pathname}`
+  return [
+    {
+      path: pathname,
+      locale: 'zh-CN',
+      title: zh.title,
+      documentTitle: zh.title,
+      description: zh.description,
+      imageAlt: 'Cali 宝宝应用图标与名称',
+      smartAppBanner: true,
+      indexable,
+    },
+    {
+      path: enPath,
+      locale: 'en',
+      title: en.title,
+      documentTitle: en.title,
+      description: en.description,
+      imageAlt: 'Cali Baby app icon and wordmark',
+      smartAppBanner: true,
+      indexable,
+    },
+  ]
+}
+
 const publicPages = [
   ...localizedPages(
     '/',
@@ -110,6 +136,59 @@ const publicPages = [
       en: 'AMA · Cali Castle. A one-to-one conversation about AI-native work, product strategy, engineering, startups, career moves, and building products.',
     },
   ),
+  ...localizedCaliBabyPages(
+    '/calibaby',
+    {
+      title: 'Cali 宝宝｜宝宝的事很多，不必都靠脑子记',
+      description:
+        '胎动、喂奶、睡眠、尿布，发生了就顺手记一下。家里人都能看到刚刚发生了什么，换谁来照顾，都不用再从头问一遍。',
+    },
+    {
+      title: 'Cali Baby | You don’t have to remember every feed.',
+      description:
+        'Log kicks, feeds, sleep, and diapers as they happen. Everyone caring for the baby can see what happened and when, so whoever takes over doesn’t have to start with a round of questions.',
+    },
+    true,
+  ),
+  ...localizedCaliBabyPages(
+    '/calibaby/help',
+    {
+      title: 'Cali 宝宝｜帮助与支持',
+      description: '查找家庭同步、备份、语音记录和账号删除帮助，了解 Cali 宝宝，或联系我们。',
+    },
+    {
+      title: 'Cali Baby | Help and Support',
+      description:
+        'Get help with Family Sync, backups, voice records, and deletion, learn about Cali Baby, or contact support.',
+    },
+    false,
+  ),
+  ...localizedCaliBabyPages(
+    '/calibaby/privacy',
+    {
+      title: 'Cali 宝宝隐私政策',
+      description: '了解 Cali 宝宝如何处理设备记录、家庭同步、语音、分析、诊断和删除请求。',
+    },
+    {
+      title: 'Cali Baby Privacy Policy',
+      description:
+        'Learn how Cali Baby handles device records, Family Sync, voice processing, analytics, diagnostics, and deletion requests.',
+    },
+    false,
+  ),
+  ...localizedCaliBabyPages(
+    '/calibaby/terms',
+    {
+      title: 'Cali 宝宝使用条款',
+      description: '阅读 Cali 宝宝关于账号、家庭共享、Cali Baby Pro、医疗边界和服务区域的使用条款。',
+    },
+    {
+      title: 'Cali Baby Terms of Use',
+      description:
+        "Read Cali Baby's terms for accounts, Family sharing, Cali Baby Pro, health boundaries, and service regions.",
+    },
+    false,
+  ),
 ]
 
 const blogDirectory = new URL('../content/blog/', import.meta.url)
@@ -156,6 +235,19 @@ function requiredElement(document, selector, description) {
   return element
 }
 
+function markdownLinkTargets(markdown) {
+  const targets = new Set()
+  for (const line of markdown.split('\n')) {
+    if (!line.startsWith('- [')) continue
+    const targetStart = line.indexOf('](')
+    const targetEnd = line.indexOf('): ', targetStart + 2)
+    if (targetStart >= 0 && targetEnd > targetStart) {
+      targets.add(line.slice(targetStart + 2, targetEnd))
+    }
+  }
+  return targets
+}
+
 async function verifyMetadata(baseUrl, page) {
   const response = await fetch(new URL(page.path, baseUrl))
   assert.equal(response.status, 200, `${page.path} status`)
@@ -163,11 +255,14 @@ async function verifyMetadata(baseUrl, page) {
   const { document } = dom.window
 
   assert.equal(document.documentElement.lang, page.locale, `${page.path} lang`)
-  assert.doesNotMatch(
-    document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? '',
-    /noindex|nofollow/,
-    `${page.path} indexing`,
-  )
+  const robots =
+    document.querySelector('meta[name="robots"]')?.getAttribute('content') ?? ''
+  if (page.indexable === false) {
+    assert.match(robots, /noindex/, `${page.path} indexing`)
+    assert.doesNotMatch(robots, /nofollow/, `${page.path} links`)
+  } else {
+    assert.doesNotMatch(robots, /noindex|nofollow/, `${page.path} indexing`)
+  }
   assert.equal(document.title, page.documentTitle, `${page.path} title`)
   assert.equal(
     requiredElement(
@@ -249,6 +344,16 @@ async function verifyMetadata(baseUrl, page) {
     ).getAttribute('content'),
     '630',
   )
+  if (page.smartAppBanner) {
+    assert.equal(
+      requiredElement(
+        document,
+        'meta[name="apple-itunes-app"]',
+        `${page.path} App Store smart banner`,
+      ).getAttribute('content'),
+      'app-id=6769728441',
+    )
+  }
   const ogImage = requiredElement(
     document,
     'meta[property="og:image"]',
@@ -278,10 +383,19 @@ async function verifyDiscoveryFiles(baseUrl) {
     /(?:application|text)\/xml/,
   )
   const sitemapXml = await sitemap.text()
-  for (const path of new Set(publicPages.map((page) => page.path))) {
+  const sitemapPaths = publicPages
+    .filter((page) => page.indexable !== false)
+    .map((page) => page.path)
+  for (const path of new Set(sitemapPaths)) {
     assert.ok(
       sitemapXml.includes(new URL(path, productionOrigin).href),
       `sitemap ${path}`,
+    )
+  }
+  for (const page of publicPages.filter((candidate) => candidate.indexable === false)) {
+    assert.ok(
+      !sitemapXml.includes(new URL(page.path, productionOrigin).href),
+      `sitemap excludes ${page.path}`,
     )
   }
 
@@ -302,6 +416,58 @@ async function verifyDiscoveryFiles(baseUrl) {
   assert.match(icon.headers.get('content-type') ?? '', /^image\/png/)
   const iconBytes = new Uint8Array(await icon.arrayBuffer())
   assert.deepEqual([...iconBytes.slice(1, 4)], [0x50, 0x4e, 0x47])
+
+  const llms = await fetch(new URL('/llms.txt', baseUrl))
+  assert.equal(llms.status, 200)
+  assert.match(llms.headers.get('content-type') ?? '', /^text\/markdown/)
+  const llmsText = await llms.text()
+  assert.match(llmsText, /^# Cali Castle and Cali Baby\n\n>/)
+  const llmsTargets = markdownLinkTargets(llmsText)
+  assert.ok(
+    llmsTargets.has('https://apps.apple.com/app/id6769728441'),
+    'llms.txt App Store listing',
+  )
+  for (const path of new Set(publicPages.map((page) => page.path))) {
+    assert.ok(
+      llmsTargets.has(new URL(path, productionOrigin).href),
+      `llms.txt ${path}`,
+    )
+  }
+}
+
+async function verifyCaliBabyProductData(baseUrl) {
+  for (const [path, name, heading] of [
+    ['/calibaby', 'Cali 宝宝', '从孕期到宝宝出生后的每一天'],
+    ['/en/calibaby', 'Cali Baby: Baby Tracker', 'From pregnancy through everyday care'],
+  ]) {
+    const response = await fetch(new URL(path, baseUrl))
+    assert.equal(response.status, 200, `${path} status`)
+    assert.match(
+      response.headers.get('link') ?? '',
+      /<\/llms\.txt>; rel="describedby"/,
+      `${path} llms.txt discovery header`,
+    )
+    const document = new JSDOM(await response.text()).window.document
+    assert.match(document.body.textContent ?? '', new RegExp(heading))
+    assert.match(document.body.textContent ?? '', /iOS 18/)
+
+    const data = JSON.parse(
+      requiredElement(
+        document,
+        'script[type="application/ld+json"]',
+        `${path} structured data`,
+      ).textContent ?? '{}',
+    )
+    assert.equal(data['@context'], 'https://schema.org')
+    assert.equal(data['@type'], 'MobileApplication')
+    assert.equal(data.name, name)
+    assert.equal(data.url, new URL(path, productionOrigin).href)
+    assert.equal(data.downloadUrl, 'https://apps.apple.com/app/id6769728441')
+    assert.equal(data.applicationCategory, 'HealthApplication')
+    assert.equal(data.offers?.price, 0)
+    assert.equal(data.publisher?.name, 'Zolplay')
+    assert.equal(data.featureList?.length, 4)
+  }
 }
 
 async function verifyNotFound(baseUrl) {
@@ -384,6 +550,7 @@ try {
   for (const page of publicPages) {
     await verifyMetadata(server.baseUrl, page)
   }
+  await verifyCaliBabyProductData(server.baseUrl)
   await verifyNoIndexUtilities(server.baseUrl)
   await verifyNotFound(server.baseUrl)
   console.log(

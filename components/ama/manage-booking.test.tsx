@@ -87,7 +87,12 @@ async function renderManage({
       return (
         reschedule?.() ??
         jsonResponse(200, {
-          booking: booking({ startsAt: SLOTS[0]!.startsAt, endsAt: SLOTS[0]!.endsAt }),
+          booking: booking({
+            status: 'finalizing',
+            startsAt: SLOTS[0]!.startsAt,
+            endsAt: SLOTS[0]!.endsAt,
+            meetingUrl: view.meetingUrl,
+          }),
         })
       )
     }
@@ -150,11 +155,15 @@ describe('ManageBooking', () => {
 
   it('notes a Finalizing Booking instead of pretending it is complete', async () => {
     await renderManage({
-      view: booking({ status: 'finalizing', meetingUrl: null }),
+      view: booking({
+        status: 'finalizing',
+        meetingUrl: 'https://meet.google.com/stale-room',
+      }),
     })
 
     expect(screen.getByText(/meeting details being finalized/)).toBeTruthy()
-    expect(screen.queryByRole('link', { name: /Open meeting link/ })).toBeNull()
+    expect(screen.queryByRole('link', { name: /stale-room/ })).toBeNull()
+    expect(screen.queryByText(/stale-room/)).toBeNull()
   })
 
   it('cancels only after an explicit two-step confirmation', async () => {
@@ -205,6 +214,8 @@ describe('ManageBooking', () => {
     const [, init] = requestsTo(`/api/ama/manage/${TOKEN}/reschedule`)[0]!
     expect(JSON.parse(String(init?.body))).toEqual({ startsAt: SLOTS[0]!.startsAt })
     expect(screen.getByText(/Rescheduled\./)).toBeTruthy()
+    expect(screen.getByText(/meeting details being finalized/)).toBeTruthy()
+    expect(screen.queryByRole('link', { name: /abc-defg-hij/ })).toBeNull()
   })
 
   it('explains the 24 hour rule when the reschedule window has closed', async () => {

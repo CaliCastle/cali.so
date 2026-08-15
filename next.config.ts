@@ -82,7 +82,13 @@ const nextConfig: NextConfig = {
   headers: async () => [
     {
       source: '/:path*',
-      headers: [...securityHeaders],
+      headers: [
+        ...securityHeaders,
+        {
+          key: 'Link',
+          value: '</llms.txt>; rel="describedby"',
+        },
+      ],
     },
     {
       // The global policy is intentionally useful for public navigation, but

@@ -11,5 +11,5 @@ export const metadata = localeMetadata({
 })
 
 export default function EnglishProjectsPage() {
-  return <ProjectsPageView />
+  return <ProjectsPageView locale="en" />
 }

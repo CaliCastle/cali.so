@@ -53,8 +53,11 @@ function fixture(input: {
 }) {
   const completes: { operationId: string; leaseToken: string; now: Date }[] = []
   const fails: FailInput[] = []
+  let claimed = false
   const operations = {
     async claimDue() {
+      if (claimed) return []
+      claimed = true
       return input.batch
     },
     async complete(operationId: string, leaseToken: string, now: Date) {
@@ -223,6 +226,127 @@ describe('operations runner', () => {
     expect(f.completes).toEqual([
       { operationId: 'op_good', leaseToken: 'lease-good', now: NOW },
     ])
+  })
+
+  it('claims due work enqueued by a handler in the same run', async () => {
+    const queue = [makeOperation({ id: 'op_parent', leaseToken: 'lease-parent' })]
+    const handled: string[] = []
+    const claims: Array<{ limit: number; kinds?: string[] }> = []
+    const operations = {
+      async claimDue(input: { limit: number; kinds?: string[] }) {
+        claims.push(input)
+        return queue.splice(0, input.limit)
+      },
+      async complete(operationId: string) {
+        return makeOperation({ id: operationId, status: 'succeeded' })
+      },
+      async fail() {
+        throw new Error('unexpected fail call')
+      },
+    } as unknown as DurableOperationsRepository
+    const runner = createOperationsRunner({
+      operations,
+      handler: async (operation) => {
+        handled.push(operation.id)
+        if (operation.id === 'op_parent') {
+          queue.push(makeOperation({ id: 'op_child', leaseToken: 'lease-child' }))
+        }
+      },
+      clock: { now: () => NOW },
+    })
+
+    const result = await runner.run()
+
+    expect(handled).toEqual(['op_parent', 'op_child'])
+    expect(claims.map(({ limit, kinds }) => ({ limit, kinds }))).toEqual([
+      { limit: 10, kinds: undefined },
+      { limit: 1, kinds: ['send_booking_email'] },
+      { limit: 1, kinds: ['send_booking_email'] },
+    ])
+    expect(result).toEqual({
+      claimed: 2,
+      succeeded: 2,
+      retried: 0,
+      failed: 0,
+      deferred: 0,
+    })
+  })
+
+  it('keeps the total claimed work within the batch size across rounds', async () => {
+    const queue = [makeOperation({ id: 'op_1', leaseToken: 'lease-1' })]
+    const handled: string[] = []
+    const claimLimits: number[] = []
+    const operations = {
+      async claimDue(input: { limit: number }) {
+        claimLimits.push(input.limit)
+        return queue.splice(0, input.limit)
+      },
+      async complete(operationId: string) {
+        return makeOperation({ id: operationId, status: 'succeeded' })
+      },
+      async fail() {
+        throw new Error('unexpected fail call')
+      },
+    } as unknown as DurableOperationsRepository
+    const runner = createOperationsRunner({
+      operations,
+      handler: async (operation) => {
+        handled.push(operation.id)
+        const next = Number(operation.id.slice('op_'.length)) + 1
+        queue.push(
+          makeOperation({ id: `op_${next}`, leaseToken: `lease-${next}` }),
+        )
+      },
+      clock: { now: () => NOW },
+      batchSize: 3,
+    })
+
+    const result = await runner.run()
+
+    expect(handled).toEqual(['op_1', 'op_2', 'op_3'])
+    expect(claimLimits).toEqual([3, 1, 1])
+    expect(queue.map((operation) => operation.id)).toEqual(['op_4'])
+    expect(result.claimed).toBe(3)
+    expect(result.succeeded).toBe(3)
+  })
+
+  it('does not start a follow-up claim without provider timeout headroom', async () => {
+    const queue = [makeOperation({ id: 'op_parent', leaseToken: 'lease-parent' })]
+    const claimLimits: number[] = []
+    let nowMs = NOW.getTime()
+    const operations = {
+      async claimDue(input: { limit: number }) {
+        claimLimits.push(input.limit)
+        return queue.splice(0, input.limit)
+      },
+      async complete(operationId: string) {
+        return makeOperation({ id: operationId, status: 'succeeded' })
+      },
+      async fail() {
+        throw new Error('unexpected fail call')
+      },
+    } as unknown as DurableOperationsRepository
+    const runner = createOperationsRunner({
+      operations,
+      handler: async () => {
+        queue.push(makeOperation({ id: 'op_child', leaseToken: 'lease-child' }))
+        nowMs += 36_000
+      },
+      clock: { now: () => new Date(nowMs) },
+      timeBudgetMs: 45_000,
+    })
+
+    const result = await runner.run()
+
+    expect(claimLimits).toEqual([10])
+    expect(queue.map((operation) => operation.id)).toEqual(['op_child'])
+    expect(result).toEqual({
+      claimed: 1,
+      succeeded: 1,
+      retried: 0,
+      failed: 0,
+      deferred: 0,
+    })
   })
 
   it('skips claimed rows without a lease token', async () => {

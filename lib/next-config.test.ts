@@ -60,4 +60,13 @@ describe('route security headers', () => {
       "form-action 'self' https://accounts.google.com",
     )
   })
+
+  it('advertises the root llms.txt from every response', async () => {
+    const rules = await nextConfig.headers!()
+    const llmsLink = rules
+      .find(({ source }) => source === '/:path*')
+      ?.headers.find(({ key }) => key === 'Link')?.value
+
+    expect(llmsLink).toBe('</llms.txt>; rel="describedby"')
+  })
 })

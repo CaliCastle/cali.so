@@ -127,6 +127,25 @@ describe('Durable Operations repository', () => {
     expect(claimed[0]?.leaseToken).toBeTruthy()
   })
 
+  it('claims only the requested operation kinds', async () => {
+    const email = await repository.enqueue(enqueueInput('email:filtered'))
+    const artifacts = await repository.enqueue(
+      enqueueInput('artifacts:filtered', { kind: 'update_booking_artifacts' }),
+    )
+
+    const claimed = await repository.claimDue({
+      now,
+      leaseSeconds: 60,
+      limit: 10,
+      kinds: ['send_booking_email'],
+    })
+
+    expect(claimed.map((operation) => operation.id)).toEqual([email.operation.id])
+    await expect(repository.get(artifacts.operation.id)).resolves.toMatchObject({
+      status: 'pending',
+    })
+  })
+
   it('does not claim operations scheduled for the future', async () => {
     await repository.enqueue(
       enqueueInput('email:future', { nextAttemptAt: new Date(now.getTime() + HOUR) }),

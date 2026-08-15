@@ -50,6 +50,7 @@ describe('localized discovery routes', () => {
       '/photos',
       '/projects',
       '/ama',
+      '/calibaby',
       ...archivedNewsletterIds.map((id) => `/newsletters/${id}`),
       ...getAllPosts().map((post) => `/blog/${post.slug}`),
     ]
@@ -72,6 +73,19 @@ describe('localized discovery routes', () => {
           }),
         )
       }
+    }
+
+    for (const path of [
+      '/calibaby/help',
+      '/calibaby/privacy',
+      '/calibaby/terms',
+    ]) {
+      expect(entries).not.toContainEqual(
+        expect.objectContaining({ url: new URL(path, seo.url).href }),
+      )
+      expect(entries).not.toContainEqual(
+        expect.objectContaining({ url: new URL(`/en${path}`, seo.url).href }),
+      )
     }
   })
 })

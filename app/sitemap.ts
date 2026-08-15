@@ -25,6 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...pairedEntry('/photos', latest),
     ...pairedEntry('/projects', latest),
     ...pairedEntry('/ama'),
+    ...pairedEntry('/calibaby'),
     ...archivedNewsletterIds.flatMap((id) => pairedEntry(`/newsletters/${id}`)),
     ...posts.flatMap((post) => pairedEntry(`/blog/${post.slug}`, post.publishedAt)),
   ]
