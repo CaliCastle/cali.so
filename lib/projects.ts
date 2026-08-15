@@ -15,7 +15,7 @@ export const projects: Project[] = [
     nameEn: 'Cali Baby',
     description: '宝宝的事很多，不必都靠脑子记。',
     descriptionEn: 'You don’t have to remember every feed.',
-    url: 'https://cali.so/calibaby',
+    url: '/calibaby',
     icon: '/images/calibaby-app-icon.png',
     domain: 'cali.so',
   },

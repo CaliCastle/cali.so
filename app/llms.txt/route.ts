@@ -145,7 +145,7 @@ export function buildLlmsText() {
     ...projects.map((project) =>
       markdownLink(
         project.nameEn,
-        project.url,
+        absoluteUrl(project.url),
         project.descriptionEn ?? project.description,
       ),
     ),

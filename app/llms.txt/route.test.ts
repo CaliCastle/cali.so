@@ -43,6 +43,8 @@ describe('llms.txt', () => {
       expect(text).toContain(new URL(`/en/newsletters/${id}`, seo.url).href)
     }
 
-    for (const project of projects) expect(text).toContain(project.url)
+    for (const project of projects) {
+      expect(text).toContain(new URL(project.url, seo.url).href)
+    }
   })
 })
