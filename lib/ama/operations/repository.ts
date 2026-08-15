@@ -98,21 +98,28 @@ export function createDurableOperationsRepository(database: () => OperationsData
       now: Date
       leaseSeconds: number
       limit: number
+      kinds?: DurableOperationKind[]
     }): Promise<DurableOperationRecord[]> {
+      if (input.kinds?.length === 0) return []
       const leaseToken = randomUUID()
       const leaseExpiresAt = new Date(input.now.getTime() + input.leaseSeconds * 1000)
       const due = database()
         .select({ id: amaDurableOperations.id })
         .from(amaDurableOperations)
         .where(
-          or(
-            and(
-              eq(amaDurableOperations.status, 'pending'),
-              lte(amaDurableOperations.nextAttemptAt, input.now),
-            ),
-            and(
-              eq(amaDurableOperations.status, 'running'),
-              lte(amaDurableOperations.leaseExpiresAt, input.now),
+          and(
+            input.kinds
+              ? inArray(amaDurableOperations.kind, input.kinds)
+              : undefined,
+            or(
+              and(
+                eq(amaDurableOperations.status, 'pending'),
+                lte(amaDurableOperations.nextAttemptAt, input.now),
+              ),
+              and(
+                eq(amaDurableOperations.status, 'running'),
+                lte(amaDurableOperations.leaseExpiresAt, input.now),
+              ),
             ),
           ),
         )

@@ -106,6 +106,29 @@ describe('BookingConfirmation', () => {
     expect(document.querySelector('[data-ama-success-stage]')).not.toBeNull()
   })
 
+  it('hides a stale meeting link while a paid Booking is finalizing', async () => {
+    respondWithHoldStates([
+      jsonResponse(200, {
+        hold: {
+          state: 'paid',
+          bookingStatus: 'finalizing',
+          startsAt: '2026-08-10T12:00:00.000Z',
+          endsAt: '2026-08-10T13:00:00.000Z',
+          meetingProvider: 'tencent-meeting',
+          guestTimeZone: 'Asia/Shanghai',
+          meetingUrl: 'https://meeting.tencent.com/stale-room',
+        },
+      }),
+    ])
+
+    render(<BookingConfirmation />)
+    await flush()
+
+    expect(screen.getByText(/being finalized/)).toBeTruthy()
+    expect(screen.queryByRole('link', { name: /stale-room/ })).toBeNull()
+    expect(screen.queryByText(/stale-room/)).toBeNull()
+  })
+
   it('tells the truth when payment landed but the time was taken', async () => {
     respondWithHoldStates([
       jsonResponse(200, { hold: { state: 'paid', bookingStatus: 'needs_reschedule' } }),

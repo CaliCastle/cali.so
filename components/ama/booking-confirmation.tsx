@@ -100,7 +100,13 @@ function sessionTime(iso: string, timeZone: string, locale: 'zh' | 'en') {
 
 // The booked session as its spec sheet — the nameplate register, printed in
 // the stage's paper ink. Rendered only from server-sent facts.
-function SessionPlate({ session }: { session: PaidSession }) {
+function SessionPlate({
+  session,
+  showMeetingUrl,
+}: {
+  session: PaidSession
+  showMeetingUrl: boolean
+}) {
   const minutes = Math.round(
     (Date.parse(session.endsAt) - Date.parse(session.startsAt)) / 60_000,
   )
@@ -143,7 +149,7 @@ function SessionPlate({ session }: { session: PaidSession }) {
           <T zh={provider.zh} en={provider.en} />
         </dd>
       </div>
-      {session.meetingUrl && (
+      {showMeetingUrl && session.meetingUrl && (
         <div>
           <dt>
             <T zh="会议链接" en="Link" />
@@ -418,7 +424,10 @@ export function BookingConfirmation() {
                 </p>
               </div>
             )}
-            <SessionPlate session={state.session} />
+            <SessionPlate
+              session={state.session}
+              showMeetingUrl={state.bookingStatus === 'confirmed'}
+            />
           </div>
         )}
         {/* Ornamental proof-sheet foot: the barcode derives from the hold id,

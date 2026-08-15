@@ -72,6 +72,8 @@ export type BookingEventViewModel = {
 type SlotViewModel = { startsAt: string; endsAt: string }
 
 const MANAGE_CUTOFF_MS = 24 * 60 * 60 * 1000
+const FINALIZING_REFRESH_MS = 10_000
+const FINALIZING_REFRESH_WINDOW_MS = 5 * 60 * 1000
 
 // Decorative reinforcement of the lifecycle the badge already announces —
 // rendered only for the linear states (diverged states have no honest rung).
@@ -249,6 +251,28 @@ export function BookingDetail({
   const [refundChecked, setRefundChecked] = useState(
     () => Date.parse(booking.startsAt) - Date.now() > MANAGE_CUTOFF_MS,
   )
+
+  useEffect(() => {
+    setStatus(booking.status)
+    setRefundStatus(booking.refundStatus)
+    setStartsAt(booking.startsAt)
+    setEndsAt(booking.endsAt)
+  }, [booking.status, booking.refundStatus, booking.startsAt, booking.endsAt])
+
+  useEffect(() => {
+    if (fixtureMode || status !== 'finalizing' || pending !== null) return
+    const interval = window.setInterval(() => {
+      if (document.visibilityState !== 'hidden') router.refresh()
+    }, FINALIZING_REFRESH_MS)
+    const timeout = window.setTimeout(
+      () => window.clearInterval(interval),
+      FINALIZING_REFRESH_WINDOW_MS,
+    )
+    return () => {
+      window.clearInterval(interval)
+      window.clearTimeout(timeout)
+    }
+  }, [fixtureMode, pending, router, status])
 
   useEffect(() => {
     if (notice) noticeRef.current?.focus()
@@ -452,6 +476,11 @@ export function BookingDetail({
       ? { zh: '中文', en: 'Chinese' }
       : { zh: '英文', en: 'English' }
   const provider = providerLabels[booking.meetingProvider]
+  const hasStoredMeetingArtifacts = Boolean(
+    booking.meetingUrl ||
+      booking.googleCalendarEventId ||
+      booking.tencentMeetingId,
+  )
 
   return (
     <div className="pb-10">
@@ -905,7 +934,26 @@ export function BookingDetail({
         <h2 id="meeting-heading" className="text-sm font-medium">
           <T zh="会议" en="Meeting" />
         </h2>
-        {booking.meetingUrl || booking.googleCalendarEventId || booking.tencentMeetingId ? (
+        {status === 'finalizing' ? (
+          <p
+            className="mt-2 text-sm leading-6 text-muted-foreground"
+            role="status"
+          >
+            {hasStoredMeetingArtifacts ? (
+              <T
+                zh="会议资料正在更新。请勿使用之前的链接；预约确认后，这里会显示新链接。"
+                en="Meeting details are being updated. Do not use a previous link. The new link appears once this Booking is confirmed."
+              />
+            ) : (
+              <T
+                zh="会议资料正在创建。预约确认后，这里会显示会议链接。"
+                en="Meeting details are being created. The meeting link appears once this Booking is confirmed."
+              />
+            )}
+          </p>
+        ) : booking.meetingUrl ||
+          booking.googleCalendarEventId ||
+          booking.tencentMeetingId ? (
           <dl className="spec-nameplate mt-3 mb-6">
             {booking.meetingUrl && (
               <DefinitionRow term={<T zh="会议链接" en="Meeting link" />}>
