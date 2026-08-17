@@ -95,8 +95,8 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.4",
-    "@next/playwright": "16.3.0",
+    "@electric-sql/pglite": "^0.5.5",
+    "@next/playwright": "16.3.1",
     "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.2",
@@ -108,7 +108,7 @@
     "@types/rss": "^0.0.32",
     "drizzle-kit": "^0.31.10",
     "jsdom": "^30.0.1",
-    "shadcn": "^4.16.2",
+    "shadcn": "^4.18.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
     "vitest": "^4.1.10",
