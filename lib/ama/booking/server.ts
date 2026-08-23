@@ -33,9 +33,11 @@ import { createBookingService } from './service'
 
 const PROVIDER_REQUEST_TIMEOUT_MS = 8_000
 const OPERATIONS_BATCH_SIZE = 10
-// Leaves headroom under the mutating routes' maxDuration for the drain pass
-// already in flight when the budget runs out.
-const INLINE_DRAIN_BUDGET_MS = 30_000
+// Budget for starting drain passes. The mutating routes set maxDuration to
+// 300s; 240s here plus one worst-case 45s pass still finishes inside that
+// ceiling, and covers enough passes that a backlog cannot starve the
+// operation the triggering mutation enqueued.
+const INLINE_DRAIN_BUDGET_MS = 240_000
 
 let services: ReturnType<typeof createServices> | undefined
 

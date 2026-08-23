@@ -5,7 +5,7 @@ import {
 } from '~/lib/ama/booking/server'
 import { protectAmaLaunchBoundary } from '~/lib/ama/security/launch-boundary-server'
 
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function POST(request: Request) {
   const blocked = protectAmaLaunchBoundary(request, ['payments'])
