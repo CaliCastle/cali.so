@@ -1,6 +1,11 @@
 import { createManageRescheduleHandler } from '~/lib/ama/booking/http'
-import { getAmaBookingServices } from '~/lib/ama/booking/server'
+import {
+  getAmaBookingServices,
+  kickAmaOperations,
+} from '~/lib/ama/booking/server'
 import { protectAmaLaunchBoundary } from '~/lib/ama/security/launch-boundary-server'
+
+export const maxDuration = 300
 
 export async function POST(
   request: Request,
@@ -13,5 +18,10 @@ export async function POST(
   if (blocked) return blocked
   const { token } = await params
   const { manage, guard } = getAmaBookingServices()
-  return createManageRescheduleHandler({ manage, guard })(request, token)
+  const response = await createManageRescheduleHandler({ manage, guard })(
+    request,
+    token,
+  )
+  if (response.ok) kickAmaOperations()
+  return response
 }

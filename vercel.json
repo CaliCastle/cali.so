@@ -6,11 +6,11 @@
   "crons": [
     {
       "path": "/api/internal/media/reconcile",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 * * * *"
     },
     {
       "path": "/api/internal/ama/work",
-      "schedule": "*/5 * * * *"
+      "schedule": "*/30 * * * *"
     }
   ]
 }
