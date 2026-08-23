@@ -3,6 +3,9 @@ import {
   getAmaAdminServices,
   ownerRequestAuthenticator,
 } from '~/lib/ama/admin/server'
+import { kickAmaOperations } from '~/lib/ama/booking/server'
+
+export const maxDuration = 60
 
 export async function POST(
   request: Request,
@@ -10,10 +13,12 @@ export async function POST(
 ) {
   const { bookingId } = await params
   const { bookingAdmin, security, baseUrl } = getAmaAdminServices()
-  return createAdminBookingActionHandler({
+  const response = await createAdminBookingActionHandler({
     authenticator: ownerRequestAuthenticator,
     service: bookingAdmin,
     security,
     baseUrl,
   })(request, bookingId)
+  if (response.ok) kickAmaOperations()
+  return response
 }

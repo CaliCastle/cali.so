@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { waitUntil } from '@vercel/functions'
+
 import { createRateLimiter } from '~/lib/rate-limit/server'
 
 import { availabilityRepository } from '../availability/repository'
@@ -226,4 +228,20 @@ function createServices() {
 export function getAmaBookingServices() {
   services ??= createServices()
   return services
+}
+
+/**
+ * Starts a background drain of due durable operations inside the current
+ * invocation, so work enqueued by a mutation (booking emails, Finalizing
+ * Booking recovery, refunds) begins immediately instead of waiting for the
+ * next scheduled sweep. The scheduled endpoint remains the sole driver for
+ * reminders, retry backoff, and expired Slot Hold release.
+ */
+export function kickAmaOperations() {
+  const { runner } = getAmaBookingServices()
+  waitUntil(
+    runner.run().catch((error) => {
+      console.error('ama: inline operations drain failed', error)
+    }),
+  )
 }
