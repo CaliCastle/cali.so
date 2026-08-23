@@ -32,6 +32,10 @@ import { bookingRepository } from './repository'
 import { createBookingService } from './service'
 
 const PROVIDER_REQUEST_TIMEOUT_MS = 8_000
+const OPERATIONS_BATCH_SIZE = 10
+// Leaves headroom under the mutating routes' maxDuration for the drain pass
+// already in flight when the budget runs out.
+const INLINE_DRAIN_BUDGET_MS = 30_000
 
 let services: ReturnType<typeof createServices> | undefined
 
@@ -188,6 +192,7 @@ function createServices() {
     clock,
   })
   const runner = createOperationsRunner({
+    batchSize: OPERATIONS_BATCH_SIZE,
     operations: durableOperationsRepository,
     handler: createOperationHandlers({
       repository: bookingRepository,
@@ -240,7 +245,20 @@ export function getAmaBookingServices() {
 export function kickAmaOperations() {
   const { runner } = getAmaBookingServices()
   waitUntil(
-    runner.run().catch((error) => {
+    (async () => {
+      // A full batch means older due work may have crowded out the operation
+      // this mutation enqueued, so keep draining until a partial batch shows
+      // the due queue is empty or the inline budget is spent. Anything left
+      // over stays with the scheduled sweep.
+      const startedAtMs = Date.now()
+      let result = await runner.run()
+      while (
+        result.claimed >= OPERATIONS_BATCH_SIZE &&
+        Date.now() - startedAtMs < INLINE_DRAIN_BUDGET_MS
+      ) {
+        result = await runner.run()
+      }
+    })().catch((error) => {
       console.error('ama: inline operations drain failed', error)
     }),
   )

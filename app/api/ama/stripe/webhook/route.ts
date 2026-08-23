@@ -12,10 +12,13 @@ export async function POST(request: Request) {
   if (blocked) return blocked
   const { booking, stripeWebhookSecret } = getAmaBookingServices()
   if (!stripeWebhookSecret) return json(503, { error: 'feature_disabled' })
-  const response = await createStripeWebhookHandler({
+  return createStripeWebhookHandler({
     service: booking,
     signingSecret: stripeWebhookSecret,
+    // Only booking creation enqueues durable work; duplicate, ignored,
+    // orphaned, and hold-release deliveries return 200 without any.
+    onOutcome: (outcome) => {
+      if (outcome === 'booking_created') kickAmaOperations()
+    },
   })(request)
-  if (response.ok) kickAmaOperations()
-  return response
 }
