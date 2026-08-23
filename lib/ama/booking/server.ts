@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { waitUntil } from '@vercel/functions'
+
 import { createRateLimiter } from '~/lib/rate-limit/server'
 
 import { availabilityRepository } from '../availability/repository'
@@ -30,6 +32,12 @@ import { bookingRepository } from './repository'
 import { createBookingService } from './service'
 
 const PROVIDER_REQUEST_TIMEOUT_MS = 8_000
+const OPERATIONS_BATCH_SIZE = 10
+// Budget for starting drain passes. The mutating routes set maxDuration to
+// 300s; 240s here plus one worst-case 45s pass still finishes inside that
+// ceiling, and covers enough passes that a backlog cannot starve the
+// operation the triggering mutation enqueued.
+const INLINE_DRAIN_BUDGET_MS = 240_000
 
 let services: ReturnType<typeof createServices> | undefined
 
@@ -186,6 +194,7 @@ function createServices() {
     clock,
   })
   const runner = createOperationsRunner({
+    batchSize: OPERATIONS_BATCH_SIZE,
     operations: durableOperationsRepository,
     handler: createOperationHandlers({
       repository: bookingRepository,
@@ -226,4 +235,33 @@ function createServices() {
 export function getAmaBookingServices() {
   services ??= createServices()
   return services
+}
+
+/**
+ * Starts a background drain of due durable operations inside the current
+ * invocation, so work enqueued by a mutation (booking emails, Finalizing
+ * Booking recovery, refunds) begins immediately instead of waiting for the
+ * next scheduled sweep. The scheduled endpoint remains the sole driver for
+ * reminders, retry backoff, and expired Slot Hold release.
+ */
+export function kickAmaOperations() {
+  const { runner } = getAmaBookingServices()
+  waitUntil(
+    (async () => {
+      // A full batch means older due work may have crowded out the operation
+      // this mutation enqueued, so keep draining until a partial batch shows
+      // the due queue is empty or the inline budget is spent. Anything left
+      // over stays with the scheduled sweep.
+      const startedAtMs = Date.now()
+      let result = await runner.run()
+      while (
+        result.claimed >= OPERATIONS_BATCH_SIZE &&
+        Date.now() - startedAtMs < INLINE_DRAIN_BUDGET_MS
+      ) {
+        result = await runner.run()
+      }
+    })().catch((error) => {
+      console.error('ama: inline operations drain failed', error)
+    }),
+  )
 }

@@ -9,7 +9,7 @@ import {
 import type { SecurityRateLimiter } from '../security/service'
 import { verifyStripeWebhook } from '../stripe/webhook'
 import type { ManageService } from './manage'
-import type { BookingService } from './service'
+import type { BookingService, WebhookOutcome } from './service'
 
 const MAX_JSON_BODY_BYTES = 32 * 1024
 
@@ -253,12 +253,18 @@ type WebhookDependencies = {
   service: Pick<BookingService, 'processWebhookEvent'>
   signingSecret: string
   clock?: { now(): Date }
+  /**
+   * Observes the processed outcome so callers can react to the ones that
+   * enqueued durable work without re-parsing the response body.
+   */
+  onOutcome?: (outcome: WebhookOutcome) => void
 }
 
 export function createStripeWebhookHandler({
   service,
   signingSecret,
   clock = { now: () => new Date() },
+  onOutcome,
 }: WebhookDependencies) {
   return async function POST(request: Request) {
     let payload: string
@@ -276,6 +282,7 @@ export function createStripeWebhookHandler({
     if (!event) return json(400, { error: 'invalid_signature' })
     try {
       const outcome = await service.processWebhookEvent(event)
+      onOutcome?.(outcome)
       return json(200, { received: true, outcome })
     } catch {
       // Signal Stripe to redeliver; the persisted provider event makes the
