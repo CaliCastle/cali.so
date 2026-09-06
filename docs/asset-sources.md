@@ -31,6 +31,15 @@ reference, not as Apple marketing artwork. Apple retains its trademark rights;
 see the [App Store identity guidelines](https://developer.apple.com/app-store/marketing/guidelines/)
 and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-property/guidelinesfor3rdparties.html).
 
+## Cali Baby screenshots
+
+The nine screenshots per language under `public/images/calibaby/screenshots/`
+come from the owner-provided September 2026 App Store exports in
+`~/Desktop/calibaby-app-store/iphone-17-pro-max/{zh-Hans,en}`. The numbered
+filenames preserve the supplied order. Chinese assets live at the screenshot
+root and English assets under `en/`. PNG originals were converted to WebP
+with `cwebp -q 90 -m 6`, retaining their 1320 × 2868 dimensions.
+
 ## Product typefaces
 
 | Surface | Typeface | Source and license |
