@@ -62,7 +62,7 @@ export function createOperationsRunner(dependencies: OperationsRunnerDependencie
   } = dependencies
 
   return {
-    async run(): Promise<OperationsRunResult> {
+    async run({ signal }: { signal?: AbortSignal } = {}): Promise<OperationsRunResult> {
       const startedAtMs = clock.now().getTime()
       const result: OperationsRunResult = {
         claimed: 0,
@@ -76,6 +76,7 @@ export function createOperationsRunner(dependencies: OperationsRunnerDependencie
         const isFollowUp = result.claimed > 0
         const startHeadroomMs = isFollowUp ? FOLLOW_UP_START_HEADROOM_MS : 0
         if (
+          signal?.aborted ||
           clock.now().getTime() - startedAtMs >=
           timeBudgetMs - startHeadroomMs
         ) {
@@ -95,6 +96,7 @@ export function createOperationsRunner(dependencies: OperationsRunnerDependencie
         for (const operation of claimed) {
           if (!operation.leaseToken) continue
           if (
+            signal?.aborted ||
             clock.now().getTime() - startedAtMs >=
             timeBudgetMs - startHeadroomMs
           ) {
