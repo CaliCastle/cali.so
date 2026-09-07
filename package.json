@@ -95,23 +95,23 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "^0.5.4",
-    "@next/playwright": "16.3.0",
+    "@electric-sql/pglite": "^0.5.8",
+    "@next/playwright": "16.3.4",
     "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
-    "@testing-library/react": "^16.3.2",
+    "@testing-library/react": "^16.3.3",
     "@types/mdx": "^2.0.14",
-    "@types/node": "^26.2.0",
-    "@types/pg": "^8.21.0",
+    "@types/node": "^26.4.1",
+    "@types/pg": "^8.23.1",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
+    "@types/react-dom": "^19.2.7",
     "@types/rss": "^0.0.32",
     "drizzle-kit": "^0.31.10",
     "jsdom": "^30.0.1",
-    "shadcn": "^4.16.2",
+    "shadcn": "^4.20.1",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10",
+    "vitest": "^5.0.0",
     "yaml": "^2.9.0"
   }
 }
