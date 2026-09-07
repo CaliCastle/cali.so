@@ -67,10 +67,17 @@ unconfigured returns 503 before touching provider code.
 
 ## Scheduled work
 
-`vercel.json` runs `/api/internal/ama/work` every five minutes with
+`vercel.json` runs `/api/internal/ama/work` every thirty minutes with
 `CRON_SECRET` bearer auth. Each run releases expired Slot Holds and drains due
 durable operations under leases; an interrupted worker's lease expires and the
 next run reclaims the work, so no step depends on a healthy previous run.
+
+Successful booking mutations also start a background drain of due operations.
+Its shared 240-second deadline cancels in-flight provider requests and prevents
+new claims or handlers from starting after expiry; interrupted operations use
+the normal durable retry path. Reminders, retry backoff, and expired Slot Hold
+release still rely on the scheduled sweep, so due work may wait up to thirty
+minutes for its next scheduled run. Media reconciliation runs hourly.
 
 ## Local confirmation previews
 

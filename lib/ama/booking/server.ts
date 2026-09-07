@@ -19,6 +19,10 @@ import type { BookingCalendar } from '../meeting/calendar'
 import { createTencentMeetingAdapter } from '../meeting/tencent'
 import type { MeetingProviderAdapter } from '../meeting/types'
 import { createOperationHandlers } from '../operations/handlers'
+import {
+  fetchWithOperationsTimeout,
+  withOperationsDeadline,
+} from '../operations/deadline'
 import { durableOperationsRepository } from '../operations/repository'
 import { createOperationsRunner } from '../operations/runner'
 import { createSecretBox } from '../secrets'
@@ -31,21 +35,13 @@ import { createBookingAdminService } from './admin'
 import { bookingRepository } from './repository'
 import { createBookingService } from './service'
 
-const PROVIDER_REQUEST_TIMEOUT_MS = 8_000
 const OPERATIONS_BATCH_SIZE = 10
-// Budget for starting drain passes. The mutating routes set maxDuration to
-// 300s; 240s here plus one worst-case 45s pass still finishes inside that
-// ceiling, and covers enough passes that a backlog cannot starve the
-// operation the triggering mutation enqueued.
+// Cancel provider IO at 240s, leaving time within the 300s routes for the
+// triggering mutation and lease bookkeeping. The runner's per-pass budget
+// is advisory and cannot bound a handler with sequential provider calls.
 const INLINE_DRAIN_BUDGET_MS = 240_000
 
 let services: ReturnType<typeof createServices> | undefined
-
-function fetchWithTimeout(input: string | URL | Request, init: RequestInit = {}) {
-  const timeout = AbortSignal.timeout(PROVIDER_REQUEST_TIMEOUT_MS)
-  const signal = init.signal ? AbortSignal.any([init.signal, timeout]) : timeout
-  return fetch(input, { ...init, signal })
-}
 
 function disabledGoogleService(): GoogleCalendarService {
   return {
@@ -112,7 +108,7 @@ function createServices() {
     ? createGoogleCalendarClient({
         clientId: environment.GOOGLE_CLIENT_ID!,
         clientSecret: environment.GOOGLE_CLIENT_SECRET!,
-        fetch: fetchWithTimeout,
+        fetch: fetchWithOperationsTimeout,
         clock,
       })
     : null
@@ -144,7 +140,7 @@ function createServices() {
     environment.features.payments && environment.STRIPE_SECRET_KEY
       ? createStripeClient({
           secretKey: environment.STRIPE_SECRET_KEY,
-          fetch: fetchWithTimeout,
+          fetch: fetchWithOperationsTimeout,
         })
       : disabledStripeClient()
 
@@ -155,7 +151,7 @@ function createServices() {
       ? createResendEmailSender({
           apiKey: environment.RESEND_API_KEY,
           from: environment.AMA_EMAIL_FROM,
-          fetch: fetchWithTimeout,
+          fetch: fetchWithOperationsTimeout,
         })
       : disabledEmailSender()
 
@@ -166,7 +162,7 @@ function createServices() {
       ? createTencentMeetingAdapter({
           url: environment.TENCENT_MEETING_MCP_URL,
           token: environment.TENCENT_MEETING_MCP_TOKEN,
-          fetch: fetchWithTimeout,
+          fetch: fetchWithOperationsTimeout,
         })
       : null
 
@@ -247,20 +243,19 @@ export function getAmaBookingServices() {
 export function kickAmaOperations() {
   const { runner } = getAmaBookingServices()
   waitUntil(
-    (async () => {
+    withOperationsDeadline(INLINE_DRAIN_BUDGET_MS, async (signal) => {
       // A full batch means older due work may have crowded out the operation
       // this mutation enqueued, so keep draining until a partial batch shows
       // the due queue is empty or the inline budget is spent. Anything left
       // over stays with the scheduled sweep.
-      const startedAtMs = Date.now()
-      let result = await runner.run()
+      let result = await runner.run({ signal })
       while (
         result.claimed >= OPERATIONS_BATCH_SIZE &&
-        Date.now() - startedAtMs < INLINE_DRAIN_BUDGET_MS
+        !signal.aborted
       ) {
-        result = await runner.run()
+        result = await runner.run({ signal })
       }
-    })().catch((error) => {
+    }).catch((error) => {
       console.error('ama: inline operations drain failed', error)
     }),
   )
