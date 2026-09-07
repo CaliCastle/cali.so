@@ -18,72 +18,92 @@ const CAROUSEL_ID = 'calibaby-screenshots'
 const SCREENSHOTS = [
   {
     src: {
-      zh: '/images/calibaby/screenshots/daily-care.webp',
-      en: '/images/calibaby/screenshots/en/daily-care.webp',
+      zh: '/images/calibaby/screenshots/01-today.webp',
+      en: '/images/calibaby/screenshots/en/01-today.webp',
     },
     alt: {
-      zh: 'Cali Baby 应用界面，展示最近的喂奶、睡眠与尿布记录',
-      en: 'Cali Baby showing recent feeds, sleep, and diaper changes',
+      zh: 'Cali 宝宝今日概览与日常照顾记录',
+      en: 'Cali Baby Today overview and daily care records',
     },
   },
   {
     src: {
-      zh: '/images/calibaby/screenshots/care-timeline.webp',
-      en: '/images/calibaby/screenshots/en/care-timeline.webp',
+      zh: '/images/calibaby/screenshots/02-sounds.webp',
+      en: '/images/calibaby/screenshots/en/02-sounds.webp',
     },
     alt: {
-      zh: 'Cali 宝宝连续照顾时间线',
-      en: 'Cali Baby continuous care timeline',
+      zh: 'Cali 宝宝助眠声音',
+      en: 'Cali Baby sleep sounds',
     },
   },
   {
     src: {
-      zh: '/images/calibaby/screenshots/pregnancy.webp',
-      en: '/images/calibaby/screenshots/en/pregnancy.webp',
+      zh: '/images/calibaby/screenshots/03-sleep-live.webp',
+      en: '/images/calibaby/screenshots/en/03-sleep-live.webp',
     },
     alt: {
-      zh: 'Cali 宝宝孕期首页',
-      en: 'Cali Baby pregnancy home screen',
+      zh: 'Cali 宝宝实时睡眠记录',
+      en: 'Cali Baby live sleep tracking',
     },
   },
   {
     src: {
-      zh: '/images/calibaby/screenshots/live-activity.webp',
-      en: '/images/calibaby/screenshots/en/live-activity.webp',
+      zh: '/images/calibaby/screenshots/04-feeding-live.webp',
+      en: '/images/calibaby/screenshots/en/04-feeding-live.webp',
     },
     alt: {
-      zh: 'Cali 宝宝锁定画面实时记录',
-      en: 'Cali Baby Lock Screen live recording',
+      zh: 'Cali 宝宝实时喂养记录',
+      en: 'Cali Baby live feeding tracking',
     },
   },
   {
     src: {
-      zh: '/images/calibaby/screenshots/voice-record.webp',
-      en: '/images/calibaby/screenshots/en/voice-record.webp',
+      zh: '/images/calibaby/screenshots/05-ipad.webp',
+      en: '/images/calibaby/screenshots/en/05-ipad.webp',
     },
     alt: {
-      zh: 'Cali 宝宝语音快速记录',
-      en: 'Cali Baby voice quick record',
+      zh: 'Cali 宝宝 iPad 应用界面',
+      en: 'Cali Baby on iPad',
     },
   },
   {
     src: {
-      zh: '/images/calibaby/screenshots/family-sync.webp',
-      en: '/images/calibaby/screenshots/en/family-sync.webp',
+      zh: '/images/calibaby/screenshots/06-watch.webp',
+      en: '/images/calibaby/screenshots/en/06-watch.webp',
     },
     alt: {
-      zh: 'Cali 宝宝家庭照顾自动同步',
-      en: 'Cali Baby automatic family care sync',
+      zh: 'Cali 宝宝 Apple Watch 应用界面',
+      en: 'Cali Baby on Apple Watch',
     },
   },
   {
     src: {
-      zh: '/images/calibaby/screenshots/trends.webp',
-      en: '/images/calibaby/screenshots/en/trends.webp',
+      zh: '/images/calibaby/screenshots/07-family.webp',
+      en: '/images/calibaby/screenshots/en/07-family.webp',
     },
     alt: {
-      zh: 'Cali 宝宝照顾趋势',
-      en: 'Cali Baby care trends',
+      zh: 'Cali 宝宝家庭共享与同步',
+      en: 'Cali Baby family sharing and sync',
+    },
+  },
+  {
+    src: {
+      zh: '/images/calibaby/screenshots/08-history.webp',
+      en: '/images/calibaby/screenshots/en/08-history.webp',
+    },
+    alt: {
+      zh: 'Cali 宝宝照顾记录与历史时间线',
+      en: 'Cali Baby care history and timeline',
+    },
+  },
+  {
+    src: {
+      zh: '/images/calibaby/screenshots/09-widgets.webp',
+      en: '/images/calibaby/screenshots/en/09-widgets.webp',
+    },
+    alt: {
+      zh: 'Cali 宝宝小组件',
+      en: 'Cali Baby widgets',
     },
   },
 ] as const
@@ -134,8 +154,8 @@ export function CaliBabyScreenshotCarousel({ locale }: { locale: Locale }) {
             <Image
               src={screenshot.src[locale]}
               alt={screenshot.alt[locale]}
-              width={1284}
-              height={2778}
+              width={1320}
+              height={2868}
               sizes="(max-width: 40rem) 78vw, (max-width: 70rem) 42vw, 22rem"
               className={styles.screenshot}
             />
