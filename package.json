@@ -87,7 +87,7 @@
     "rss": "^1.2.2",
     "server-only": "^0.0.1",
     "shaders": "3.0.448",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.4",
     "shiki": "^4.4.2",
     "subset-font": "^2.5.0",
     "tailwind-merge": "^3.6.0",
