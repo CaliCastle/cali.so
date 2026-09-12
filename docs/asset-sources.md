@@ -33,12 +33,17 @@ and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-proper
 
 ## Cali Baby screenshots
 
-The nine screenshots per language under `public/images/calibaby/screenshots/`
-come from the owner-provided September 2026 App Store exports in
-`~/Desktop/calibaby-app-store/iphone-17-pro-max/{zh-Hans,en}`. The numbered
-filenames preserve the supplied order. Chinese assets live at the screenshot
-root and English assets under `en/`. PNG originals were converted to WebP
-with `cwebp -q 90 -m 6`, retaining their 1320 × 2868 dimensions.
+The ten Chinese screenshots at the root of
+`public/images/calibaby/screenshots/` come from the owner-provided September
+2026 exports in `~/Desktop/calibaby-app-store/calibaby-app-store-all-19/`.
+They include every image from `iphone-69-main/` except `05-baby-supplies.png`,
+plus `01b-bottle-input.png` and `05b-supplies-catalog.png` from
+`iphone-69-alternatives/`, sorted by filename.
+
+The nine English screenshots under `screenshots/en/` retain the earlier exports
+from `~/Desktop/calibaby-app-store/iphone-17-pro-max/en/` and their supplied order.
+PNG originals were converted to WebP with `cwebp -q 90 -m 6`, retaining their
+1320 × 2868 dimensions.
 
 ## Product typefaces
 

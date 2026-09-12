@@ -15,98 +15,88 @@ import styles from '../_views/calibaby-landing.module.css'
 
 const CAROUSEL_ID = 'calibaby-screenshots'
 
-const SCREENSHOTS = [
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/01-today.webp',
-      en: '/images/calibaby/screenshots/en/01-today.webp',
+const SCREENSHOTS = {
+  zh: [
+    {
+      src: '/images/calibaby/screenshots/01-everyday-care.webp',
+      alt: 'Cali 宝宝日常照顾记录与今日概览',
     },
-    alt: {
-      zh: 'Cali 宝宝今日概览与日常照顾记录',
-      en: 'Cali Baby Today overview and daily care records',
+    {
+      src: '/images/calibaby/screenshots/01b-bottle-input.webp',
+      alt: 'Cali 宝宝瓶喂记录，一次记好奶量与奶源',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/02-sounds.webp',
-      en: '/images/calibaby/screenshots/en/02-sounds.webp',
+    {
+      src: '/images/calibaby/screenshots/02-family-care.webp',
+      alt: 'Cali 宝宝家庭共享与共同照顾',
     },
-    alt: {
-      zh: 'Cali 宝宝助眠声音',
-      en: 'Cali Baby sleep sounds',
+    {
+      src: '/images/calibaby/screenshots/03-watch-and-widgets.webp',
+      alt: 'Cali 宝宝 Apple Watch 与小组件',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/03-sleep-live.webp',
-      en: '/images/calibaby/screenshots/en/03-sleep-live.webp',
+    {
+      src: '/images/calibaby/screenshots/04-voice-recording.webp',
+      alt: 'Cali 宝宝语音记录',
     },
-    alt: {
-      zh: 'Cali 宝宝实时睡眠记录',
-      en: 'Cali Baby live sleep tracking',
+    {
+      src: '/images/calibaby/screenshots/05b-supplies-catalog.webp',
+      alt: 'Cali 宝宝用品目录，集中管理喂养、护理与营养用品',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/04-feeding-live.webp',
-      en: '/images/calibaby/screenshots/en/04-feeding-live.webp',
+    {
+      src: '/images/calibaby/screenshots/06-vaccine-book.webp',
+      alt: 'Cali 宝宝疫苗本',
     },
-    alt: {
-      zh: 'Cali 宝宝实时喂养记录',
-      en: 'Cali Baby live feeding tracking',
+    {
+      src: '/images/calibaby/screenshots/07-feeding-records.webp',
+      alt: 'Cali 宝宝喂养记录',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/05-ipad.webp',
-      en: '/images/calibaby/screenshots/en/05-ipad.webp',
+    {
+      src: '/images/calibaby/screenshots/08-sleep-records.webp',
+      alt: 'Cali 宝宝睡眠记录',
     },
-    alt: {
-      zh: 'Cali 宝宝 iPad 应用界面',
-      en: 'Cali Baby on iPad',
+    {
+      src: '/images/calibaby/screenshots/09-growth-records.webp',
+      alt: 'Cali 宝宝成长记录',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/06-watch.webp',
-      en: '/images/calibaby/screenshots/en/06-watch.webp',
+  ],
+  en: [
+    {
+      src: '/images/calibaby/screenshots/en/01-today.webp',
+      alt: 'Cali Baby Today overview and daily care records',
     },
-    alt: {
-      zh: 'Cali 宝宝 Apple Watch 应用界面',
-      en: 'Cali Baby on Apple Watch',
+    {
+      src: '/images/calibaby/screenshots/en/02-sounds.webp',
+      alt: 'Cali Baby sleep sounds',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/07-family.webp',
-      en: '/images/calibaby/screenshots/en/07-family.webp',
+    {
+      src: '/images/calibaby/screenshots/en/03-sleep-live.webp',
+      alt: 'Cali Baby live sleep tracking',
     },
-    alt: {
-      zh: 'Cali 宝宝家庭共享与同步',
-      en: 'Cali Baby family sharing and sync',
+    {
+      src: '/images/calibaby/screenshots/en/04-feeding-live.webp',
+      alt: 'Cali Baby live feeding tracking',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/08-history.webp',
-      en: '/images/calibaby/screenshots/en/08-history.webp',
+    {
+      src: '/images/calibaby/screenshots/en/05-ipad.webp',
+      alt: 'Cali Baby on iPad',
     },
-    alt: {
-      zh: 'Cali 宝宝照顾记录与历史时间线',
-      en: 'Cali Baby care history and timeline',
+    {
+      src: '/images/calibaby/screenshots/en/06-watch.webp',
+      alt: 'Cali Baby on Apple Watch',
     },
-  },
-  {
-    src: {
-      zh: '/images/calibaby/screenshots/09-widgets.webp',
-      en: '/images/calibaby/screenshots/en/09-widgets.webp',
+    {
+      src: '/images/calibaby/screenshots/en/07-family.webp',
+      alt: 'Cali Baby family sharing and sync',
     },
-    alt: {
-      zh: 'Cali 宝宝小组件',
-      en: 'Cali Baby widgets',
+    {
+      src: '/images/calibaby/screenshots/en/08-history.webp',
+      alt: 'Cali Baby care history and timeline',
     },
-  },
-] as const
+    {
+      src: '/images/calibaby/screenshots/en/09-widgets.webp',
+      alt: 'Cali Baby widgets',
+    },
+  ],
+} as const
 
 const CONTROL_COPY = {
   zh: {
@@ -133,6 +123,7 @@ function Arrow({ direction }: { direction: 'previous' | 'next' }) {
 
 export function CaliBabyScreenshotCarousel({ locale }: { locale: Locale }) {
   const copy = CONTROL_COPY[locale]
+  const screenshots = SCREENSHOTS[locale]
 
   return (
     <div className={styles.carouselFrame}>
@@ -144,16 +135,16 @@ export function CaliBabyScreenshotCarousel({ locale }: { locale: Locale }) {
         aria-roledescription="carousel"
         className={styles.carousel}
       >
-        {SCREENSHOTS.map((screenshot, index) => (
+        {screenshots.map((screenshot, index) => (
           <li
-            key={screenshot.src.zh}
+            key={screenshot.src}
             data-blossom-slide
             className={styles.slide}
-            aria-label={`${index + 1} / ${SCREENSHOTS.length}`}
+            aria-label={`${index + 1} / ${screenshots.length}`}
           >
             <Image
-              src={screenshot.src[locale]}
-              alt={screenshot.alt[locale]}
+              src={screenshot.src}
+              alt={screenshot.alt}
               width={1320}
               height={2868}
               sizes="(max-width: 40rem) 78vw, (max-width: 70rem) 42vw, 22rem"
@@ -181,7 +172,7 @@ export function CaliBabyScreenshotCarousel({ locale }: { locale: Locale }) {
             <BlossomDot
               className={styles.carouselDot}
               data-active={active ? 'true' : 'false'}
-              aria-label={SCREENSHOTS[index]?.alt[locale]}
+              aria-label={screenshots[index]?.alt}
             >
               <span className={styles.carouselDotMark} />
             </BlossomDot>
