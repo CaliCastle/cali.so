@@ -38,8 +38,8 @@ come from the live iPhone galleries for Cali Baby 1.4.1, retrieved from Apple
 on September 13, 2026:
 
 - Chinese: [China App Store listing](https://apps.apple.com/cn/app/id6769728441),
-  using the ordered `screenshotUrls` from
-  [Apple's China lookup response](https://itunes.apple.com/lookup?id=6769728441&country=cn).
+  verified against the screenshot URLs and order in the live page HTML
+  with `l=zh-Hans-CN`.
 - English: [US App Store listing](https://apps.apple.com/us/app/id6769728441),
   using the ordered `screenshotUrls` from
   [Apple's US lookup response](https://itunes.apple.com/lookup?id=6769728441&country=us).
@@ -47,7 +47,10 @@ on September 13, 2026:
 Each locale preserves its live listing order, which differs between storefronts.
 Both include the baby-supplies screenshot. Chinese assets live at the screenshot
 root and English assets under `en/`. The filename prefixes identify the original
-artboards; display order is defined in the carousel's locale arrays.
+artboards; display order is defined in the carousel's locale arrays. Chinese
+filenames also include the first 12 characters of each WebP's SHA-256 hash,
+so updated artwork gets a new URL instead of reusing an optimized image cache.
+Regenerate that suffix whenever replacing a Chinese screenshot.
 
 Images were downloaded from the returned Apple CDN paths with the
 `1320x2868bb.png` rendition, then converted to WebP with `cwebp -q 90 -m 6`.

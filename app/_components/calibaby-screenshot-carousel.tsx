@@ -18,43 +18,43 @@ const CAROUSEL_ID = 'calibaby-screenshots'
 const SCREENSHOTS = {
   zh: [
     {
-      src: '/images/calibaby/screenshots/01-everyday-care.webp',
+      src: '/images/calibaby/screenshots/01-everyday-care.653dd75e16a9.webp',
       alt: 'Cali 宝宝日常照顾记录与今日概览',
     },
     {
-      src: '/images/calibaby/screenshots/04-voice-recording.webp',
+      src: '/images/calibaby/screenshots/04-voice-recording.dd06a2eb154c.webp',
       alt: 'Cali 宝宝语音记录',
     },
     {
-      src: '/images/calibaby/screenshots/02-family-care.webp',
+      src: '/images/calibaby/screenshots/02-family-care.04bec4067dd0.webp',
       alt: 'Cali 宝宝家庭共享与共同照顾',
     },
     {
-      src: '/images/calibaby/screenshots/01b-bottle-input.webp',
+      src: '/images/calibaby/screenshots/01b-bottle-input.2d1d3c2aff94.webp',
       alt: 'Cali 宝宝瓶喂记录，一次记好奶量与奶源',
     },
     {
-      src: '/images/calibaby/screenshots/08-sleep-records.webp',
+      src: '/images/calibaby/screenshots/08-sleep-records.060e3e73740f.webp',
       alt: 'Cali 宝宝睡眠记录',
     },
     {
-      src: '/images/calibaby/screenshots/07-feeding-records.webp',
+      src: '/images/calibaby/screenshots/07-feeding-records.5a3d7c5924a9.webp',
       alt: 'Cali 宝宝喂养记录',
     },
     {
-      src: '/images/calibaby/screenshots/06-vaccine-book.webp',
+      src: '/images/calibaby/screenshots/06-vaccine-book.31176d51bb08.webp',
       alt: 'Cali 宝宝疫苗本',
     },
     {
-      src: '/images/calibaby/screenshots/05-baby-supplies.webp',
+      src: '/images/calibaby/screenshots/05-baby-supplies.139f01f31593.webp',
       alt: 'Cali 宝宝用品管理与用量记录',
     },
     {
-      src: '/images/calibaby/screenshots/09-growth-records.webp',
+      src: '/images/calibaby/screenshots/09-growth-records.702cf412d02e.webp',
       alt: 'Cali 宝宝成长记录',
     },
     {
-      src: '/images/calibaby/screenshots/03-watch-and-widgets.webp',
+      src: '/images/calibaby/screenshots/03-watch-and-widgets.a053fcb8d0fe.webp',
       alt: 'Cali 宝宝 Apple Watch 与小组件',
     },
   ],
