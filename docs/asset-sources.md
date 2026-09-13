@@ -33,17 +33,25 @@ and [Apple trademark guidelines](https://www.apple.com/legal/intellectual-proper
 
 ## Cali Baby screenshots
 
-The ten Chinese screenshots at the root of
-`public/images/calibaby/screenshots/` come from the owner-provided September
-2026 exports in `~/Desktop/calibaby-app-store/calibaby-app-store-all-19/`.
-They include every image from `iphone-69-main/` except `05-baby-supplies.png`,
-plus `01b-bottle-input.png` and `05b-supplies-catalog.png` from
-`iphone-69-alternatives/`, sorted by filename.
+The ten screenshots per language under `public/images/calibaby/screenshots/`
+come from the live iPhone galleries for Cali Baby 1.4.1, retrieved from Apple
+on September 13, 2026:
 
-The nine English screenshots under `screenshots/en/` retain the earlier exports
-from `~/Desktop/calibaby-app-store/iphone-17-pro-max/en/` and their supplied order.
-PNG originals were converted to WebP with `cwebp -q 90 -m 6`, retaining their
-1320 × 2868 dimensions.
+- Chinese: [China App Store listing](https://apps.apple.com/cn/app/id6769728441),
+  using the ordered `screenshotUrls` from
+  [Apple's China lookup response](https://itunes.apple.com/lookup?id=6769728441&country=cn).
+- English: [US App Store listing](https://apps.apple.com/us/app/id6769728441),
+  using the ordered `screenshotUrls` from
+  [Apple's US lookup response](https://itunes.apple.com/lookup?id=6769728441&country=us).
+
+Each locale preserves its live listing order, which differs between storefronts.
+Both include the baby-supplies screenshot. Chinese assets live at the screenshot
+root and English assets under `en/`. The filename prefixes identify the original
+artboards; display order is defined in the carousel's locale arrays.
+
+Images were downloaded from the returned Apple CDN paths with the
+`1320x2868bb.png` rendition, then converted to WebP with `cwebp -q 90 -m 6`.
+All 20 images retain their 1320 × 2868 dimensions.
 
 ## Product typefaces
 

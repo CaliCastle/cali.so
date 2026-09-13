@@ -22,78 +22,82 @@ const SCREENSHOTS = {
       alt: 'Cali 宝宝日常照顾记录与今日概览',
     },
     {
-      src: '/images/calibaby/screenshots/01b-bottle-input.webp',
-      alt: 'Cali 宝宝瓶喂记录，一次记好奶量与奶源',
+      src: '/images/calibaby/screenshots/04-voice-recording.webp',
+      alt: 'Cali 宝宝语音记录',
     },
     {
       src: '/images/calibaby/screenshots/02-family-care.webp',
       alt: 'Cali 宝宝家庭共享与共同照顾',
     },
     {
-      src: '/images/calibaby/screenshots/03-watch-and-widgets.webp',
-      alt: 'Cali 宝宝 Apple Watch 与小组件',
-    },
-    {
-      src: '/images/calibaby/screenshots/04-voice-recording.webp',
-      alt: 'Cali 宝宝语音记录',
-    },
-    {
-      src: '/images/calibaby/screenshots/05b-supplies-catalog.webp',
-      alt: 'Cali 宝宝用品目录，集中管理喂养、护理与营养用品',
-    },
-    {
-      src: '/images/calibaby/screenshots/06-vaccine-book.webp',
-      alt: 'Cali 宝宝疫苗本',
-    },
-    {
-      src: '/images/calibaby/screenshots/07-feeding-records.webp',
-      alt: 'Cali 宝宝喂养记录',
+      src: '/images/calibaby/screenshots/01b-bottle-input.webp',
+      alt: 'Cali 宝宝瓶喂记录，一次记好奶量与奶源',
     },
     {
       src: '/images/calibaby/screenshots/08-sleep-records.webp',
       alt: 'Cali 宝宝睡眠记录',
     },
     {
+      src: '/images/calibaby/screenshots/07-feeding-records.webp',
+      alt: 'Cali 宝宝喂养记录',
+    },
+    {
+      src: '/images/calibaby/screenshots/06-vaccine-book.webp',
+      alt: 'Cali 宝宝疫苗本',
+    },
+    {
+      src: '/images/calibaby/screenshots/05-baby-supplies.webp',
+      alt: 'Cali 宝宝用品管理与用量记录',
+    },
+    {
       src: '/images/calibaby/screenshots/09-growth-records.webp',
       alt: 'Cali 宝宝成长记录',
+    },
+    {
+      src: '/images/calibaby/screenshots/03-watch-and-widgets.webp',
+      alt: 'Cali 宝宝 Apple Watch 与小组件',
     },
   ],
   en: [
     {
-      src: '/images/calibaby/screenshots/en/01-today.webp',
-      alt: 'Cali Baby Today overview and daily care records',
+      src: '/images/calibaby/screenshots/en/01-everyday-care.webp',
+      alt: 'Cali Baby daily care records and Today overview',
     },
     {
-      src: '/images/calibaby/screenshots/en/02-sounds.webp',
-      alt: 'Cali Baby sleep sounds',
+      src: '/images/calibaby/screenshots/en/02-family-care.webp',
+      alt: 'Cali Baby family sharing and shared care',
     },
     {
-      src: '/images/calibaby/screenshots/en/03-sleep-live.webp',
-      alt: 'Cali Baby live sleep tracking',
+      src: '/images/calibaby/screenshots/en/04-voice-recording.webp',
+      alt: 'Cali Baby voice recording',
     },
     {
-      src: '/images/calibaby/screenshots/en/04-feeding-live.webp',
-      alt: 'Cali Baby live feeding tracking',
+      src: '/images/calibaby/screenshots/en/01b-bottle-input.webp',
+      alt: 'Cali Baby bottle feeding records with milk amount and source',
     },
     {
-      src: '/images/calibaby/screenshots/en/05-ipad.webp',
-      alt: 'Cali Baby on iPad',
+      src: '/images/calibaby/screenshots/en/07-feeding-records.webp',
+      alt: 'Cali Baby feeding records',
     },
     {
-      src: '/images/calibaby/screenshots/en/06-watch.webp',
-      alt: 'Cali Baby on Apple Watch',
+      src: '/images/calibaby/screenshots/en/08-sleep-records.webp',
+      alt: 'Cali Baby sleep records',
     },
     {
-      src: '/images/calibaby/screenshots/en/07-family.webp',
-      alt: 'Cali Baby family sharing and sync',
+      src: '/images/calibaby/screenshots/en/09-growth-records.webp',
+      alt: 'Cali Baby growth records',
     },
     {
-      src: '/images/calibaby/screenshots/en/08-history.webp',
-      alt: 'Cali Baby care history and timeline',
+      src: '/images/calibaby/screenshots/en/05-baby-supplies.webp',
+      alt: 'Cali Baby supplies management and usage tracking',
     },
     {
-      src: '/images/calibaby/screenshots/en/09-widgets.webp',
-      alt: 'Cali Baby widgets',
+      src: '/images/calibaby/screenshots/en/06-vaccine-book.webp',
+      alt: 'Cali Baby vaccination book',
+    },
+    {
+      src: '/images/calibaby/screenshots/en/03-watch-and-widgets.webp',
+      alt: 'Cali Baby on Apple Watch and widgets',
     },
   ],
 } as const
