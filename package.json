@@ -9,9 +9,9 @@
   },
   "pnpm": {
     "overrides": {
-      "gray-matter>js-yaml": "3.15.1",
+      "gray-matter>js-yaml": "3.15.2",
       "next>postcss": "8.5.26",
-      "next>sharp": "0.35.3"
+      "next>sharp": "0.35.4"
     }
   },
   "scripts": {
@@ -75,7 +75,7 @@
     "heic-decode": "^2.1.0",
     "lucide-react": "^1.31.0",
     "motion": "^13.0.0",
-    "next": "16.3.0",
+    "next": "16.3.5",
     "next-mdx-remote": "^6.0.0",
     "pg": "^8.23.0",
     "react": "^19.2.8",
@@ -87,7 +87,7 @@
     "rss": "^1.2.2",
     "server-only": "^0.0.1",
     "shaders": "3.0.448",
-    "sharp": "^0.35.3",
+    "sharp": "^0.35.4",
     "shiki": "^4.4.2",
     "subset-font": "^2.5.0",
     "tailwind-merge": "^3.6.0",
@@ -96,7 +96,7 @@
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.4",
-    "@next/playwright": "16.3.0",
+    "@next/playwright": "16.3.5",
     "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "^4.3.3",
     "@testing-library/react": "^16.3.2",
