@@ -32,22 +32,23 @@ export const rootMetadata: Metadata = {
 export async function SiteDocument({
   children,
   isAdmin = false,
+  isPrivate = false,
   locale,
   restoreLocale = false,
 }: Readonly<{
   children: React.ReactNode
   isAdmin?: boolean
+  isPrivate?: boolean
   locale: Locale
   restoreLocale?: boolean
 }>) {
   const english = locale === 'en'
   const fontVariables = fontVariablesForLocale(locale)
 
-  if (isAdmin) {
-    // The owner admin shares the public warm paper, ambient layer, and
-    // column geometry, but stays outside public analytics, social reads,
-    // and route view transitions — its chrome is the owner dock rendered
-    // by the protected admin layout.
+  if (isAdmin || isPrivate) {
+    // Private documents and the owner admin share the public paper and
+    // column geometry without analytics, social reads, or route transitions.
+    // The protected admin layout supplies its own owner dock.
     return (
       <html
         lang={english ? 'en' : 'zh-CN'}

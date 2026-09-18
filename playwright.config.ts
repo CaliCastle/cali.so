@@ -23,7 +23,11 @@ const localServerEnv = {
     process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? 'pk_live_Y2xlcmsuY2FsaS5zbyQ',
   RATE_LIMIT_HASH_KEY:
     process.env.RATE_LIMIT_HASH_KEY ?? 'AgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgI=',
-  SITE_URL: process.env.SITE_URL ?? 'https://cali.so',
+  RESUME_PASSPHRASE: 'local-resume-preview-only',
+  RESUME_SESSION_SECRET: 'local-resume-test-secret-not-for-deployment-1234567890',
+  // Native same-origin forms must use the local test server's origin.
+  // Public canonical URLs remain controlled by PUBLIC_SITE_URL.
+  SITE_URL: baseURL,
 }
 
 export default defineConfig({

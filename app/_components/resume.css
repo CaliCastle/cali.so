@@ -1,0 +1,312 @@
+.resume-page {
+  color: var(--gray-11);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.resume-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+.resume-text-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  color: var(--gray-9);
+  font-size: 14px;
+}
+
+.resume-page :where(a, button, input):focus-visible {
+  outline: 2px solid var(--gray-12);
+  outline-offset: 4px;
+}
+
+.resume-page :where(a, button) {
+  transition: color 150ms ease;
+}
+
+.resume-gate {
+  max-width: 26rem;
+  margin: 0 auto;
+  padding-top: clamp(0rem, 6vh, 4rem);
+}
+
+.resume-gate-heading {
+  margin: 2rem 0;
+}
+
+.resume-gate h1 {
+  color: var(--gray-12);
+  font-size: clamp(24px, 5vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.resume-gate-heading p {
+  margin-top: 1rem;
+  max-width: 23rem;
+  color: var(--gray-10);
+  text-wrap: pretty;
+}
+
+.resume-form label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.resume-input-wrap {
+  position: relative;
+}
+
+.resume-input-wrap input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.625rem 4.25rem 0.625rem 0.75rem;
+  background: var(--surface-1);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--gray-5);
+  font-size: 16px;
+  color: var(--gray-12);
+}
+
+.resume-reveal {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 56px;
+  min-height: 44px;
+  font-size: 12px;
+  color: var(--gray-9);
+}
+
+.resume-form-message {
+  min-height: 3.25rem;
+  padding-top: 0.625rem;
+  font-size: 12px;
+  color: var(--gray-9);
+}
+
+.resume-form-message[role='alert'] {
+  color: var(--gray-12);
+}
+
+.resume-submit {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  border-radius: 2px;
+  background: var(--gray-12);
+  color: var(--gray-1);
+  font-size: 14px;
+}
+
+.resume-page button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.resume-gate-signature {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: var(--border-hairline) solid var(--gray-5);
+  color: var(--gray-8);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+}
+
+.resume-gate-signature span {
+  color: var(--gray-6);
+}
+
+.resume-name {
+  margin-top: 2rem;
+  color: var(--gray-12);
+  font-size: clamp(28px, 6vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+}
+
+.resume-role {
+  margin-top: 0.75rem;
+  color: var(--gray-10);
+  text-wrap: balance;
+}
+
+.resume-intro {
+  margin-top: 1.5rem;
+  text-wrap: pretty;
+}
+
+.resume-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.5rem;
+  margin-top: 1rem;
+}
+
+.resume-contact a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--gray-10);
+  font-size: 12px;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.resume-section {
+  margin-top: 3rem;
+}
+
+.resume-experience, .resume-projects {
+  margin-top: 1rem;
+}
+
+.resume-entry {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr;
+  gap: 1rem;
+  padding: 1.125rem 0;
+}
+
+.resume-date {
+  padding-top: 0.125rem;
+  color: var(--gray-9);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.resume-entry h3, .resume-project h3 {
+  color: var(--gray-12);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.resume-entry h3 a, .resume-project h3 a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.5rem 0;
+  margin: -0.5rem 0;
+}
+
+.resume-project {
+  padding: 1.125rem 0;
+}
+
+.resume-project p {
+  margin-top: 0.25rem;
+  color: var(--gray-10);
+}
+
+.resume-footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  color: var(--gray-9);
+  font-size: 12px;
+}
+
+.resume-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 400px) {
+  .resume-nav {
+    margin-bottom: 2.5rem;
+  }
+  .resume-entry {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .resume-page a:hover, .resume-text-control:hover, .resume-reveal:hover {
+    color: var(--gray-12);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resume-page :where(a, button) {
+    transition: none;
+  }
+}
+
+@media print {
+  @page {
+    margin: 16mm;
+  }
+  html.public-site, html.public-site.dark {
+    --gray-1: white;
+    --gray-5: #ddd;
+    --gray-8: #666;
+    --gray-9: #555;
+    --gray-10: #444;
+    --gray-11: #333;
+    --gray-12: #111;
+    --muted-foreground: #555;
+    --background: white;
+    --foreground: #111;
+    color-scheme: light;
+  }
+  body {
+    background: white !important;
+  }
+  body > .min-h-screen {
+    display: block;
+    min-height: 0;
+    padding-bottom: 0;
+  }
+  .paper-grain, .column-guides, .column-rulers, .viewport-edge-fade, .resume-nav, .resume-actions {
+    display: none !important;
+  }
+  body main {
+    padding-top: 0;
+  }
+  .resume-page {
+    max-width: none;
+    padding: 0;
+    font-size: 11px;
+  }
+  .resume-name {
+    margin-top: 1rem;
+    font-size: 26px;
+  }
+  .resume-entry h3, .resume-project h3 {
+    font-size: 13px;
+  }
+  .resume-entry h3 a, .resume-project h3 a {
+    min-height: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .resume-section {
+    margin-top: 1.5rem;
+  }
+  .resume-entry, .resume-project {
+    padding: 0.75rem 0;
+    break-inside: avoid;
+  }
+  .resume-section h2 {
+    break-after: avoid;
+  }
+  .resume-footer {
+    margin-top: 1.5rem;
+  }
+}
