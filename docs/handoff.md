@@ -41,6 +41,10 @@ Current as of July 2026.
   production discovery output.
 - Public pages are static where possible. GitHub and YouTube social values use
   ISR-backed fetches with committed JSON snapshots as outage fallbacks.
+- The unlisted `/resume` and `/en/resume` documents use a server-checked
+  passphrase session and stay outside public discovery and analytics. They
+  remain locked until both résumé credentials are configured; see
+  `docs/private-resume.md` for setup, content, and access checks.
 - Vercel Web Analytics is instrumented to collect first-party page views
   across the public Chinese and English route families. Owner-admin routes
   stay excluded from public analytics.
