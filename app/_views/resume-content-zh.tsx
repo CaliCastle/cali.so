@@ -77,7 +77,7 @@ export function ChineseResumeSections({ content }: { content: ChineseResumeConte
             {content.openSource.map((project) => (
               <div key={project.name} className="resume-open-source">
                 <header>
-                  <h3>{project.name}</h3>
+                  <h3>{project.url ? <a href={project.url} rel="noreferrer">{project.name} ↗</a> : project.name}</h3>
                   <p className="resume-job-role">{project.technology}</p>
                 </header>
                 <p className="resume-job-description">{project.description}</p>

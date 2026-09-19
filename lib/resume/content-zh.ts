@@ -24,7 +24,12 @@ const chineseResumeSchema = z.object({
       bullets: bullets.min(1),
     })).max(20).optional(),
   }).refine((job) => Boolean(job.description) || job.bullets.length > 0)).min(1).max(20),
-  openSource: z.array(z.object({ name: text, technology: text, description: text })).max(20),
+  openSource: z.array(z.object({
+    name: text,
+    technology: text,
+    description: text,
+    url: z.url({ protocol: /^https$/ }).max(2048).optional(),
+  })).max(20),
   capabilities: z.array(z.object({ label: text, description: text })).max(12),
   education: z.array(z.object({
     institution: text,

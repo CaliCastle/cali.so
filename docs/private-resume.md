@@ -92,8 +92,9 @@ and optional `engagements` (`name`, `role`, optional `note`, and `bullets`).
 `period` accepts either one string or an array of date/location lines.
 Capabilities have `label` and `description`; education has `institution`,
 `qualification`, and optional `notes`. Optional `openSource` entries contain
-`name`, `technology`, and `description`; `educationNote` holds the closing
-education paragraph. Earlier documents without these additions remain valid.
+`name`, `technology`, `description`, and an optional HTTPS `url`;
+`educationNote` holds the closing education paragraph. Earlier documents
+without these additions remain valid.
 The schema lives in `lib/resume/content.ts`. English bullets support
 `**bold emphasis**` and `*italics*`; HTML and executable MDX are never interpreted.
 
@@ -101,7 +102,9 @@ The Chinese schema in `lib/resume/content-zh.ts` uses the same top-level fields,
 with required `openSource` and an optional `educationNote`. Each experience has a
 `periods` array instead of `period`, and supports an optional `description`
 for roles presented as a paragraph; either the description or bullets must be
-present. Open-source entries have `name`, `technology`, and `description`.
+present. Open-source entries have `name`, `technology`, `description`, and an
+optional HTTPS `url`. A configured URL makes the project name a link in either
+language; existing entries without URLs stay as text.
 Each education entry also has a `notes` array.
 Chinese bullets support bold emphasis.
 

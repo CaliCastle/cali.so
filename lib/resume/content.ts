@@ -22,7 +22,12 @@ const resumeContentSchema = z.object({
     bullets,
     engagements: z.array(engagement).max(20).optional(),
   })).min(1).max(20),
-  openSource: z.array(z.object({ name: text, technology: text, description: text })).max(20).optional(),
+  openSource: z.array(z.object({
+    name: text,
+    technology: text,
+    description: text,
+    url: z.url({ protocol: /^https$/ }).max(2048).optional(),
+  })).max(20).optional(),
   capabilities: z.array(z.object({ label: text, description: text })).max(12),
   education: z.array(z.object({
     institution: text,
