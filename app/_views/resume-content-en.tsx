@@ -48,6 +48,9 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
                 </div>
               </header>
               <Bullets items={job.bullets} />
+              {Boolean(job.selectedClients?.length) && (
+                <p className="resume-clients"><strong>Selected clients:</strong> {job.selectedClients?.join(' · ')}</p>
+              )}
               {Boolean(job.engagements?.length) && (
                 <section className="resume-engagements" aria-label="Selected products and engagements">
                   <p className="resume-subsection-label">Selected products and engagements</p>

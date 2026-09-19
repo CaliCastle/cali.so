@@ -20,6 +20,7 @@ const resumeContentSchema = z.object({
     role: text,
     period: z.union([text, z.array(text).min(1).max(5)]),
     bullets,
+    selectedClients: z.array(z.string().trim().min(1).max(100)).max(20).optional(),
     engagements: z.array(engagement).max(20).optional(),
   })).min(1).max(20),
   openSource: z.array(z.object({

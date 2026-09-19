@@ -17,6 +17,7 @@ const chineseResumeSchema = z.object({
     periods: z.array(text).min(1).max(5),
     description: text.optional(),
     bullets,
+    selectedClients: z.array(z.string().trim().min(1).max(100)).max(20).optional(),
     engagements: z.array(z.object({
       name: text,
       role: text,

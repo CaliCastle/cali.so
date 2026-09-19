@@ -50,6 +50,9 @@ export function ChineseResumeSections({ content }: { content: ChineseResumeConte
               </header>
               {job.description && <p className="resume-job-description">{job.description}</p>}
               <Bullets items={job.bullets} />
+              {Boolean(job.selectedClients?.length) && (
+                <p className="resume-clients"><strong>代表客户：</strong>{job.selectedClients?.join(' · ')}</p>
+              )}
               {Boolean(job.engagements?.length) && (
                 <section className="resume-engagements" aria-label="代表产品与项目">
                   <p className="resume-subsection-label">代表产品与项目</p>
