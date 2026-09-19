@@ -71,6 +71,16 @@ beforeEach(() => {
 })
 
 describe('SiteDocument analytics', () => {
+  it('keeps private documents outside public analytics and social reads', async () => {
+    const html = renderToStaticMarkup(await SiteDocument({ children: <p>Private document</p>, isPrivate: true, locale: 'en' }))
+    expect(html).toContain('Private document')
+    expect(html).not.toContain('data-vercel-analytics')
+    expect(html).not.toContain('data-public-dock')
+    expect(html).not.toContain('data-public-footer')
+    expect(getSocial).not.toHaveBeenCalled()
+    expect(getGitHub).not.toHaveBeenCalled()
+  })
+
   it('activates the CJK font only for Chinese documents', async () => {
     const chinese = renderToStaticMarkup(
       await SiteDocument({ children: <p>中文页面</p>, locale: 'zh' }),

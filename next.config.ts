@@ -91,6 +91,23 @@ const nextConfig: NextConfig = {
       ],
     },
     {
+      // Private documents are never cached, indexed, or sent as external referrers.
+      source: '/:locale(en)?/resume/:path*',
+      headers: [
+        { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+        { key: 'Referrer-Policy', value: 'same-origin' },
+      ],
+    },
+    {
+      source: '/api/resume/:path*',
+      headers: [
+        { key: 'Cache-Control', value: 'private, no-store, max-age=0' },
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+        { key: 'Referrer-Policy', value: 'same-origin' },
+      ],
+    },
+    {
       // The global policy is intentionally useful for public navigation, but
       // admin API responses must never disclose their origin to another site.
       source: '/api/admin/:path*',

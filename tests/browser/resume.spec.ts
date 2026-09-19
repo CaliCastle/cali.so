@@ -1,0 +1,97 @@
+import { expect, test } from '@playwright/test'
+
+test.describe('private résumé', () => {
+  test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL), 'Uses local credentials only.')
+
+  test('protects HTML and RSC responses, unlocks, prints, and rechecks the session', async ({ page, request }) => {
+    const protectedCopy = 'very very spaceship'
+    for (const path of ['/resume', '/en/resume']) {
+      const requestHeaders: Record<string, string>[] = [{}, { RSC: '1' }]
+      for (const headers of requestHeaders) {
+        const response = await request.get(path, { headers })
+        expect(response.status()).toBe(200)
+        expect(await response.text()).not.toContain(protectedCopy)
+        expect(await response.text()).not.toContain('Synthetic achievement')
+        expect(await response.text()).not.toContain('Example open source')
+        expect(await response.text()).not.toContain('示例成果')
+        expect(await response.text()).not.toContain('示例开源组件')
+        expect(response.headers()['cache-control']).toContain('no-store')
+        expect(response.headers()['x-robots-tag']).toContain('noindex')
+        expect(response.headers()['referrer-policy']).toBe('same-origin')
+      }
+    }
+    for (const path of ['/sitemap.xml', '/llms.txt', '/robots.txt']) {
+      expect(await (await request.get(path)).text()).not.toContain('/resume')
+    }
+
+    await page.goto('/en/resume')
+    await expect(page.getByRole('heading', { name: 'A little more about me.' })).toBeVisible()
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', /noindex/)
+    await page.getByLabel('Passphrase', { exact: true }).fill('incorrect')
+    await page.getByRole('button', { name: 'View résumé' }).click()
+    await expect(page.locator('#resume-form-message')).toHaveText('That passphrase isn’t right. Please try again.')
+    await expect(page.getByText(protectedCopy)).toHaveCount(0)
+    await page.getByLabel('Passphrase', { exact: true }).fill('local-resume-preview-only')
+    await page.getByRole('button', { name: 'View résumé' }).click()
+    await expect(page.getByRole('heading', { name: 'Cali Castle', exact: true })).toBeVisible()
+    await expect(page.getByText(protectedCopy)).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Example internal product', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Example university', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Example open source', exact: true })).toBeVisible()
+    await expect(page.getByText('Example joint education program.', { exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Lock résumé' })).toHaveCount(0)
+    await page.reload()
+    await expect(page.getByText(protectedCopy)).toBeVisible()
+    const cookie = (await page.context().cookies()).find((value) => value.name === 'cali-resume')!
+    expect(cookie.httpOnly).toBe(true)
+    expect(cookie.sameSite).toBe('Lax')
+    expect(await page.evaluate(() => document.cookie)).not.toContain('cali-resume')
+
+    await page.getByRole('link', { name: '中文', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '工作经历', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '示例姓名', exact: true })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '示例开源组件', exact: true })).toBeVisible()
+    await expect(page.getByText('示例合作培养项目说明。', { exact: true })).toBeVisible()
+    await expect(page.locator('html')).toHaveClass(/resume-swiss/)
+    await expect(page.locator('.paper-grain, .column-guides, .section-tag')).toHaveCount(0)
+    expect(await page.locator('.resume-page').evaluate((element) => element.getBoundingClientRect().width)).toBe(1120)
+    await expect(page.getByRole('button', { name: '锁定简历' })).toHaveCount(0)
+    await page.emulateMedia({ media: 'print' })
+    await expect(page.getByRole('navigation')).toBeHidden()
+    await expect(page.getByRole('button', { name: '打印 / 存为 PDF', exact: true })).toBeHidden()
+    await page.emulateMedia({ media: 'screen' })
+    await page.context().clearCookies()
+    await page.reload()
+    await expect(page.getByRole('heading', { name: '很高兴认识你。' })).toBeVisible()
+    await expect(page.getByText(protectedCopy)).toHaveCount(0)
+    await expect(page.getByText('示例成果')).toHaveCount(0)
+    await page.goBack()
+    await expect(page.locator('.resume-gate')).toBeVisible()
+    await expect(page.getByText(protectedCopy)).toHaveCount(0)
+    await expect(page.getByText('示例成果')).toHaveCount(0)
+    await page.goto('/resume')
+    await expect(page.getByRole('heading', { name: '很高兴认识你。' })).toBeVisible()
+    const scripts = await page.locator('script[src]').evaluateAll((elements) => elements.map((element) => element.getAttribute('src')))
+    expect(scripts.join(' ')).not.toMatch(/insights|analytics/)
+  })
+
+  test('works without JavaScript and on a narrow dark viewport', async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false, baseURL, viewport: { width: 375, height: 812 }, colorScheme: 'dark' })
+    const page = await context.newPage()
+    await page.goto('/en/resume')
+    await page.getByLabel('Passphrase', { exact: true }).fill('local-resume-preview-only')
+    await page.getByLabel('Passphrase', { exact: true }).press('Enter')
+    await expect(page.getByRole('heading', { name: 'Cali Castle', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Lock résumé' })).toHaveCount(0)
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    await page.getByRole('link', { name: '中文', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '示例姓名', exact: true })).toBeVisible()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    expect(await page.locator('html').evaluate((element) => getComputedStyle(element).colorScheme)).toBe('dark')
+    expect(await page.locator('.resume-career').evaluate((element) => element.getBoundingClientRect().left))
+      .toBe(await page.locator('.resume-section-title').first().evaluate((element) => element.getBoundingClientRect().left))
+    await expect(page.getByRole('button', { name: '锁定简历' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: '打印 / 存为 PDF', exact: true })).toBeVisible()
+    await context.close()
+  })
+})

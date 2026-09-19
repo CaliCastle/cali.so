@@ -1,0 +1,36 @@
+.resume-master-en .resume-periods {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.resume-master-en .resume-open-source {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.resume-master-en .resume-open-source h3 {
+  color: var(--gray-12);
+  font-size: 15px;
+  font-weight: var(--font-weight-medium);
+}
+
+.resume-master-en .resume-job-description {
+  margin-top: 0.75rem;
+}
+
+.resume-master-en .resume-education-note {
+  margin-top: 1rem;
+  color: var(--gray-10);
+}
+
+@media print {
+  .resume-master-en header, .resume-master-en .resume-open-source {
+    break-inside: avoid;
+  }
+  .resume-master-en .resume-open-source h3 {
+    font-size: 13px;
+  }
+  .resume-master-en .resume-education:last-of-type {
+    break-after: avoid;
+  }
+}
