@@ -100,6 +100,12 @@ without these additions remain valid.
 The schema lives in `lib/resume/content.ts`. English bullets support
 `**bold emphasis**` and `*italics*`; HTML and executable MDX are never interpreted.
 
+Both editions accept an optional top-level `phone` field containing an
+international number starting with `+`. Spaces and hyphens are allowed for
+display and removed from the tap-to-call link. Keep the actual number in the
+private JSON, never in tracked source files. It appears only after unlocking
+the résumé and is included when printing.
+
 The Chinese schema in `lib/resume/content-zh.ts` uses the same top-level fields,
 with required `openSource` and an optional `educationNote`. Each experience has a
 `periods` array instead of `period`, and supports an optional `description`
