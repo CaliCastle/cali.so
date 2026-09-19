@@ -11,6 +11,9 @@ export function ResumeUnlockForm({ locale, error, available }: {
 }) {
   const [visible, setVisible] = useState(false)
   const [pending, setPending] = useState(false)
+  const message = error ?? (!available
+    ? localize(locale, '暂时无法访问，请稍后再试。', 'Access is temporarily unavailable. Please try again later.')
+    : undefined)
 
   useEffect(() => {
     const reset = () => setPending(false)
@@ -36,7 +39,7 @@ export function ResumeUnlockForm({ locale, error, available }: {
           maxLength={256}
           disabled={!available}
           aria-invalid={Boolean(error)}
-          aria-describedby="resume-form-message"
+          aria-describedby={message ? 'resume-form-message' : undefined}
         />
         <button
           type="button"
@@ -50,12 +53,10 @@ export function ResumeUnlockForm({ locale, error, available }: {
         </button>
       </div>
       <p id="resume-form-message" className="resume-form-message" role={error ? 'alert' : undefined}>
-        {error ?? (available
-          ? localize(locale, '请输入收到的口令，区分大小写。', 'Enter the passphrase you were given. It’s case-sensitive.')
-          : localize(locale, '暂时无法访问，请稍后再试。', 'Access is temporarily unavailable. Please try again later.'))}
+        {message}
       </p>
       <button type="submit" className="resume-submit" disabled={pending || !available} aria-busy={pending}>
-        <span>{pending ? localize(locale, '正在打开…', 'Opening…') : localize(locale, '查看简历', 'View résumé')}</span>
+        <span>{pending ? localize(locale, '正在打开…', 'Opening…') : localize(locale, '继续', 'Continue')}</span>
         <span aria-hidden="true">↗</span>
       </button>
     </form>

@@ -151,7 +151,6 @@ html.resume-swiss {
 .resume-gate { margin-top: 120px; padding-top: 40px; border-top: 1px solid var(--resume-ink); }
 .resume-gate-body { grid-column: 4 / 10; }
 .resume-gate-heading h1 { font-size: clamp(30px, 4vw, 48px); letter-spacing: -0.04em; line-height: 1.3; }
-.resume-gate-heading p { margin-top: 24px; }
 .resume-form { margin-top: 48px; }
 .resume-form label { display: block; margin-bottom: 12px; color: var(--resume-ink); font-size: 14px; }
 .resume-input-wrap { position: relative; }
@@ -161,7 +160,6 @@ html.resume-swiss {
 .resume-form-message[role='alert'] { color: var(--resume-ink); }
 .resume-submit { display: flex; justify-content: space-between; align-items: center; width: 100%; min-height: 56px; padding: 12px 20px; background: var(--resume-ink); color: var(--resume-paper); font-size: 14px; }
 .resume-page button:disabled { cursor: default; opacity: 0.5; }
-.resume-gate-signature { margin-top: 64px; color: var(--resume-muted); font-size: 13px; }
 
 @media (hover: hover) and (pointer: fine) {
   .resume-text-control:hover, .resume-contact a:hover, .resume-job a:hover, .resume-open-source a:hover { color: var(--resume-ink); text-decoration: underline; }

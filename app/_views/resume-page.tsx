@@ -28,14 +28,11 @@ export async function ResumePage({ locale, searchParams }: ResumePageProps & { l
 
   return (
     <section className="resume-gate">
-      <p className="resume-document-label">Private document</p>
       <div className="resume-gate-body">
         <header className="resume-gate-heading">
-          <h1>A little more about me.</h1>
-          <p>My résumé lives here. If I’ve shared a passphrase with you, you’re in the right place.</p>
+          <h1>View my résumé</h1>
         </header>
         <ResumeUnlockForm locale={locale} error={error} available={Boolean(resumeCredentials())} />
-        <p className="resume-gate-signature">Cali Castle</p>
       </div>
     </section>
   )
