@@ -48,6 +48,9 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
                 </div>
               </header>
               <Bullets items={job.bullets} />
+              {Boolean(job.selectedClients?.length) && (
+                <p className="resume-clients"><strong>Selected clients:</strong> {job.selectedClients?.join(' · ')}</p>
+              )}
               {Boolean(job.engagements?.length) && (
                 <section className="resume-engagements" aria-label="Selected products and engagements">
                   <p className="resume-subsection-label">Selected products and engagements</p>
@@ -75,7 +78,7 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
             {content.openSource?.map((project) => (
               <div key={project.name} className="resume-open-source">
                 <header>
-                  <h3>{project.name}</h3>
+                  <h3>{project.url ? <a href={project.url} rel="noreferrer">{project.name} ↗</a> : project.name}</h3>
                   <p className="resume-job-role">{project.technology}</p>
                 </header>
                 <p className="resume-job-description">{project.description}</p>
