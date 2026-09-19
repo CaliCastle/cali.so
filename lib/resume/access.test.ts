@@ -33,6 +33,21 @@ describe('private resume access', () => {
     expect(await matchesPassphrase('', credentials)).toBe(false)
   })
 
+  it('rejects excess concurrent verification and recovers after work finishes', async () => {
+    const accepted = [
+      matchesPassphrase(credentials.passphrase, credentials),
+      matchesPassphrase('incorrect', credentials),
+    ]
+    const excess = await Promise.allSettled(Array.from({ length: 10 }, () =>
+      matchesPassphrase(credentials.passphrase, credentials),
+    ))
+    expect(excess.every((result) =>
+      result.status === 'rejected' && result.reason.message === 'Resume passphrase verification is busy',
+    )).toBe(true)
+    expect(await Promise.all(accepted)).toEqual([true, false])
+    expect(await matchesPassphrase(credentials.passphrase, credentials)).toBe(true)
+  })
+
   it('issues unique sessions without embedding credentials', async () => {
     const token = await createResumeSession(credentials, now)
     expect(await validResumeSession(token, credentials, now)).toBe(true)

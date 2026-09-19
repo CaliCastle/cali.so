@@ -37,12 +37,24 @@ function credentialKey(credentials: ResumeCredentials) {
   return cachedKey.key
 }
 
+// Keep untrusted scrypt work bounded across client identities. Reject excess
+// attempts without a queue so other requests can still use the crypto pool.
+let activeVerifications = 0
+const MAX_ACTIVE_VERIFICATIONS = 2
+
 export async function matchesPassphrase(value: string, credentials: ResumeCredentials) {
-  const [supplied, expected] = await Promise.all([
-    deriveKey(value, credentials.secret),
-    credentialKey(credentials),
-  ])
-  return timingSafeEqual(supplied, expected)
+  if (activeVerifications >= MAX_ACTIVE_VERIFICATIONS) {
+    throw new Error('Resume passphrase verification is busy')
+  }
+  activeVerifications++
+  try {
+    // Finish the single cached derivation before starting submitted work.
+    const expected = await credentialKey(credentials)
+    const supplied = await deriveKey(value, credentials.secret)
+    return timingSafeEqual(supplied, expected)
+  } finally {
+    activeVerifications--
+  }
 }
 
 async function signature(payload: string, credentials: ResumeCredentials) {

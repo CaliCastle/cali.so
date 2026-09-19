@@ -47,7 +47,9 @@ document, someone with access can retain a copy or share their access.
 
 Both POST endpoints check the configured origin and Fetch Metadata. Unlock
 allows five attempts per client in fifteen minutes, using the existing
-pseudonymous rate limiter; backend failures deny access. Form bodies have a
+pseudonymous rate limiter. Each server process allows at most two concurrent
+passphrase verifications, rejecting excess work with a generic 503 instead of
+queuing expensive derivations. Backend failures deny access. Form bodies have a
 4 KiB limit. Private pages and endpoints use `private, no-store` responses.
 Print / save PDF uses the authenticated browser document; no public PDF exists.
 
