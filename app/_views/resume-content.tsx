@@ -7,6 +7,7 @@ import { projects } from '~/lib/projects'
 import { getEnglishResumeContent } from '~/lib/resume/content'
 import { getChineseResumeContent } from '~/lib/resume/content-zh'
 
+import { ResumeContact } from '../_components/resume-contact'
 import { EnglishResumeSections } from './resume-content-en'
 import { ChineseResumeContent } from './resume-content-zh'
 
@@ -46,12 +47,7 @@ export function ResumeContent({ locale }: { locale: Locale }) {
           <p className="resume-intro">{localizedContent?.summary ?? localize(locale,
             '我是两个孩子的父亲、设计工程师，也是智能体编排者。我创立了佐玩 Zolplay，一家 AI 原生设计工作室，打造产品、品牌与数字体验。我喜欢把细节做到刚刚好。',
             'I’m a father of two, a design engineer, and an agent orchestrator. I founded Zolplay, an AI-native design studio creating products, brands, and digital experiences. I love getting the details just right.')}</p>
-          <div className="resume-contact">
-            <a href="mailto:hi@cali.so">hi@cali.so ↗</a>
-            {localizedContent?.phone && <a href={`tel:${localizedContent.phone.replace(/[ -]/g, '')}`}>{localizedContent.phone}</a>}
-            <a href="https://github.com/CaliCastle" rel="noreferrer">GitHub ↗</a>
-            <a href="https://zolplay.com" rel="noreferrer">Zolplay ↗</a>
-          </div>
+          <ResumeContact phone={localizedContent?.phone} />
         </div>
       </header>
 

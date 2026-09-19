@@ -91,6 +91,7 @@ html.resume-swiss {
 .resume-intro { max-width: 42em; font-size: 18px; line-height: 1.9; text-wrap: pretty; }
 .resume-contact { display: flex; flex-wrap: wrap; column-gap: 28px; margin-top: 24px; }
 .resume-contact a { color: var(--resume-ink); }
+.resume-contact svg { flex: none; pointer-events: none; }
 
 .resume-section {
   margin-top: 96px;
@@ -240,6 +241,7 @@ html.resume-swiss {
   .resume-intro { font-size: 12px; line-height: 1.75; }
   .resume-contact { margin-top: 8px; gap: 16px; }
   .resume-contact a { min-height: 0; font-size: 10px; }
+  .resume-contact svg { width: 12px; height: 12px; }
   .resume-section { display: block; margin-top: 24px; padding-top: 12px; }
   .resume-section-title { display: flex; align-items: baseline; gap: 12px; position: static; padding: 0; margin-bottom: 12px; font-size: 14px; }
   .resume-overline { order: 1; margin: 0; font-size: 9px; }
