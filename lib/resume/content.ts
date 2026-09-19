@@ -18,12 +18,18 @@ const resumeContentSchema = z.object({
   experience: z.array(z.object({
     company: text,
     role: text,
-    period: text,
+    period: z.union([text, z.array(text).min(1).max(5)]),
     bullets,
     engagements: z.array(engagement).max(20).optional(),
   })).min(1).max(20),
+  openSource: z.array(z.object({ name: text, technology: text, description: text })).max(20).optional(),
   capabilities: z.array(z.object({ label: text, description: text })).max(12),
-  education: z.array(z.object({ institution: text, qualification: text })).max(10),
+  education: z.array(z.object({
+    institution: text,
+    qualification: text,
+    notes: z.array(text).max(10).optional(),
+  })).max(10),
+  educationNote: text.optional(),
 })
 
 export type ResumeContentData = z.infer<typeof resumeContentSchema>

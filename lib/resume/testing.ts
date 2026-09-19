@@ -8,7 +8,7 @@ export const resumeContentFixture: ResumeContentData = {
   experience: [{
     company: 'very very spaceship',
     role: 'Example engineer',
-    period: 'Example period',
+    period: ['Example first period', 'Example second period'],
     bullets: ['**Synthetic achievement** with supporting context.'],
     engagements: [{
       name: 'Example internal product',
@@ -17,6 +17,8 @@ export const resumeContentFixture: ResumeContentData = {
       bullets: ['**Shipped an example tool** with a small team.'],
     }],
   }],
+  openSource: [{ name: 'Example open source', technology: 'Example technology', description: 'Synthetic open-source contribution.' }],
   capabilities: [{ label: 'Example capability', description: 'Example tools.' }],
-  education: [{ institution: 'Example university', qualification: 'Example degree.' }],
+  education: [{ institution: 'Example university', qualification: 'Example degree.', notes: ['Example academic recognition.'] }],
+  educationNote: 'Example joint education program.',
 }

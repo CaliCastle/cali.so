@@ -25,16 +25,39 @@ describe('private English resume content', () => {
     }
   })
 
+  it('retains support for earlier documents with one period and no extra sections', () => {
+    const content = structuredClone(resumeContentFixture)
+    content.experience[0].period = 'Example period'
+    delete content.openSource
+    delete content.educationNote
+    delete content.education[0].notes
+    expect(parseResumeContent(encode(content))).toEqual(content)
+    expect(renderToStaticMarkup(<EnglishResumeSections content={content} />)).toContain('Example period')
+  })
+
   it('renders achievements, shipped products, toolkit, and education with safe emphasis', () => {
     const content = structuredClone(resumeContentFixture)
-    content.experience[0].bullets.push('<script>unsafe()</script> **Safe emphasis**')
+    content.experience[0].bullets.push('<script>unsafe()</script> **Safe emphasis** and *Example game*')
     const html = renderToStaticMarkup(<EnglishResumeSections content={content} />)
     expect(html).toContain('<strong>Synthetic achievement</strong>')
     expect(html).toContain('Example internal product')
     expect(html).toContain('Example university')
+    expect(html).toContain('<em>Example game</em>')
     expect(html).not.toContain('<script>')
     expect(html).toContain('&lt;script&gt;')
     expect(html.indexOf('Example internal product')).toBeLessThan(html.indexOf('Example capability'))
+  })
+
+  it('preserves multiple dates, open-source work, and education notes in order', () => {
+    const content = parseResumeContent(encode(resumeContentFixture))!
+    const html = renderToStaticMarkup(<EnglishResumeSections content={content} />)
+    for (const text of [
+      'Example first period', 'Example second period',
+      'Synthetic open-source contribution.', 'Example academic recognition.',
+      'Example joint education program.',
+    ]) expect(html).toContain(text)
+    expect(html.indexOf('Example open source')).toBeLessThan(html.indexOf('Example capability'))
+    expect(html.indexOf('Example capability')).toBeLessThan(html.indexOf('Example university'))
   })
 
   it('updates only English and leaves the Chinese résumé unchanged', () => {

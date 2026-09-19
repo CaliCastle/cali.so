@@ -85,16 +85,21 @@ value as private content. No remote configuration is changed by this work.
 The English JSON has `name`, `title`, `summary`, `experience`, `capabilities`, and
 `education` fields. Each experience has `company`, `role`, `period`, `bullets`,
 and optional `engagements` (`name`, `role`, optional `note`, and `bullets`).
-Capabilities have `label` and `description`; education has `institution` and
-`qualification`. The schema lives in `lib/resume/content.ts`. Bullets support
-`**bold emphasis**`; HTML and executable MDX are never interpreted.
+`period` accepts either one string or an array of date/location lines.
+Capabilities have `label` and `description`; education has `institution`,
+`qualification`, and optional `notes`. Optional `openSource` entries contain
+`name`, `technology`, and `description`; `educationNote` holds the closing
+education paragraph. Earlier documents without these additions remain valid.
+The schema lives in `lib/resume/content.ts`. English bullets support
+`**bold emphasis**` and `*italics*`; HTML and executable MDX are never interpreted.
 
-The Chinese schema in `lib/resume/content-zh.ts` uses the same top-level fields
-plus `openSource` and an optional `educationNote`. Each experience has a
+The Chinese schema in `lib/resume/content-zh.ts` uses the same top-level fields,
+with required `openSource` and an optional `educationNote`. Each experience has a
 `periods` array instead of `period`, and supports an optional `description`
 for roles presented as a paragraph; either the description or bullets must be
 present. Open-source entries have `name`, `technology`, and `description`.
 Each education entry also has a `notes` array.
+Chinese bullets support bold emphasis.
 
 The layouts are in `app/_views/resume-content-en.tsx` and
 `app/_views/resume-content-zh.tsx`. They preserve each master's experience and
