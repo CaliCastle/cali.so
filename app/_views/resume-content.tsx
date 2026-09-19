@@ -48,6 +48,7 @@ export function ResumeContent({ locale }: { locale: Locale }) {
             'I’m a father of two, a design engineer, and an agent orchestrator. I founded Zolplay, an AI-native design studio creating products, brands, and digital experiences. I love getting the details just right.')}</p>
           <div className="resume-contact">
             <a href="mailto:hi@cali.so">hi@cali.so ↗</a>
+            {localizedContent?.phone && <a href={`tel:${localizedContent.phone.replace(/[ -]/g, '')}`}>{localizedContent.phone}</a>}
             <a href="https://github.com/CaliCastle" rel="noreferrer">GitHub ↗</a>
             <a href="https://zolplay.com" rel="noreferrer">Zolplay ↗</a>
           </div>

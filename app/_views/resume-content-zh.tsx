@@ -177,6 +177,7 @@ export function ChineseResumeContent({ content }: { content: ChineseResumeConten
           <p className="resume-intro">{content?.summary ?? '我是两个孩子的父亲、设计工程师，也是智能体编排者。我创立了佐玩 Zolplay，一家 AI 原生设计工作室，打造产品、品牌与数字体验。我喜欢把细节做到刚刚好。'}</p>
           <div className="resume-contact">
             <a href="mailto:hi@cali.so">hi@cali.so ↗</a>
+            {content?.phone && <a href={`tel:${content.phone.replace(/[ -]/g, '')}`}>{content.phone}</a>}
             <a href="https://github.com/CaliCastle" rel="noreferrer">GitHub ↗</a>
             <a href="https://zolplay.com" rel="noreferrer">Zolplay ↗</a>
           </div>
