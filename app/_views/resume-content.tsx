@@ -36,7 +36,7 @@ export function ResumeContent({ locale }: { locale: Locale }) {
     <article className="resume-content">
       <header>
         <div className="flex items-center justify-between gap-4">
-          <p className="page-eyebrow">{localize(locale, '简历', 'Curriculum vitæ')}</p>
+          <p className="page-eyebrow">{localize(locale, '简历', 'Curriculum vitae')}</p>
           <PixelCluster variant={5} />
         </div>
         <h1 className="resume-name">{localizedContent?.name ?? 'Cali Castle'}</h1>
