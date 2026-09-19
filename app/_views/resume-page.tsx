@@ -7,6 +7,7 @@ import { resumeCredentials } from '~/lib/resume/access'
 import { hasResumeAccess } from '~/lib/resume/server'
 
 import { ResumeContent } from './resume-content'
+import { ChineseResumeGate } from './resume-content-zh'
 
 export type ResumePageProps = {
   searchParams: Promise<{ access?: string | string[] }>
@@ -24,6 +25,8 @@ export async function ResumePage({ locale, searchParams }: ResumePageProps & { l
 
   const { access } = await searchParams
   const error = typeof access === 'string' ? messages[access]?.[locale] : undefined
+  if (locale === 'zh') return <ChineseResumeGate error={error} available={Boolean(resumeCredentials())} />
+
   return (
     <section className="resume-gate">
       <div className="flex items-center justify-between gap-4">

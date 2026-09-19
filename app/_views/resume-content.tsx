@@ -9,7 +9,7 @@ import { getEnglishResumeContent } from '~/lib/resume/content'
 import { getChineseResumeContent } from '~/lib/resume/content-zh'
 
 import { EnglishResumeSections } from './resume-content-en'
-import { ChineseResumeSections } from './resume-content-zh'
+import { ChineseResumeContent } from './resume-content-zh'
 
 function SectionTitle({ index, children }: { index: string; children: React.ReactNode }) {
   return (
@@ -24,9 +24,10 @@ function SectionTitle({ index, children }: { index: string; children: React.Reac
 // The default draft uses published facts. Detailed localized copy is loaded
 // from server configuration only after ResumePage verifies access.
 export function ResumeContent({ locale }: { locale: Locale }) {
+  if (locale === 'zh') return <ChineseResumeContent content={getChineseResumeContent()} />
+
   const englishContent = locale === 'en' ? getEnglishResumeContent() : null
-  const chineseContent = locale === 'zh' ? getChineseResumeContent() : null
-  const localizedContent = englishContent ?? chineseContent
+  const localizedContent = englishContent
   const selectedProjects = projects.filter((project) =>
     ['Cali Baby', 'Zolplay Website', 'Raycast · Apple Developer Docs', 'PopMenu'].includes(project.nameEn),
   )
@@ -52,8 +53,6 @@ export function ResumeContent({ locale }: { locale: Locale }) {
 
       {englishContent ? (
         <EnglishResumeSections content={englishContent} />
-      ) : chineseContent ? (
-        <ChineseResumeSections content={chineseContent} />
       ) : (
         <>
           <section className="resume-section">
