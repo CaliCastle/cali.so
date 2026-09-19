@@ -1,6 +1,4 @@
-import '../globals.css'
 import '../_components/resume.css'
-import '../_components/resume-en.css'
 
 import { ResumeDocument, resumeMetadata } from '../_components/resume-document'
 
