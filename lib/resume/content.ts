@@ -15,6 +15,7 @@ const resumeContentSchema = z.object({
   name: text,
   title: text,
   summary: text,
+  phone: z.string().trim().min(8).max(32).regex(/^\+[1-9][0-9]*(?:[ -][0-9]+)*$/).optional(),
   experience: z.array(z.object({
     company: text,
     role: text,
