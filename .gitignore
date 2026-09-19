@@ -53,3 +53,6 @@ static/
 .react-email/
 /.idea
 .env*
+
+# Private resume copy belongs in server configuration, never public source.
+/.private/resume.en.json

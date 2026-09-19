@@ -211,6 +211,110 @@
   color: var(--gray-10);
 }
 
+.resume-career {
+  margin-top: 1.25rem;
+}
+
+.resume-job {
+  padding: 1.5rem 0;
+}
+
+.resume-job + .resume-job {
+  margin-top: 0.75rem;
+}
+
+.resume-job-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem 1.5rem;
+}
+
+.resume-job h3, .resume-engagement h4, .resume-education h3 {
+  color: var(--gray-12);
+  font-size: 15px;
+  font-weight: var(--font-weight-medium);
+  text-wrap: balance;
+}
+
+.resume-job-role {
+  margin-top: 0.125rem;
+  color: var(--gray-10);
+}
+
+.resume-bullets {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-left: 1rem;
+  list-style: disc;
+}
+
+.resume-bullets li {
+  padding-left: 0.25rem;
+  text-wrap: pretty;
+}
+
+.resume-bullets li::marker {
+  color: var(--gray-8);
+  font-size: 0.75em;
+}
+
+.resume-bullets strong {
+  color: var(--gray-12);
+  font-weight: var(--font-weight-medium);
+}
+
+.resume-engagements {
+  margin-top: 2rem;
+}
+
+.resume-subsection-label {
+  color: var(--gray-9);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.resume-engagement {
+  margin-top: 1.5rem;
+}
+
+.resume-engagement + .resume-engagement {
+  margin-top: 2rem;
+}
+
+.resume-context-note {
+  margin-top: 0.75rem;
+  color: var(--gray-9);
+  font-size: 12px;
+}
+
+.resume-capabilities {
+  margin-top: 1rem;
+}
+
+.resume-capabilities > div {
+  padding: 1rem 0;
+}
+
+.resume-capabilities dt {
+  color: var(--gray-12);
+  font-weight: var(--font-weight-medium);
+}
+
+.resume-capabilities dd, .resume-education p {
+  margin-top: 0.375rem;
+  color: var(--gray-10);
+}
+
+.resume-education {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
 .resume-footer {
   margin-top: 3rem;
   padding-top: 1rem;
@@ -308,5 +412,33 @@
   }
   .resume-footer {
     margin-top: 1.5rem;
+  }
+  .resume-master .resume-job {
+    padding: 1rem 0;
+  }
+  .resume-content:has(.resume-master) {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+  .resume-master .resume-job h3, .resume-master .resume-engagement h4, .resume-master .resume-education h3 {
+    font-size: 13px;
+  }
+  .resume-master .resume-bullets {
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+  .resume-master .resume-bullets li, .resume-master .resume-capabilities > div, .resume-master .resume-education {
+    break-inside: avoid;
+    orphans: 3;
+    widows: 3;
+  }
+  .resume-master header, .resume-master .resume-subsection-label {
+    break-after: avoid;
+  }
+  .resume-master .resume-engagements, .resume-master .resume-engagement + .resume-engagement {
+    margin-top: 1.25rem;
+  }
+  .resume-master .resume-capabilities > div {
+    padding: 0.75rem 0;
   }
 }

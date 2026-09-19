@@ -46,14 +46,38 @@ Print / save PDF uses the authenticated browser document; no public PDF exists.
 
 ## Content
 
-The initial edition uses the existing `lib/personal.ts` work history,
-`lib/projects.ts` project registry, and homepage introduction. It adds no
-unverified education, accomplishments, dates, or metrics.
+The Chinese document remains the initial draft from `lib/personal.ts`,
+`lib/projects.ts`, and the homepage introduction. English can use a full CV
+through the server-only `RESUME_EN_CONTENT_BASE64` setting. When that setting
+is absent, English uses the initial public-content draft too. Invalid configured
+content fails with a generic error instead of silently showing an old draft.
 
-Edit the layout and private copy in `app/_views/resume-content.tsx`. Keep any
-future sensitive content in server-only modules and out of `public/` or client
-components. This repository's visibility still determines who can read source;
-the website gate does not protect committed source from repository readers.
+The supplied English master is kept in `.private/resume.en.json`, an ignored
+local file. **Do not commit this file or its encoded value.** This repository
+is public, and the website passphrase cannot protect material in Git history.
+The content is parsed only after the page checks the visitor's session.
+
+To prepare the deployment value locally:
+
+```sh
+node -e 'process.stdout.write(require("node:fs").readFileSync(".private/resume.en.json").toString("base64"))'
+```
+
+Set the result as `RESUME_EN_CONTENT_BASE64` in the intended server environment
+and redeploy. Base64 is only a transport encoding, not encryption; handle the
+value as private content. No remote configuration is changed by this work.
+
+The JSON has `name`, `title`, `summary`, `experience`, `capabilities`, and
+`education` fields. Each experience has `company`, `role`, `period`, `bullets`,
+and optional `engagements` (`name`, `role`, optional `note`, and `bullets`).
+Capabilities have `label` and `description`; education has `institution` and
+`qualification`. The schema lives in `lib/resume/content.ts`. Bullets support
+`**bold emphasis**`; HTML and executable MDX are never interpreted.
+
+The English layout is in `app/_views/resume-content-en.tsx`. It preserves the
+master's experience and project order, with readable page breaks when printed.
+Interview notes and editorial recommendations surrounding the CV are omitted.
+Tests use synthetic content instead of private career or commercial details.
 
 ## Checks
 
