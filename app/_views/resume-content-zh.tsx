@@ -195,14 +195,11 @@ export function ChineseResumeContent({ content }: { content: ChineseResumeConten
 export function ChineseResumeGate({ error, available }: { error?: string; available: boolean }) {
   return (
     <section className="resume-gate">
-      <p className="resume-document-label">私人文档<span lang="en">Private document</span></p>
       <div className="resume-gate-body">
         <header className="resume-gate-heading">
-          <h1>很高兴认识你。</h1>
-          <p>这里是我的简历。输入口令，就可以继续阅读。</p>
+          <h1>查看我的简历</h1>
         </header>
         <ResumeUnlockForm locale="zh" error={error} available={available} />
-        <p className="resume-gate-signature">Cali Castle</p>
       </div>
     </section>
   )
