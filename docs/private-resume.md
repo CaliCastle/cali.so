@@ -46,14 +46,17 @@ Print / save PDF uses the authenticated browser document; no public PDF exists.
 
 ## Content
 
-The Chinese document remains the initial draft from `lib/personal.ts`,
-`lib/projects.ts`, and the homepage introduction. English can use a full CV
-through the server-only `RESUME_EN_CONTENT_BASE64` setting. When that setting
-is absent, English uses the initial public-content draft too. Invalid configured
-content fails with a generic error instead of silently showing an old draft.
+Each language has an independent full CV setting: `RESUME_ZH_CONTENT_BASE64`
+for Chinese and `RESUME_EN_CONTENT_BASE64` for English. When a locale's setting
+is absent, that locale uses the initial draft from `lib/personal.ts`,
+`lib/projects.ts`, and the homepage introduction. Invalid configured content
+fails with a generic error instead of silently showing an old draft. Only the
+requested locale's configuration is parsed, so an invalid Chinese setting
+cannot affect English, and vice versa.
 
-The supplied English master is kept in `.private/resume.en.json`, an ignored
-local file. **Do not commit this file or its encoded value.** This repository
+The supplied masters are kept in `.private/resume.zh.json` and
+`.private/resume.en.json`, ignored local files. **Do not commit these files or
+their encoded values.** This repository
 is public, and the website passphrase cannot protect material in Git history.
 The content is parsed only after the page checks the visitor's session.
 
@@ -64,18 +67,34 @@ node -e 'process.stdout.write(require("node:fs").readFileSync(".private/resume.e
 ```
 
 Set the result as `RESUME_EN_CONTENT_BASE64` in the intended server environment
-and redeploy. Base64 is only a transport encoding, not encryption; handle the
+and redeploy. For Chinese, encode its own file:
+
+```sh
+node -e 'process.stdout.write(require("node:fs").readFileSync(".private/resume.zh.json").toString("base64"))'
+```
+
+Set that result as `RESUME_ZH_CONTENT_BASE64`, preserving the English setting.
+Base64 is only a transport encoding, not encryption; handle the
 value as private content. No remote configuration is changed by this work.
 
-The JSON has `name`, `title`, `summary`, `experience`, `capabilities`, and
+The English JSON has `name`, `title`, `summary`, `experience`, `capabilities`, and
 `education` fields. Each experience has `company`, `role`, `period`, `bullets`,
 and optional `engagements` (`name`, `role`, optional `note`, and `bullets`).
 Capabilities have `label` and `description`; education has `institution` and
 `qualification`. The schema lives in `lib/resume/content.ts`. Bullets support
 `**bold emphasis**`; HTML and executable MDX are never interpreted.
 
-The English layout is in `app/_views/resume-content-en.tsx`. It preserves the
-master's experience and project order, with readable page breaks when printed.
+The Chinese schema in `lib/resume/content-zh.ts` uses the same top-level fields
+plus `openSource` and an optional `educationNote`. Each experience has a
+`periods` array instead of `period`, and supports an optional `description`
+for roles presented as a paragraph; either the description or bullets must be
+present. Open-source entries have `name`, `technology`, and `description`.
+Each education entry also has a `notes` array.
+
+The layouts are in `app/_views/resume-content-en.tsx` and
+`app/_views/resume-content-zh.tsx`. They preserve each master's experience and
+project order, with readable page breaks when printed. Chinese-specific styles
+load only in the Chinese document layout.
 Interview notes and editorial recommendations surrounding the CV are omitted.
 Tests use synthetic content instead of private career or commercial details.
 

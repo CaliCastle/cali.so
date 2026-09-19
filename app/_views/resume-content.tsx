@@ -6,8 +6,10 @@ import { localize, localePath, type Locale } from '~/lib/locale-route'
 import { experience } from '~/lib/personal'
 import { projects } from '~/lib/projects'
 import { getEnglishResumeContent } from '~/lib/resume/content'
+import { getChineseResumeContent } from '~/lib/resume/content-zh'
 
 import { EnglishResumeSections } from './resume-content-en'
+import { ChineseResumeSections } from './resume-content-zh'
 
 function SectionTitle({ index, children }: { index: string; children: React.ReactNode }) {
   return (
@@ -19,10 +21,12 @@ function SectionTitle({ index, children }: { index: string; children: React.Reac
   )
 }
 
-// The default draft uses published facts. Detailed English copy is loaded
+// The default draft uses published facts. Detailed localized copy is loaded
 // from server configuration only after ResumePage verifies access.
 export function ResumeContent({ locale }: { locale: Locale }) {
   const englishContent = locale === 'en' ? getEnglishResumeContent() : null
+  const chineseContent = locale === 'zh' ? getChineseResumeContent() : null
+  const localizedContent = englishContent ?? chineseContent
   const selectedProjects = projects.filter((project) =>
     ['Cali Baby', 'Zolplay Website', 'Raycast · Apple Developer Docs', 'PopMenu'].includes(project.nameEn),
   )
@@ -34,9 +38,9 @@ export function ResumeContent({ locale }: { locale: Locale }) {
           <p className="page-eyebrow">{localize(locale, '简历', 'Curriculum vitæ')}</p>
           <PixelCluster variant={5} />
         </div>
-        <h1 className="resume-name">{englishContent?.name ?? 'Cali Castle'}</h1>
-        <p className="resume-role">{englishContent?.title ?? localize(locale, '设计工程师 · 创始人 · 创意总监', 'Design engineer · Founder · Creative director')}</p>
-        <p className="resume-intro">{englishContent?.summary ?? localize(locale,
+        <h1 className="resume-name">{localizedContent?.name ?? 'Cali Castle'}</h1>
+        <p className="resume-role">{localizedContent?.title ?? localize(locale, '设计工程师 · 创始人 · 创意总监', 'Design engineer · Founder · Creative director')}</p>
+        <p className="resume-intro">{localizedContent?.summary ?? localize(locale,
           '我是两个孩子的父亲、设计工程师，也是智能体编排者。我创立了佐玩 Zolplay，一家 AI 原生设计工作室，打造产品、品牌与数字体验。我喜欢把细节做到刚刚好。',
           'I’m a father of two, a design engineer, and an agent orchestrator. I founded Zolplay, an AI-native design studio creating products, brands, and digital experiences. I love getting the details just right.')}</p>
         <div className="resume-contact">
@@ -48,6 +52,8 @@ export function ResumeContent({ locale }: { locale: Locale }) {
 
       {englishContent ? (
         <EnglishResumeSections content={englishContent} />
+      ) : chineseContent ? (
+        <ChineseResumeSections content={chineseContent} />
       ) : (
         <>
           <section className="resume-section">

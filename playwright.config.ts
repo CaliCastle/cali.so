@@ -1,5 +1,6 @@
 import { defineConfig, devices } from '@playwright/test'
 import { resumeContentFixture } from './lib/resume/testing'
+import { chineseResumeContentFixture } from './lib/resume/testing-zh'
 
 const hostedBaseUrl = process.env.PLAYWRIGHT_BASE_URL
 const baseURL = hostedBaseUrl ?? 'http://127.0.0.1:3210'
@@ -27,6 +28,7 @@ const localServerEnv = {
   RESUME_PASSPHRASE: 'local-resume-preview-only',
   RESUME_SESSION_SECRET: 'local-resume-test-secret-not-for-deployment-1234567890',
   RESUME_EN_CONTENT_BASE64: Buffer.from(JSON.stringify(resumeContentFixture)).toString('base64'),
+  RESUME_ZH_CONTENT_BASE64: Buffer.from(JSON.stringify(chineseResumeContentFixture)).toString('base64'),
   // Native same-origin forms must use the local test server's origin.
   // Public canonical URLs remain controlled by PUBLIC_SITE_URL.
   SITE_URL: baseURL,

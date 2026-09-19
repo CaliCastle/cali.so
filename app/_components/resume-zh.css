@@ -1,0 +1,41 @@
+/* Loaded only by the Chinese document; the English layout stays unchanged. */
+html[lang='zh-CN'] .resume-content:has(.resume-master-zh) {
+  line-height: 1.9;
+}
+
+.resume-master-zh .resume-periods {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.resume-master-zh .resume-job-description {
+  margin-top: 1rem;
+}
+
+.resume-master-zh .resume-open-source {
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.resume-master-zh .resume-open-source h3 {
+  color: var(--gray-12);
+  font-size: 15px;
+  font-weight: var(--font-weight-medium);
+}
+
+.resume-master-zh .resume-education-note {
+  margin-top: 1rem;
+  color: var(--gray-10);
+}
+
+@media print {
+  html[lang='zh-CN'] .resume-content:has(.resume-master-zh) {
+    line-height: 1.8;
+  }
+  .resume-master-zh header, .resume-master-zh .resume-open-source {
+    break-inside: avoid;
+  }
+  .resume-master-zh .resume-open-source h3 {
+    font-size: 13px;
+  }
+}
