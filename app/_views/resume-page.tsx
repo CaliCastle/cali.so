@@ -1,8 +1,7 @@
 import 'server-only'
 
-import { PixelCluster } from '~/components/pixel-cluster'
 import { ResumeUnlockForm } from '~/components/resume-controls'
-import { localize, type Locale } from '~/lib/locale-route'
+import type { Locale } from '~/lib/locale-route'
 import { resumeCredentials } from '~/lib/resume/access'
 import { hasResumeAccess } from '~/lib/resume/server'
 
@@ -29,18 +28,12 @@ export async function ResumePage({ locale, searchParams }: ResumePageProps & { l
 
   return (
     <section className="resume-gate">
-      <div className="flex items-center justify-between gap-4">
-        <p className="page-eyebrow">{localize(locale, '私人文档', 'Private document')}</p>
-        <PixelCluster variant={5} />
+      <div className="resume-gate-body">
+        <header className="resume-gate-heading">
+          <h1>View my résumé</h1>
+        </header>
+        <ResumeUnlockForm locale={locale} error={error} available={Boolean(resumeCredentials())} />
       </div>
-      <div className="resume-gate-heading">
-        <h1>{localize(locale, '很高兴认识你。', 'A little more about me.')}</h1>
-        <p>{localize(locale,
-          '这里是我的简历。输入口令，就可以继续阅读。',
-          'My résumé lives here. If I’ve shared a passphrase with you, you’re in the right place.')}</p>
-      </div>
-      <ResumeUnlockForm locale={locale} error={error} available={Boolean(resumeCredentials())} />
-      <p className="resume-gate-signature">Cali Castle <span aria-hidden="true">/</span> cali.so</p>
     </section>
   )
 }

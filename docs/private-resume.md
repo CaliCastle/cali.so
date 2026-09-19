@@ -1,13 +1,13 @@
 # Private résumé
 
 `/resume` (Chinese) and `/en/resume` (English) are direct-link pages, with no
-public dock, footer, analytics, or social requests. The Chinese document has a
+public dock, footer, analytics, or social requests. Both documents share a
 standalone Swiss grid: a 1120px page, an asymmetric twelve-column layout,
 generous section spacing, and neutral sans-serif type. It uses its own
 stylesheet and system light/dark palette, without the site's paper texture or
 decorative chrome. On phones it becomes a single reading column; print uses
-a compact A4 layout. The English document retains its existing site typography
-and layout. Only these private pages link to
+a compact A4 layout. Each language keeps its own content and section labels.
+Only these private pages link to
 each other. They are absent from navigation, the sitemap, feeds, and `llms.txt`.
 The routes send `noindex, nofollow, noarchive, nosnippet` and a `same-origin`
 referrer policy. This keeps the private URL out of external requests while
@@ -107,10 +107,10 @@ Chinese bullets support bold emphasis.
 
 The layouts are in `app/_views/resume-content-en.tsx` and
 `app/_views/resume-content-zh.tsx`. They preserve each master's experience and
-project order, with readable page breaks when printed. The Chinese root layout
-loads only `app/_components/resume-zh.css`; it does not use `SiteDocument` or
-the public site styles. Its unconfigured draft and passphrase form share the
-same standalone layout.
+project order, with readable page breaks when printed. Both root layouts use
+`ResumeDocument` and load only `app/_components/resume.css`; neither uses
+`SiteDocument` or the public site styles. Their unconfigured drafts and
+passphrase forms share the same standalone layout.
 Interview notes and editorial recommendations surrounding the CV are omitted.
 Tests use synthetic content instead of private career or commercial details.
 

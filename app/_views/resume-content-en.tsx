@@ -20,10 +20,9 @@ function Bullets({ items }: { items: string[] }) {
 
 function SectionTitle({ index, children }: { index: number; children: React.ReactNode }) {
   return (
-    <h2 className="section-tag">
-      <span className="section-tag-index" aria-hidden="true">{String(index).padStart(2, '0')}</span>
-      <span className="section-tag-hatch" aria-hidden="true" />
-      <span className="section-tag-label">{children}</span>
+    <h2 className="resume-section-title">
+      <span className="resume-overline" aria-hidden="true">{String(index).padStart(2, '0')}</span>
+      <span>{children}</span>
     </h2>
   )
 }
@@ -36,7 +35,7 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
         <SectionTitle index={++sectionIndex}>Experience</SectionTitle>
         <ol className="resume-career">
           {content.experience.map((job) => (
-            <li key={job.company} className="resume-job hairline-top">
+            <li key={job.company} className="resume-job">
               <header className="resume-job-heading">
                 <div>
                   <h3>{job.company}</h3>
@@ -72,15 +71,17 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
       {Boolean(content.openSource?.length) && (
         <section className="resume-section">
           <SectionTitle index={++sectionIndex}>Open source</SectionTitle>
-          {content.openSource?.map((project) => (
-            <div key={project.name} className="resume-open-source hairline-top">
-              <header>
-                <h3>{project.name}</h3>
-                <p className="resume-job-role">{project.technology}</p>
-              </header>
-              <p className="resume-job-description">{project.description}</p>
-            </div>
-          ))}
+          <div className="resume-section-body">
+            {content.openSource?.map((project) => (
+              <div key={project.name} className="resume-open-source">
+                <header>
+                  <h3>{project.name}</h3>
+                  <p className="resume-job-role">{project.technology}</p>
+                </header>
+                <p className="resume-job-description">{project.description}</p>
+              </div>
+            ))}
+          </div>
         </section>
       )}
 
@@ -89,7 +90,7 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
           <SectionTitle index={++sectionIndex}>Selected capabilities & toolkit</SectionTitle>
           <dl className="resume-capabilities">
             {content.capabilities.map((capability) => (
-              <div key={capability.label} className="hairline-top">
+              <div key={capability.label}>
                 <dt>{capability.label}</dt>
                 <dd>{capability.description}</dd>
               </div>
@@ -101,14 +102,16 @@ export function EnglishResumeSections({ content }: { content: ResumeContentData 
       {content.education.length > 0 && (
         <section className="resume-section">
           <SectionTitle index={++sectionIndex}>Education</SectionTitle>
-          {content.education.map((education) => (
-            <div key={education.institution} className="resume-education hairline-top">
-              <h3>{education.institution}</h3>
-              <p>{education.qualification}</p>
-              {education.notes?.map((note) => <p key={note}>{note}</p>)}
-            </div>
-          ))}
-          {content.educationNote && <p className="resume-education-note">{content.educationNote}</p>}
+          <div className="resume-section-body">
+            {content.education.map((education) => (
+              <div key={education.institution} className="resume-education">
+                <h3>{education.institution}</h3>
+                <p>{education.qualification}</p>
+                {education.notes?.map((note) => <p key={note}>{note}</p>)}
+              </div>
+            ))}
+            {content.educationNote && <p className="resume-education-note">{content.educationNote}</p>}
+          </div>
         </section>
       )}
     </div>

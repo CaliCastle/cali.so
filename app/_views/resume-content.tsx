@@ -1,6 +1,5 @@
 import 'server-only'
 
-import { PixelCluster } from '~/components/pixel-cluster'
 import { ResumePrintButton } from '~/components/resume-controls'
 import { localize, localePath, type Locale } from '~/lib/locale-route'
 import { experience } from '~/lib/personal'
@@ -13,10 +12,9 @@ import { ChineseResumeContent } from './resume-content-zh'
 
 function SectionTitle({ index, children }: { index: string; children: React.ReactNode }) {
   return (
-    <h2 className="section-tag">
-      <span className="section-tag-index" aria-hidden="true">{index}</span>
-      <span className="section-tag-hatch" aria-hidden="true" />
-      <span className="section-tag-label">{children}</span>
+    <h2 className="resume-section-title">
+      <span className="resume-overline" aria-hidden="true">{index}</span>
+      <span>{children}</span>
     </h2>
   )
 }
@@ -28,43 +26,50 @@ export function ResumeContent({ locale }: { locale: Locale }) {
 
   const englishContent = locale === 'en' ? getEnglishResumeContent() : null
   const localizedContent = englishContent
+  const name = localizedContent?.name ?? 'Cali Castle'
+  const names = name.split(/\s*\|\s*/)
   const selectedProjects = projects.filter((project) =>
     ['Cali Baby', 'Zolplay Website', 'Raycast · Apple Developer Docs', 'PopMenu'].includes(project.nameEn),
   )
 
   return (
     <article className="resume-content">
-      <header>
-        <div className="flex items-center justify-between gap-4">
-          <p className="page-eyebrow">{localize(locale, '简历', 'Curriculum vitae')}</p>
-          <PixelCluster variant={5} />
-        </div>
-        <h1 className="resume-name">{localizedContent?.name ?? 'Cali Castle'}</h1>
+      <header className="resume-hero">
+        <p className="resume-document-label">Curriculum vitae</p>
+        <h1 className="resume-name" aria-label={name}>
+          {names.map((part, index) => (
+            <span key={index} className={index ? 'resume-name-alternate' : undefined}>{part}</span>
+          ))}
+        </h1>
         <p className="resume-role">{localizedContent?.title ?? localize(locale, '设计工程师 · 创始人 · 创意总监', 'Design engineer · Founder · Creative director')}</p>
-        <p className="resume-intro">{localizedContent?.summary ?? localize(locale,
-          '我是两个孩子的父亲、设计工程师，也是智能体编排者。我创立了佐玩 Zolplay，一家 AI 原生设计工作室，打造产品、品牌与数字体验。我喜欢把细节做到刚刚好。',
-          'I’m a father of two, a design engineer, and an agent orchestrator. I founded Zolplay, an AI-native design studio creating products, brands, and digital experiences. I love getting the details just right.')}</p>
-        <div className="resume-contact">
-          <a href="mailto:hi@cali.so">hi@cali.so ↗</a>
-          <a href="https://github.com/CaliCastle" rel="noreferrer">GitHub ↗</a>
-          <a href="https://zolplay.com" rel="noreferrer">Zolplay ↗</a>
+        <div className="resume-introduction">
+          <p className="resume-intro">{localizedContent?.summary ?? localize(locale,
+            '我是两个孩子的父亲、设计工程师，也是智能体编排者。我创立了佐玩 Zolplay，一家 AI 原生设计工作室，打造产品、品牌与数字体验。我喜欢把细节做到刚刚好。',
+            'I’m a father of two, a design engineer, and an agent orchestrator. I founded Zolplay, an AI-native design studio creating products, brands, and digital experiences. I love getting the details just right.')}</p>
+          <div className="resume-contact">
+            <a href="mailto:hi@cali.so">hi@cali.so ↗</a>
+            <a href="https://github.com/CaliCastle" rel="noreferrer">GitHub ↗</a>
+            <a href="https://zolplay.com" rel="noreferrer">Zolplay ↗</a>
+          </div>
         </div>
       </header>
 
       {englishContent ? (
         <EnglishResumeSections content={englishContent} />
       ) : (
-        <>
+        <div className="resume-master resume-master-en">
           <section className="resume-section">
             <SectionTitle index="01">{localize(locale, '经历', 'Experience')}</SectionTitle>
-            <ol className="resume-experience">
+            <ol className="resume-career">
               {experience.map((job) => (
-                <li key={job.company} className="resume-entry hairline-top">
-                  <p className="resume-date">{job.from} <span aria-hidden="true">/</span> {job.to ?? localize(locale, '至今', 'Present')}</p>
-                  <div>
-                    <h3>{job.url ? <a href={job.url} rel="noreferrer">{localize(locale, job.company, job.companyEn)} ↗</a> : localize(locale, job.company, job.companyEn)}</h3>
-                    <p className="text-muted-foreground">{localize(locale, job.role, job.roleEn ?? job.role)}</p>
-                  </div>
+                <li key={job.company} className="resume-job">
+                  <header className="resume-job-heading">
+                    <div>
+                      <h3>{job.url ? <a href={job.url} rel="noreferrer">{localize(locale, job.company, job.companyEn)} ↗</a> : localize(locale, job.company, job.companyEn)}</h3>
+                      <p className="resume-job-role">{localize(locale, job.role, job.roleEn ?? job.role)}</p>
+                    </div>
+                    <p className="resume-date">{job.from} <span aria-hidden="true">/</span> {job.to ?? localize(locale, '至今', 'Present')}</p>
+                  </header>
                 </li>
               ))}
             </ol>
@@ -72,19 +77,19 @@ export function ResumeContent({ locale }: { locale: Locale }) {
 
           <section className="resume-section">
             <SectionTitle index="02">{localize(locale, '代表作品', 'Selected work')}</SectionTitle>
-            <ul className="resume-projects">
+            <ul className="resume-section-body">
               {selectedProjects.map((project) => (
-                <li key={project.nameEn} className="resume-project hairline-top">
+                <li key={project.nameEn} className="resume-open-source">
                   <h3><a href={project.url.startsWith('/') ? localePath(locale, project.url) : project.url} rel="noreferrer">{localize(locale, project.name, project.nameEn)} ↗</a></h3>
-                  <p>{localize(locale, project.description, project.descriptionEn ?? project.description)}</p>
+                  <p className="resume-job-description">{localize(locale, project.description, project.descriptionEn ?? project.description)}</p>
                 </li>
               ))}
             </ul>
           </section>
-        </>
+        </div>
       )}
 
-      <footer className="resume-footer hairline-top">
+      <footer className="resume-footer">
         <p>{localize(locale, '感谢你花时间了解我。', 'Thanks for taking a closer look.')}</p>
         <div className="resume-actions">
           <ResumePrintButton locale={locale} />
