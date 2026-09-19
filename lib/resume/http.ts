@@ -79,11 +79,11 @@ export function createResumeHandlers({ baseUrl, credentials, guard }: Dependenci
       }
       if (!credentials) return redirectToResume(baseUrl, form, 'unavailable')
       const passphrase = form.get('passphrase') ?? ''
-      if (passphrase.length > 256 || !matchesPassphrase(passphrase, credentials)) {
+      if (passphrase.length > 256 || !await matchesPassphrase(passphrase, credentials)) {
         return redirectToResume(baseUrl, form, 'incorrect')
       }
       const response = redirectToResume(baseUrl, form)
-      response.cookies.set(RESUME_COOKIE, createResumeSession(credentials), {
+      response.cookies.set(RESUME_COOKIE, await createResumeSession(credentials), {
         ...cookieOptions,
         maxAge: RESUME_SESSION_SECONDS,
       })

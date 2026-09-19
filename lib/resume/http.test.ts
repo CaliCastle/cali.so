@@ -36,7 +36,7 @@ describe('resume HTTP boundary', () => {
     expect(cookie).toContain('Secure')
     expect(cookie).toContain('SameSite=lax')
     expect(cookie).toContain('Max-Age=28800')
-    expect(validResumeSession(cookie.split(';')[0].slice(RESUME_COOKIE.length + 1), credentials)).toBe(true)
+    expect(await validResumeSession(cookie.split(';')[0].slice(RESUME_COOKIE.length + 1), credentials)).toBe(true)
     expect(response.headers.get('cache-control')).toContain('no-store')
     expect(response.headers.get('x-robots-tag')).toContain('noindex')
     expect(response.headers.get('referrer-policy')).toBe('same-origin')

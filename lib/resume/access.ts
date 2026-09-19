@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
+import { createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto'
 
 export const RESUME_COOKIE = 'cali-resume'
 export const RESUME_SESSION_SECONDS = 8 * 60 * 60
@@ -17,25 +17,47 @@ export function resumeCredentials(
   return { passphrase, secret }
 }
 
-export function matchesPassphrase(value: string, credentials: ResumeCredentials) {
-  const digest = (text: string) => createHash('sha256').update(text).digest()
-  return timingSafeEqual(digest(value), digest(credentials.passphrase))
+function deriveKey(passphrase: string, secret: string): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    scrypt(passphrase, secret, 32, { N: 32768, r: 8, p: 1, maxmem: 64 * 1024 * 1024 }, (error, key) => {
+      if (error) reject(error)
+      else resolve(key)
+    })
+  })
 }
 
-function signature(payload: string, credentials: ResumeCredentials) {
-  // Bind sessions to both credentials so rotating either invalidates access.
-  return createHmac('sha256', credentials.secret)
-    .update(JSON.stringify(['resume:v1', credentials.passphrase, payload]))
+// Cache only the configured key, never submitted passphrases. Credential
+// rotation replaces the single entry and invalidates existing sessions.
+let cachedKey: (ResumeCredentials & { key: Promise<Buffer> }) | undefined
+
+function credentialKey(credentials: ResumeCredentials) {
+  if (cachedKey?.passphrase !== credentials.passphrase || cachedKey?.secret !== credentials.secret) {
+    cachedKey = { ...credentials, key: deriveKey(credentials.passphrase, credentials.secret) }
+  }
+  return cachedKey.key
+}
+
+export async function matchesPassphrase(value: string, credentials: ResumeCredentials) {
+  const [supplied, expected] = await Promise.all([
+    deriveKey(value, credentials.secret),
+    credentialKey(credentials),
+  ])
+  return timingSafeEqual(supplied, expected)
+}
+
+async function signature(payload: string, credentials: ResumeCredentials) {
+  return createHmac('sha256', await credentialKey(credentials))
+    .update(JSON.stringify(['resume:v1', payload]))
     .digest('base64url')
 }
 
-export function createResumeSession(credentials: ResumeCredentials, now = Date.now()) {
+export async function createResumeSession(credentials: ResumeCredentials, now = Date.now()) {
   const expires = Math.floor(now / 1000) + RESUME_SESSION_SECONDS
   const payload = `v1.${expires}.${randomBytes(16).toString('hex')}`
-  return `${payload}.${signature(payload, credentials)}`
+  return `${payload}.${await signature(payload, credentials)}`
 }
 
-export function validResumeSession(
+export async function validResumeSession(
   token: string | undefined,
   credentials: ResumeCredentials | null,
   now = Date.now(),
@@ -46,7 +68,7 @@ export function validResumeSession(
   const [, payload, expires, supplied] = match
   const seconds = Math.floor(now / 1000)
   if (Number(expires) <= seconds || Number(expires) > seconds + RESUME_SESSION_SECONDS) return false
-  return timingSafeEqual(Buffer.from(supplied), Buffer.from(signature(payload, credentials)))
+  return timingSafeEqual(Buffer.from(supplied), Buffer.from(await signature(payload, credentials)))
 }
 
 export const resumeHeaders = {

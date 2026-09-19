@@ -26,34 +26,34 @@ describe('private resume access', () => {
     expect(resumeCredentials({ RESUME_PASSPHRASE: credentials.passphrase, RESUME_SESSION_SECRET: credentials.secret })).toEqual(credentials)
   })
 
-  it('requires the exact passphrase, including case and whitespace', () => {
-    expect(matchesPassphrase(credentials.passphrase, credentials)).toBe(true)
-    expect(matchesPassphrase(credentials.passphrase.toUpperCase(), credentials)).toBe(false)
-    expect(matchesPassphrase(` ${credentials.passphrase}`, credentials)).toBe(false)
-    expect(matchesPassphrase('', credentials)).toBe(false)
+  it('requires the exact passphrase, including case and whitespace', async () => {
+    expect(await matchesPassphrase(credentials.passphrase, credentials)).toBe(true)
+    expect(await matchesPassphrase(credentials.passphrase.toUpperCase(), credentials)).toBe(false)
+    expect(await matchesPassphrase(` ${credentials.passphrase}`, credentials)).toBe(false)
+    expect(await matchesPassphrase('', credentials)).toBe(false)
   })
 
-  it('issues unique sessions without embedding credentials', () => {
-    const token = createResumeSession(credentials, now)
-    expect(validResumeSession(token, credentials, now)).toBe(true)
-    expect(createResumeSession(credentials, now)).not.toBe(token)
+  it('issues unique sessions without embedding credentials', async () => {
+    const token = await createResumeSession(credentials, now)
+    expect(await validResumeSession(token, credentials, now)).toBe(true)
+    expect(await createResumeSession(credentials, now)).not.toBe(token)
     expect(token).not.toContain(credentials.passphrase)
     expect(token).not.toContain(credentials.secret)
   })
 
-  it('rejects missing, malformed, forged, and expired sessions', () => {
-    const token = createResumeSession(credentials, now)
+  it('rejects missing, malformed, forged, and expired sessions', async () => {
+    const token = await createResumeSession(credentials, now)
     for (const candidate of [undefined, '', 'true', `${token}.extra`, token.replace('v1', 'v2'), `${token.slice(0, -5)}AAAAA`]) {
-      expect(validResumeSession(candidate, credentials, now)).toBe(false)
+      expect(await validResumeSession(candidate, credentials, now)).toBe(false)
     }
-    expect(validResumeSession(token, credentials, now + RESUME_SESSION_SECONDS * 1000 - 1000)).toBe(true)
-    expect(validResumeSession(token, credentials, now + RESUME_SESSION_SECONDS * 1000)).toBe(false)
-    expect(validResumeSession(token, null, now)).toBe(false)
+    expect(await validResumeSession(token, credentials, now + RESUME_SESSION_SECONDS * 1000 - 1000)).toBe(true)
+    expect(await validResumeSession(token, credentials, now + RESUME_SESSION_SECONDS * 1000)).toBe(false)
+    expect(await validResumeSession(token, null, now)).toBe(false)
   })
 
-  it('invalidates sessions when either credential is rotated', () => {
-    const token = createResumeSession(credentials, now)
-    expect(validResumeSession(token, { ...credentials, passphrase: 'a different long test phrase' }, now)).toBe(false)
-    expect(validResumeSession(token, { ...credentials, secret: 'b'.repeat(64) }, now)).toBe(false)
+  it('invalidates sessions when either credential is rotated', async () => {
+    const token = await createResumeSession(credentials, now)
+    expect(await validResumeSession(token, { ...credentials, passphrase: 'a different long test phrase' }, now)).toBe(false)
+    expect(await validResumeSession(token, { ...credentials, secret: 'b'.repeat(64) }, now)).toBe(false)
   })
 })

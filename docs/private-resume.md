@@ -36,7 +36,9 @@ No new database schema is required. This feature does not change remote settings
 ## Access boundary
 
 The server validates an expiring HMAC-signed cookie before rendering the
-résumé. The passphrase and session secret remain on the server. Protected
+résumé. Passphrase comparisons and session signing use an asynchronous
+scrypt-derived key bound to both credentials. The passphrase and session
+secret remain on the server. Protected
 content is absent from signed-out HTML and React Server Component responses.
 The cookie is HttpOnly, SameSite=Lax, and Secure on HTTPS, with an eight-hour
 expiry. Rotating either credential invalidates existing sessions. Both footers
