@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('private résumé', () => {
   test.skip(Boolean(process.env.PLAYWRIGHT_BASE_URL), 'Uses local credentials only.')
 
-  test('protects HTML and RSC responses, unlocks, prints, and locks again', async ({ page, request }) => {
+  test('protects HTML and RSC responses, unlocks, prints, and rechecks the session', async ({ page, request }) => {
     const protectedCopy = 'very very spaceship'
     for (const path of ['/resume', '/en/resume']) {
       const requestHeaders: Record<string, string>[] = [{}, { RSC: '1' }]
@@ -36,6 +36,7 @@ test.describe('private résumé', () => {
     await expect(page.getByText(protectedCopy)).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Example internal product', exact: true })).toBeVisible()
     await expect(page.getByRole('heading', { name: 'Example university', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Lock résumé' })).toHaveCount(0)
     await page.reload()
     await expect(page.getByText(protectedCopy)).toBeVisible()
     const cookie = (await page.context().cookies()).find((value) => value.name === 'cali-resume')!
@@ -51,17 +52,22 @@ test.describe('private résumé', () => {
     await expect(page.locator('html')).toHaveClass(/resume-swiss/)
     await expect(page.locator('.paper-grain, .column-guides, .section-tag')).toHaveCount(0)
     expect(await page.locator('.resume-page').evaluate((element) => element.getBoundingClientRect().width)).toBe(1120)
+    await expect(page.getByRole('button', { name: '锁定简历' })).toHaveCount(0)
     await page.emulateMedia({ media: 'print' })
     await expect(page.getByRole('navigation')).toBeHidden()
-    await expect(page.getByRole('button', { name: '锁定简历' })).toBeHidden()
+    await expect(page.getByRole('button', { name: '打印 / 存为 PDF', exact: true })).toBeHidden()
     await page.emulateMedia({ media: 'screen' })
-    await page.getByRole('button', { name: '锁定简历' }).click()
+    await page.context().clearCookies()
+    await page.reload()
     await expect(page.getByRole('heading', { name: '很高兴认识你。' })).toBeVisible()
     await expect(page.getByText(protectedCopy)).toHaveCount(0)
     await expect(page.getByText('示例成果')).toHaveCount(0)
     await page.goBack()
+    await expect(page.locator('.resume-gate')).toBeVisible()
     await expect(page.getByText(protectedCopy)).toHaveCount(0)
     await expect(page.getByText('示例成果')).toHaveCount(0)
+    await page.goto('/resume')
+    await expect(page.getByRole('heading', { name: '很高兴认识你。' })).toBeVisible()
     const scripts = await page.locator('script[src]').evaluateAll((elements) => elements.map((element) => element.getAttribute('src')))
     expect(scripts.join(' ')).not.toMatch(/insights|analytics/)
   })
@@ -73,6 +79,7 @@ test.describe('private résumé', () => {
     await page.getByLabel('Passphrase', { exact: true }).fill('local-resume-preview-only')
     await page.getByLabel('Passphrase', { exact: true }).press('Enter')
     await expect(page.getByRole('heading', { name: 'Cali Castle', exact: true })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Lock résumé' })).toHaveCount(0)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
     await page.getByRole('link', { name: '中文', exact: true }).click()
     await expect(page.getByRole('heading', { name: '示例姓名', exact: true })).toBeVisible()
@@ -80,8 +87,8 @@ test.describe('private résumé', () => {
     expect(await page.locator('html').evaluate((element) => getComputedStyle(element).colorScheme)).toBe('dark')
     expect(await page.locator('.resume-career').evaluate((element) => element.getBoundingClientRect().left))
       .toBe(await page.locator('.resume-section-title').first().evaluate((element) => element.getBoundingClientRect().left))
-    await page.getByRole('button', { name: '锁定简历' }).click()
-    await expect(page.getByRole('heading', { name: '很高兴认识你。' })).toBeVisible()
+    await expect(page.getByRole('button', { name: '锁定简历' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: '打印 / 存为 PDF', exact: true })).toBeVisible()
     await context.close()
   })
 })

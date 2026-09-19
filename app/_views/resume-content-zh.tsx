@@ -186,10 +186,6 @@ export function ChineseResumeContent({ content }: { content: ChineseResumeConten
         <p>感谢你花时间了解我。</p>
         <div className="resume-actions">
           <ResumePrintButton locale="zh" />
-          <form action="/api/resume/lock" method="post">
-            <input type="hidden" name="locale" value="zh" />
-            <button type="submit" className="resume-text-control">锁定简历 <span aria-hidden="true">↗</span></button>
-          </form>
         </div>
       </footer>
     </article>

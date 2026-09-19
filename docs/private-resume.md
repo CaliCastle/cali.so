@@ -39,9 +39,9 @@ The server validates an expiring HMAC-signed cookie before rendering the
 résumé. The passphrase and session secret remain on the server. Protected
 content is absent from signed-out HTML and React Server Component responses.
 The cookie is HttpOnly, SameSite=Lax, and Secure on HTTPS, with an eight-hour
-expiry. Rotating either credential invalidates existing sessions. Lock résumé
-clears this browser's cookie. Like any shared-passphrase document, someone
-with access can retain a copy or share their access.
+expiry. Rotating either credential invalidates existing sessions. Both footers
+offer only printing, with no manual lock control. Like any shared-passphrase
+document, someone with access can retain a copy or share their access.
 
 Both POST endpoints check the configured origin and Fetch Metadata. Unlock
 allows five attempts per client in fifteen minutes, using the existing

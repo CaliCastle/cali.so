@@ -88,10 +88,6 @@ export function ResumeContent({ locale }: { locale: Locale }) {
         <p>{localize(locale, '感谢你花时间了解我。', 'Thanks for taking a closer look.')}</p>
         <div className="resume-actions">
           <ResumePrintButton locale={locale} />
-          <form action="/api/resume/lock" method="post">
-            <input type="hidden" name="locale" value={locale} />
-            <button type="submit" className="resume-text-control">{localize(locale, '锁定简历', 'Lock résumé')} <span aria-hidden="true">↗</span></button>
-          </form>
         </div>
       </footer>
     </article>
