@@ -128,6 +128,8 @@ html.resume-swiss {
 .resume-bullets li::marker { color: var(--resume-muted); font-size: 0.65em; }
 .resume-bullets strong { color: var(--resume-ink); font-weight: 500; }
 .resume-job-description { max-width: 46em; margin-top: 16px; text-wrap: pretty; }
+.resume-clients { margin-top: 20px; font-size: 13px; line-height: 1.85; overflow-wrap: anywhere; text-wrap: pretty; }
+.resume-clients strong { color: var(--resume-ink); font-weight: 500; }
 .resume-engagements { margin-top: 48px; }
 .resume-subsection-label { padding-bottom: 16px; border-bottom: 1px solid var(--resume-rule); color: var(--resume-muted); font-size: 12px; }
 .resume-engagement { margin-top: 32px; }
@@ -256,6 +258,7 @@ html.resume-swiss {
   .resume-context-note { margin-top: 8px; font-size: 10px; }
   .resume-engagement .resume-bullets { margin-top: 8px; }
   .resume-job-description { max-width: none; margin-top: 8px; }
+  .resume-clients { margin-top: 10px; font-size: 10px; }
   .resume-open-source + .resume-open-source, .resume-education + .resume-education { margin-top: 12px; padding-top: 12px; }
   .resume-capabilities > div + div { margin-top: 12px; }
   .resume-capabilities dd { max-width: none; margin-top: 4px; }
