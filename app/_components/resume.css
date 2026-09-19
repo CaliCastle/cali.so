@@ -128,7 +128,7 @@ html.resume-swiss {
 .resume-bullets li::marker { color: var(--resume-muted); font-size: 0.65em; }
 .resume-bullets strong { color: var(--resume-ink); font-weight: 500; }
 .resume-job-description { max-width: 46em; margin-top: 16px; text-wrap: pretty; }
-.resume-clients { margin-top: 20px; font-size: 13px; line-height: 1.85; text-wrap: pretty; }
+.resume-clients { margin-top: 20px; font-size: 13px; line-height: 1.85; overflow-wrap: anywhere; text-wrap: pretty; }
 .resume-clients strong { color: var(--resume-ink); font-weight: 500; }
 .resume-engagements { margin-top: 48px; }
 .resume-subsection-label { padding-bottom: 16px; border-bottom: 1px solid var(--resume-rule); color: var(--resume-muted); font-size: 12px; }
