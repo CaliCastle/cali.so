@@ -3,6 +3,7 @@ import {
   getMediaAdminServices,
   ownerRequestAuthenticator,
 } from '~/lib/media/admin/server'
+import { publicContentOnlyNotFound } from '~/lib/public-content-only'
 
 function handler() {
   const { purge, security } = getMediaAdminServices()
@@ -17,6 +18,8 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ mediaAssetId: string }> },
 ) {
+  const unavailable = publicContentOnlyNotFound()
+  if (unavailable) return unavailable
   return handler().GET(request, (await params).mediaAssetId)
 }
 

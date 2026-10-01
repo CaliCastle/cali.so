@@ -27,6 +27,15 @@ function isAdminPage(pathname: string) {
   return pathname === '/admin' || pathname.startsWith('/admin/')
 }
 
+function isPreviewBlocked(pathname: string) {
+  if (process.env.PUBLIC_CONTENT_ONLY !== 'true') return false
+  return (
+    /^\/(?:en\/)?(?:photos|ama|resume)(?:\/|$)/.test(pathname) ||
+    /^\/(?:api\/(?:admin|ama|resume|internal))(?:\/|$)/.test(pathname) ||
+    pathname === '/admin' || pathname.startsWith('/admin/')
+  )
+}
+
 function isUnavailableAmaFixture(pathname: string) {
   return (
     process.env.NODE_ENV !== 'development' &&
@@ -49,7 +58,7 @@ function usesClerk(pathname: string) {
 export function siteProxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (missingPublicContent(pathname) || isUnavailableAmaFixture(pathname)) {
+  if (isPreviewBlocked(pathname) || missingPublicContent(pathname) || isUnavailableAmaFixture(pathname)) {
     const notFoundUrl = request.nextUrl.clone()
     notFoundUrl.pathname = '/_not-found'
     return NextResponse.rewrite(notFoundUrl, { status: 404 })
@@ -64,6 +73,7 @@ const clerkProxy = clerkMiddleware(async (auth, request) => {
 })
 
 export function proxy(request: NextRequest, event: NextFetchEvent) {
+  if (isPreviewBlocked(request.nextUrl.pathname)) return siteProxy(request)
   if (isUnavailableAmaFixture(request.nextUrl.pathname)) {
     return siteProxy(request)
   }
@@ -75,6 +85,15 @@ export const config = {
   matcher: [
     '/admin/:path*',
     '/api/admin/:path*',
+    '/api/ama/:path*',
+    '/api/resume/:path*',
+    '/api/internal/:path*',
+    '/photos/:path*',
+    '/en/photos/:path*',
+    '/ama/:path*',
+    '/en/ama/:path*',
+    '/resume/:path*',
+    '/en/resume/:path*',
     '/blog/:slug',
     '/en/blog/:slug',
     '/newsletters/:id',

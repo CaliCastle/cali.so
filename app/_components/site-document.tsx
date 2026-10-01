@@ -43,6 +43,7 @@ export async function SiteDocument({
   restoreLocale?: boolean
 }>) {
   const english = locale === 'en'
+  const publicContentOnly = process.env.PUBLIC_CONTENT_ONLY === 'true'
   const fontVariables = fontVariablesForLocale(locale)
 
   if (isAdmin || isPrivate) {
@@ -104,10 +105,10 @@ export async function SiteDocument({
                     CSS-named list → loading shell → article groups active. */}
                 <RouteViewTransition>{children}</RouteViewTransition>
               </main>
-              <SiteFooter social={social} github={github} locale={locale} />
+              <SiteFooter social={social} github={github} locale={locale} publicContentOnly={publicContentOnly} />
             </div>
-            <Suspense fallback={<DockFallback locale={locale} />}>
-              <Dock />
+            <Suspense fallback={<DockFallback locale={locale} publicContentOnly={publicContentOnly} />}>
+              <Dock publicContentOnly={publicContentOnly} />
             </Suspense>
           </PreviewCardTimingProvider>
         </ThemeProvider>

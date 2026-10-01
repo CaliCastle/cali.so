@@ -184,8 +184,8 @@ export function HomeIntroduction({ social, github }: { social: SocialSnapshot; g
         <T
           zh={
             <>
-              我是 Cali，两个孩子的爸爸，也是一名
-              <DesignEngineerPhrase>设计工程师</DesignEngineerPhrase>。我也是 Agent 指挥官，热爱把细节做到
+              我是 陈纳兰，一名极简的辩证主义者，也是一名
+              <DesignEngineerPhrase>全栈工程师</DesignEngineerPhrase>。我也是 lastwar 指挥官，热爱把细节做到
               <DetailsPhrase>
                 <span className="home-detail-units">
                   <span className="home-detail-unit">刚</span>

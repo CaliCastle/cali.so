@@ -1,11 +1,14 @@
 import { createHoldStateHandler } from '~/lib/ama/booking/http'
 import { getLocalConfirmationFixture } from '~/lib/ama/booking/local-confirmation-fixtures'
 import { getAmaBookingServices } from '~/lib/ama/booking/server'
+import { publicContentOnlyNotFound } from '~/lib/public-content-only'
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ holdId: string }> },
 ) {
+  const unavailable = publicContentOnlyNotFound()
+  if (unavailable) return unavailable
   const { holdId } = await params
   const fixture = getLocalConfirmationFixture(holdId)
   if (fixture) {

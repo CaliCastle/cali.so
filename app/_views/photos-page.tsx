@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { notFound } from 'next/navigation'
 
 import { PixelCluster } from '~/components/pixel-cluster'
 import {
@@ -9,6 +10,7 @@ import { T } from '~/lib/i18n'
 import { getPublishedPhotoSelection } from '~/lib/media/photo-selection/server'
 
 export function PhotosPageView() {
+  if (process.env.PUBLIC_CONTENT_ONLY === 'true') notFound()
   return (
     <div className="mx-auto w-full max-w-[37.5rem] px-6">
       <div className="flex items-center justify-between gap-4">

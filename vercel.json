@@ -1,16 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "git": {
-    "deploymentEnabled": false
-  },
-  "crons": [
-    {
-      "path": "/api/internal/media/reconcile",
-      "schedule": "0 * * * *"
-    },
-    {
-      "path": "/api/internal/ama/work",
-      "schedule": "*/30 * * * *"
-    }
-  ]
+  "crons": []
 }

@@ -48,10 +48,12 @@ export function SiteFooter({
   social,
   github,
   locale = 'zh',
+  publicContentOnly = false,
 }: {
   social: { x: SocialSnapshot; telegram: SocialSnapshot; youtube: SocialSnapshot }
   github: GitHubSnapshot
   locale?: Locale
+  publicContentOnly?: boolean
 }) {
   return (
     <footer className="mx-auto mt-24 w-full max-w-[37.5rem] px-6 pb-24 text-sm text-muted-foreground sm:pb-12">
@@ -84,21 +86,21 @@ export function SiteFooter({
               <T zh="项目" en="Projects" />
             </Link>
           </li>
-          <li>
+          {!publicContentOnly && <li>
             <Link href={localePath(locale, '/photos')} className="footer-tree-link">
               <T zh="照片" en="Photos" />
             </Link>
-          </li>
+          </li>}
           <li>
             <Link href={localePath(locale, '/blog')} className="footer-tree-link">
               <T zh="写作" en="Writing" />
             </Link>
           </li>
-          <li>
+          {!publicContentOnly && <li>
             <Link href={localePath(locale, '/ama')} className="footer-tree-link">
               <T zh="一对一" en="AMA" />
             </Link>
-          </li>
+          </li>}
           <li>
             <a href="/feed.xml" className="footer-tree-link" data-zh>
               RSS

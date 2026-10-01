@@ -6,6 +6,7 @@ import {
   getMediaAdminServices,
   ownerRequestAuthenticator,
 } from '~/lib/media/admin/server'
+import { publicContentOnlyNotFound } from '~/lib/public-content-only'
 
 export async function POST(request: Request) {
   const { ingestion, security } = getMediaAdminServices()
@@ -17,6 +18,8 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const unavailable = publicContentOnlyNotFound()
+  if (unavailable) return unavailable
   const { security, transfer } = getMediaAdminServices()
   return createMediaTransferListHandler({
     authenticator: ownerRequestAuthenticator,

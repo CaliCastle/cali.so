@@ -171,12 +171,14 @@ export function useDockGoShortcuts({
   activeHref,
   onNavigate,
   ownerAdmin = false,
+  publicContentOnly = false,
 }: {
   locale: Locale
   activeHref: string | undefined
   onNavigate?: (href: string, keyboardInitiated: boolean) => void
   /** Arms G then D → /admin once the owner probe has confirmed the session. */
   ownerAdmin?: boolean
+  publicContentOnly?: boolean
 }) {
   const ownerAdminRef = useRef(ownerAdmin)
   ownerAdminRef.current = ownerAdmin
@@ -186,10 +188,10 @@ export function useDockGoShortcuts({
     activeHref,
     onNavigate,
     resolve(key) {
-      if (ownerAdminRef.current && key === ADMIN_GO_SHORTCUT.key) {
+      if (!publicContentOnly && ownerAdminRef.current && key === ADMIN_GO_SHORTCUT.key) {
         return { href: ADMIN_GO_SHORTCUT.href, localize: false }
       }
-      const href = DOCK_GO_SHORTCUTS[key]
+      const href = publicContentOnly && (key === 'p' || key === 'a') ? undefined : DOCK_GO_SHORTCUTS[key]
       return href ? { href, localize: true } : undefined
     },
   })

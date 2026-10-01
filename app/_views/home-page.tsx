@@ -86,7 +86,7 @@ export async function HomePageView({ locale }: { locale: Locale }) {
         postCount={posts.length}
         projectCount={projects.length}
         locale={locale}
-        photoCard={
+        photoCard={process.env.PUBLIC_CONTENT_ONLY === 'true' ? null :
           <Suspense
             fallback={
               <PhotoNavCard

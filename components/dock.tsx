@@ -123,7 +123,7 @@ export function DockItem({
   )
 }
 
-export function DockFallback({ locale }: { locale: Locale }) {
+export function DockFallback({ locale, publicContentOnly = false }: { locale: Locale; publicContentOnly?: boolean }) {
   return (
     <nav
       className="dock"
@@ -144,7 +144,7 @@ export function DockFallback({ locale }: { locale: Locale }) {
         </span>
       </DockItem>
       <span className="dock-rule" aria-hidden />
-      {ITEMS.map(({ href, zh, en, icon: Icon }) => (
+      {ITEMS.filter(({ href }) => !publicContentOnly || (href !== '/photos' && href !== '/ama')).map(({ href, zh, en, icon: Icon }) => (
         <DockItem
           key={href}
           href={localePath(locale, href)}
@@ -173,11 +173,12 @@ export function DockFallback({ locale }: { locale: Locale }) {
 // The global pill dock, bottom center — the avatar is home, everything
 // else an icon. Circles inside a pill keep the radii concentric by
 // construction.
-export function Dock() {
+export function Dock({ publicContentOnly = false }: { publicContentOnly?: boolean }) {
   const locale = useLocale()
   const pathname = usePathname()
   const routePathname = unlocalizedPathname(pathname)
-  const activeHref = routePathname === '/' ? '/' : ITEMS.find(({ href }) => routePathname.startsWith(href))?.href
+  const visibleItems = ITEMS.filter(({ href }) => !publicContentOnly || (href !== '/photos' && href !== '/ama'))
+  const activeHref = routePathname === '/' ? '/' : visibleItems.find(({ href }) => routePathname.startsWith(href))?.href
   // Owner chrome is invisible until known: the hint remembers a confirmed
   // probe so the Admin row and its chord are armed instantly on later
   // visits; the probe itself runs when the Preferences panel opens.
@@ -190,6 +191,7 @@ export function Dock() {
     activeHref,
     onNavigate: handleNavigate,
     ownerAdmin,
+    publicContentOnly,
   })
 
   useEffect(() => {
@@ -224,7 +226,7 @@ export function Dock() {
         </span>
       </DockItem>
       <span className="dock-rule" aria-hidden />
-      {ITEMS.map(({ href, zh, en, icon: Icon }) => (
+      {visibleItems.map(({ href, zh, en, icon: Icon }) => (
         <DockItem
           key={href}
           href={localePath(locale, href)}

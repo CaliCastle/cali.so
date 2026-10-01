@@ -48,7 +48,9 @@ export function buildLlmsText() {
       ),
     ]
   })
-  const sections = ['blog', 'photos', 'projects', 'ama'] as const
+  const sections = process.env.PUBLIC_CONTENT_ONLY === 'true'
+    ? ['blog', 'projects'] as const
+    : ['blog', 'photos', 'projects', 'ama'] as const
 
   return [
     '# Cali Castle and Cali Baby',

@@ -4,8 +4,11 @@ import {
   ownerRequestAuthenticator,
 } from '~/lib/ama/admin/server'
 import { protectAmaLaunchBoundary } from '~/lib/ama/security/launch-boundary-server'
+import { publicContentOnlyNotFound } from '~/lib/public-content-only'
 
 export async function GET(request: Request) {
+  const unavailable = publicContentOnlyNotFound()
+  if (unavailable) return unavailable
   const blocked = protectAmaLaunchBoundary(request, ['google'])
   if (blocked) return blocked
   const { google, security, baseUrl } = getAmaAdminServices()
