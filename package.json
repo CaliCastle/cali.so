@@ -111,7 +111,7 @@
     "shadcn": "^4.16.2",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.10",
+    "vitest": "^4.1.11",
     "yaml": "^2.9.0"
   }
 }
